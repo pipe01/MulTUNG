@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>dd8039f4-4e5f-4a9f-8e10-08ac8849cfb0</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Common</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Constants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NetState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\DeleteBoardPacket.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\Packet.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\PlaceComponentPacket.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\Utils\PacketBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\Utils\PacketReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\Utils\PacketDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\Utils\PacketType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\PlaceBoardPacket.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\PlayerStatePacket.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\PlayerWelcomePacket.cs" />
+  </ItemGroup>
+</Project>
