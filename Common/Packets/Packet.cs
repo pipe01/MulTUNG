@@ -16,7 +16,7 @@ namespace Common.Packets
                 .WritePacketType(Type)
                 .WriteFloat(Time)
                 .WriteInt32(SenderID)
-                .WriteBytes(SerializeInner())
+                .Write(SerializeInner())
                 .Done();
         }
 

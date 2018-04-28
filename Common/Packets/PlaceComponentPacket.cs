@@ -43,12 +43,7 @@ namespace Common.Packets
             var reader = new PacketReader(data);
 
             var packet = reader.ReadBasePacket<PlaceComponentPacket>();
-
-            using (MemoryStream mem = new MemoryStream(reader.ReadByteArray()))
-            {
-                packet.SavedObject = (SavedObjectV2)BinFormatter.Deserialize(mem);
-            }
-
+            packet.SavedObject = reader.ReadBinaryObject<SavedObjectV2>();
             packet.ParentBoardID = reader.ReadInt32();
             packet.LocalPosition = reader.ReadVector3();
             packet.EulerAngles = reader.ReadVector3();
