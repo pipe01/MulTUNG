@@ -11,30 +11,26 @@ namespace Common.Packets
     public class PacketReader
     {
         private static BinaryFormatter BinFormatter = new BinaryFormatter();
-
-        private byte[] Buffer;
-        private int Position;
+        
+        private MemoryStream Data;
 
         public PacketReader(byte[] data)
         {
-            this.Buffer = data;
+            this.Data = new MemoryStream(data);
         }
 
         private byte[] Read(int count)
         {
             byte[] ret = new byte[count];
 
-            for (int i = 0; i < count; i++)
-            {
-                ret[i] = Buffer[Position++];
-            }
-            
+            this.Data.Read(ret, 0, count);
+
             return ret;
         }
 
         public T ReadBasePacket<T>() where T : Packet, new()
         {
-            Position = 0;
+            Data.Position = 0;
             ReadPacketType();
 
             return new T
