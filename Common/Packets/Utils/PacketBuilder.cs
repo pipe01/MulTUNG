@@ -15,58 +15,34 @@ namespace Common.Packets
 
         public byte[] Done() => Data.ToArray();
 
-        private void Write(byte data)
+        private PacketBuilder Write(byte data)
         {
             Data.Write(new byte[] { data }, 0, 1);
+
+            return this;
         }
 
-        private void Write(byte[] data)
+        public PacketBuilder Write(byte[] data)
         {
             Data.Write(data, 0, data.Length);
-        }
-
-        public PacketBuilder WritePacketType(PacketType d)
-        {
-            Write((byte)d);
-            
-            return this;
-        }
-
-        public PacketBuilder WriteInt32(int d)
-        {
-            Write(BitConverter.GetBytes(d));
 
             return this;
         }
 
-        public PacketBuilder WriteInt64(long d)
-        {
-            Write(BitConverter.GetBytes(d));
+        public PacketBuilder WritePacketType(PacketType d) => Write((byte)d);
 
-            return this;
-        }
+        public PacketBuilder WriteInt32(int d) => Write(BitConverter.GetBytes(d));
 
-        public PacketBuilder WriteFloat(float d)
-        {
-            Write(BitConverter.GetBytes(d));
+        public PacketBuilder WriteInt64(long d) => Write(BitConverter.GetBytes(d));
 
-            return this;
-        }
+        public PacketBuilder WriteFloat(float d) => Write(BitConverter.GetBytes(d));
 
-        public PacketBuilder WriteBool(bool d)
-        {
-            Write(BitConverter.GetBytes(d));
+        public PacketBuilder WriteBool(bool d) => Write(BitConverter.GetBytes(d));
 
-            return this;
-        }
-
-        public PacketBuilder WriteVector3(Vector3 d)
-        {
-            return this
-                .WriteFloat(d.x)
+        public PacketBuilder WriteVector3(Vector3 d) =>
+                 WriteFloat(d.x)
                 .WriteFloat(d.y)
                 .WriteFloat(d.z);
-        }
 
         public PacketBuilder WriteString(string d)
         {
