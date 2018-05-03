@@ -53,7 +53,7 @@ namespace Server
 
         public void Broadcast(Packet packet, params int[] excludeIds)
         {
-            PacketProcessor.Process(packet, 0);
+            Network.Process(packet, 0);
 
             Broadcast(packet.Serialize(), excludeIds);
         }

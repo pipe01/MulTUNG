@@ -8,9 +8,9 @@ using System.Text;
 
 namespace MulTUNG
 {
-    public static class PacketProcessor
+    public static class Network
     {
-        public static void Process(Packet packet, int playerId)
+        public static void ProcessPacket(Packet packet, int playerId)
         {
             if (packet is PlayerWelcomePacket wel)
             {
