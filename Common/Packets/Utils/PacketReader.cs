@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using UnityEngine;
@@ -12,7 +10,7 @@ namespace Common.Packets
     {
         private static BinaryFormatter BinFormatter = new BinaryFormatter();
         
-        private MemoryStream Data;
+        private readonly MemoryStream Data;
 
         public PacketReader(byte[] data)
         {
@@ -64,12 +62,7 @@ namespace Common.Packets
 
         public T ReadBinaryObject<T>()
         {
-            byte[] data = ReadByteArray();
-
-            using (MemoryStream mem = new MemoryStream(data))
-            {
-                return (T)BinFormatter.Deserialize(mem);
-            }
+            return (T)BinFormatter.Deserialize(Data);
         }
     }
 }

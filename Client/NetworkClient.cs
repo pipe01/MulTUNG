@@ -3,6 +3,7 @@ using Common.Packets;
 using PiTung;
 using PiTung.Console;
 using System;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
@@ -14,13 +15,16 @@ namespace Client
     {
         public TcpClient Client { get; private set; }
         public int PlayerID { get; private set; } = -2;
-        public int UpdateInterval { get; set; } = 500;
+        public int UpdateInterval { get; set; } = 25;
 
         private BlockingQueue<Packet> SendQueue = new BlockingQueue<Packet>();
+        private CustomFixedUpdate OriginalFixedUpdate = null;
 
         public void Connect(string host)
         {
             Disconnect();
+
+            PatchCircuitUpdater();
 
             Client = new TcpClient();
 
@@ -78,8 +82,15 @@ namespace Client
             while (Client.Connected)
             {
                 var packet = SendQueue.Dequeue();
-                
-                Client.Client.Send(packet.Serialize());
+
+                try
+                {
+                    Client.Client.Send(packet.Serialize());
+                }
+                catch (Exception ex)
+                {
+                    IGConsole.Log(ex);
+                }
             }
         }
 
@@ -103,49 +114,75 @@ namespace Client
 
         private void HandlePacket(Packet packet)
         {
-            //IGConsole.Log(packet.SenderID + ": " + packet.GetType().Name);
-
             if (packet is PlayerWelcomePacket wel)
             {
                 IGConsole.Log("Your player ID is " + wel.YourID);
 
                 this.PlayerID = wel.YourID;
             }
-            else if (this.PlayerID != -2)
+            if (this.PlayerID == -2 || packet.SenderID == this.PlayerID)
             {
-                if (packet is PlayerStatePacket state)
-                {
+                return;
+            }
+
+            switch (packet)
+            {
+                case PlayerStatePacket state:
                     if (state.PlayerID != this.PlayerID)
+                    {
                         PlayerManager.UpdatePlayer(state);
-                }
-                else if (packet is PlaceBoardPacket board)
-                {
+                    }
+
+                    break;
+                case PlaceBoardPacket board:
                     if (board.AuthorID != this.PlayerID)
+                    {
                         NetUtilitiesComponent.Instance.Enqueue(new PlaceBoardJob(board));
-                }
-                else if (packet is DeleteBoardPacket del)
-                {
+                    }
+
+                    break;
+                case DeleteBoardPacket del:
                     NetUtilitiesComponent.Instance.Enqueue(new DeleteBoardJob(del.BoardID));
-                }
+
+                    break;
+                case PlaceComponentPacket placeComp:
+                    NetUtilitiesComponent.Instance.Enqueue(new PlaceComponentJob(placeComp));
+
+                    break;
+                case DeleteComponentPacket delComp:
+                    NetUtilitiesComponent.Instance.Enqueue(new DeleteComponentJob(delComp.ComponentNetID));
+
+                    break;
+                case CircuitUpdatePacket imnotgonnausethis:
+                    MyFixedUpdate.Instance?.ForceUpdate();
+
+                    break;
             }
         }
 
         public void SendPacket(Packet packet)
         {
             packet.SenderID = this.PlayerID;
+            packet.Time = Time.time;
 
             SendQueue.Enqueue(packet);
         }
 
-        public void UpdatePosition(Transform playerTransform)
+        private void PatchCircuitUpdater(bool restore = false)
         {
-            SendPacket(new PlayerStatePacket
+            var behaviorManager = GameObject.FindObjectOfType<BehaviorManager>();
+            CustomFixedUpdate newUpdater = null;
+
+            if (restore)
             {
-                Time = Time.time,
-                PlayerID = PlayerID,
-                EulerAngles = playerTransform.eulerAngles,
-                Position = playerTransform.position
-            });
+                newUpdater = OriginalFixedUpdate;
+            }
+            else
+            {
+                newUpdater = new MyFixedUpdate(_ => { });
+            }
+
+            ModUtilities.SetFieldValue(behaviorManager, "CircuitLogicUpdate", newUpdater);
         }
     }
 }

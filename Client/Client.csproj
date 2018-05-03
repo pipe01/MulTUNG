@@ -49,9 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlockingQueue.cs" />
-    <Compile Include="BoardManager.cs" />
     <Compile Include="Client.cs" />
-    <Compile Include="NetBoard.cs" />
+    <Compile Include="MyFixedUpdate.cs" />
+    <Compile Include="NetObject.cs" />
     <Compile Include="NetJobs.cs" />
     <Compile Include="NetUtilitiesComponent.cs" />
     <Compile Include="NetworkClient.cs" />

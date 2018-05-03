@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Common.Packets
 {
     public class DeleteBoardPacket : Packet
     {
         public override PacketType Type => PacketType.DeleteBoard;
+        public override bool ShouldBroadcast => true;
 
         public int BoardID { get; set; }
 

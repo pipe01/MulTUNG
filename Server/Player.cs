@@ -1,10 +1,8 @@
 ﻿using Common;
 using Common.Packets;
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Net.Sockets;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
 
 namespace Server
 {
@@ -37,10 +35,14 @@ namespace Server
             {
                 try
                 {
-                    Send(new PlayerStatePacket { Connected = false, PlayerID = this.ID });
+                    NetworkServer.Instance.Broadcast(new PlayerStatePacket
+                    {
+                        Connected = false,
+                        PlayerID = this.ID
+                    }, this.ID);
                 }
                 catch { }
-
+                
                 Client.Close();
 
                 Log.WriteLine($"Player {this.ID} disconnected");
@@ -78,8 +80,11 @@ namespace Server
                 if (packet == null)
                     return;
 
-                Log.WriteLine($"Packet of type {packet.GetType().Name} received from {packet.SenderID}");
-
+                if (!(packet is PlayerStatePacket))
+                {
+                    Log.WriteLine($"Packet of type {packet.GetType().Name} received from {packet.SenderID}");
+                }
+                
                 if (packet.ShouldBroadcast)
                 {
                     NetworkServer.Instance.Broadcast(packet, packet.SenderID);

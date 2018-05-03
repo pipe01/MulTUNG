@@ -11,6 +11,8 @@ namespace Client
         
         private Queue<INetJob> JobQueue = new Queue<INetJob>();
 
+        public INetJob CurrentJob { get; private set; }
+
         public NetUtilitiesComponent()
         {
             if (_Instance != null)
@@ -28,7 +30,11 @@ namespace Client
         {
             while (JobQueue.Count > 0)
             {
-                JobQueue.Dequeue().Do();
+                CurrentJob = JobQueue.Dequeue();
+
+                CurrentJob.Do();
+
+                CurrentJob = null;
             }
         }
     }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-namespace Common.Packets
+﻿namespace Common.Packets
 {
     public class PlayerWelcomePacket : Packet
     {

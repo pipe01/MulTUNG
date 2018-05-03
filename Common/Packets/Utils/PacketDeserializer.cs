@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Common.Packets
 {
@@ -13,6 +12,8 @@ namespace Common.Packets
             [PacketType.PlaceBoard] = PlaceBoardPacket.Deserialize,
             [PacketType.DeleteBoard] = DeleteBoardPacket.Deserialize,
             [PacketType.PlaceComponent] = PlaceComponentPacket.Deserialize,
+            [PacketType.DeleteComponent] = DeleteComponentPacket.Deserialize,
+            [PacketType.CircuitUpdate] = _ => new CircuitUpdatePacket(),
         };
 
         public static Packet DeserializePacket(byte[] data)

@@ -2,12 +2,11 @@
 using Common.Packets;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Server
@@ -17,6 +16,19 @@ namespace Server
         private static BinaryFormatter BinFormatter = new BinaryFormatter();
         public static NetworkServer Instance { get; private set; }
 
+        private int _CircuitUpdateRate;
+        public int CircuitUpdateRate
+        {
+            get => _CircuitUpdateRate;
+            set
+            {
+                _CircuitUpdateRate = value;
+
+                CircuitUpdateTime = TimeSpan.FromMilliseconds(1000f / value);
+            }
+        }
+
+        private TimeSpan CircuitUpdateTime;
         private int PlayerIdCounter = 123;
         private TcpListener Listener;
         private IList<Player> Players = new List<Player>();
@@ -24,12 +36,15 @@ namespace Server
         public NetworkServer()
         {
             Instance = this;
+            CircuitUpdateRate = 100;
         }
 
         public void Start()
         {
             Listener = new TcpListener(IPAddress.Any, Constants.Port);
             Listener.Start();
+
+            StartCircuitUpdateClock();
 
             BeginAcceptTcpClient();
         }
@@ -55,6 +70,19 @@ namespace Server
                     o.Disconnect();
                 }
             });
+        }
+
+        private void StartCircuitUpdateClock()
+        {
+            new Thread(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(CircuitUpdateTime);
+                    
+                    Broadcast(new CircuitUpdatePacket());
+                }
+            }).Start();
         }
 
         private void BeginAcceptTcpClient()

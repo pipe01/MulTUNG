@@ -1,5 +1,6 @@
 ﻿using Common.Packets;
 using References;
+using System.Linq;
 using UnityEngine;
 
 namespace Client
@@ -20,11 +21,12 @@ namespace Client
 
         public void Do()
         {
-            GameObject gameObject = Object.Instantiate(Prefabs.CircuitBoard, Packet.Position, Quaternion.Euler(Packet.EulerAngles));
+            GameObject parentBoard = NetObject.GetByNetId(Packet.ParentBoardID);
+
+            GameObject gameObject = Object.Instantiate(Prefabs.CircuitBoard, Packet.Position, Quaternion.Euler(Packet.EulerAngles), parentBoard?.transform);
 
             gameObject.AddComponent<ObjectInfo>().ComponentType = ComponentType.CircuitBoard;
-            gameObject.AddComponent<NetBoard>().BoardID = Packet.BoardID;
-            gameObject.tag = "NetBoard" + Packet.BoardID;
+            gameObject.AddComponent<NetObject>().NetID = Packet.BoardID;
 
             CircuitBoard component = gameObject.GetComponent<CircuitBoard>();
             component.x = Packet.Width;
@@ -46,10 +48,43 @@ namespace Client
 
         public void Do()
         {
-            var obj = GameObject.FindGameObjectWithTag("NetBoard" + BoardID);
+            var board = NetObject.GetByNetId(BoardID);
+            
+            if (board != null)
+                StuffDeleter.DeleteThing(board.gameObject);
+        }
+    }
 
-            if (!obj)
-                return;
+    public struct PlaceComponentJob : INetJob
+    {
+        private PlaceComponentPacket Packet;
+
+        public PlaceComponentJob(PlaceComponentPacket packet)
+        {
+            this.Packet = packet;
+        }
+
+        public void Do()
+        {
+            var parentBoard = NetObject.GetByNetId(Packet.ParentBoardID);
+
+            var component = SavedObjectUtilities.LoadSavedObject(Packet.SavedObject, parentBoard?.transform);
+            component.AddComponent<NetObject>().NetID = Packet.NetID;
+        }
+    }
+
+    public struct DeleteComponentJob : INetJob
+    {
+        private int NetID;
+
+        public DeleteComponentJob(int id)
+        {
+            this.NetID = id;
+        }
+
+        public void Do()
+        {
+            var obj = NetObject.GetByNetId(NetID);
 
             GameObject.Destroy(obj);
         }

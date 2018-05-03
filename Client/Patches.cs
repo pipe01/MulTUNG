@@ -1,10 +1,7 @@
 ﻿using Common.Packets;
 using PiTung;
 using PiTung.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using SavedObjects;
 using UnityEngine;
 
 namespace Client
@@ -20,21 +17,24 @@ namespace Client
             if (StuffPlacer.OkayToPlace)
             {
                 var boardComp = BoardPlacer.BoardBeingPlaced.GetComponent<CircuitBoard>();
-                int id = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+                int id = Random.Range(int.MinValue, int.MaxValue);
 
-                if (boardComp.GetComponent<NetBoard>() == null)
-                    boardComp.gameObject.AddComponent<NetBoard>().BoardID = id;
+                if (boardComp.GetComponent<NetObject>() == null)
+                    boardComp.gameObject.AddComponent<NetObject>().NetID = id;
+
+                var parent = BoardPlacer.ReferenceObject.transform.parent;
 
                 var packet = new PlaceBoardPacket
                 {
                     AuthorID = Client.NetClient.PlayerID,
                     BoardID = id,
+                    ParentBoardID = parent?.GetComponent<NetObject>()?.NetID ?? 0,
                     Width = boardComp.x,
                     Height = boardComp.z,
                     Position = boardComp.transform.position,
                     EulerAngles = boardComp.transform.eulerAngles
                 };
-
+                
                 Client.NetClient.SendPacket(packet);
             }
         }
@@ -44,12 +44,12 @@ namespace Client
         {
             if (IsTryingToMoveBoard)
             {
-                var net = NewBoard.GetComponent<NetBoard>();
+                var net = NewBoard.GetComponent<NetObject>();
 
                 if (net != null)
                 {
-                    IGConsole.Log("Send delete board with id " + net.BoardID);
-                    Client.NetClient.SendPacket(new DeleteBoardPacket { BoardID = net.BoardID });
+                    IGConsole.Log("Send delete board with id " + net.NetID);
+                    Client.NetClient.SendPacket(new DeleteBoardPacket { BoardID = net.NetID });
                 }
             }
         }
@@ -71,6 +71,87 @@ namespace Client
         public static void ExecuteSelectedActionPostfix()
         {
             BoardPlacerPatch.IsTryingToMoveBoard = false;
+        }
+    }
+
+    [Target(typeof(StuffPlacer))]
+    internal static class StuffPlacerPatch
+    {
+        [PatchMethod]
+        public static void PlaceThingBeingPlaced(ref GameObject __state)
+        {
+            __state = StuffPlacer.GetThingBeingPlaced;
+        }
+
+        [PatchMethod(OriginalMethod = "PlaceThingBeingPlaced", PatchType = PatchType.Postfix)]
+        public static void PlaceThingBeingPlacedPostfix(ref GameObject __state)
+        {
+            var objInfo = __state.GetComponent<ObjectInfo>();
+
+            if (objInfo != null && objInfo.ComponentType != ComponentType.CircuitBoard)
+            {
+                var netObj = __state.AddComponent<NetObject>();
+                netObj.NetID = Random.Range(int.MinValue, int.MaxValue);
+
+                Client.NetClient.SendPacket(new PlaceComponentPacket
+                {
+                    NetID = netObj.NetID,
+                    SavedObject = SavedObjectUtilities.CreateSavedObjectFrom(objInfo),
+                    LocalPosition = __state.transform.localPosition,
+                    EulerAngles = __state.transform.localEulerAngles,
+                    ParentBoardID = __state.transform.parent?.gameObject.GetComponent<NetObject>()?.NetID ?? 0
+                });
+            }
+        }
+    }
+
+    [Target(typeof(StuffDeleter))]
+    internal static class StuffDeleterPatch
+    {
+        [PatchMethod]
+        public static void DeleteThing(GameObject DestroyThis, ref bool __state)
+        {
+            __state = DestroyThis?.tag == "CircuitBoard";
+        }
+
+        [PatchMethod(OriginalMethod = "DeleteThing", PatchType = PatchType.Postfix)]
+        public static void DeleteThingPostfix(GameObject DestroyThis)
+        {
+            if (DestroyThis == null)
+                return;
+            
+            var netObj = DestroyThis.GetComponent<NetObject>();
+
+            if (netObj == null)
+                return;
+            
+            if (DestroyThis.tag == "CircuitBoard")
+            {
+                if (!(NetUtilitiesComponent.Instance.CurrentJob is DeleteBoardJob))
+                {
+                    Client.NetClient.SendPacket(new DeleteBoardPacket
+                    {
+                        BoardID = netObj.NetID
+                    });
+                }
+            }
+            else //if (DestroyThis.GetComponent<ObjectInfo>()?.ComponentType != ComponentType.CircuitBoard)
+            {
+                Client.NetClient.SendPacket(new DeleteComponentPacket
+                {
+                    ComponentNetID = netObj.NetID
+                });
+            }
+        }
+    }
+
+    [Target(typeof(BehaviorManager))]
+    internal static class BehaviorManagerPatch
+    {
+        [PatchMethod]
+        public static void Awake()
+        {
+            MyFixedUpdate.NextInstanceIsNice = true;
         }
     }
 }

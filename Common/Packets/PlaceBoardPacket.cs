@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Common.Packets
 {
@@ -11,6 +8,7 @@ namespace Common.Packets
         public override bool ShouldBroadcast => true;
 
         public int BoardID { get; set; }
+        public int ParentBoardID { get; set; }
         public int AuthorID { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
@@ -21,6 +19,7 @@ namespace Common.Packets
         {
             return new PacketBuilder()
                 .WriteInt32(BoardID)
+                .WriteInt32(ParentBoardID)
                 .WriteInt32(AuthorID)
                 .WriteInt32(Width)
                 .WriteInt32(Height)
@@ -35,6 +34,7 @@ namespace Common.Packets
 
             var packet = reader.ReadBasePacket<PlaceBoardPacket>();
             packet.BoardID = reader.ReadInt32();
+            packet.ParentBoardID = reader.ReadInt32();
             packet.AuthorID = reader.ReadInt32();
             packet.Width = reader.ReadInt32();
             packet.Height = reader.ReadInt32();

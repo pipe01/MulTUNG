@@ -11,7 +11,9 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Constants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NetState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\CircuitUpdatePacket.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Packets\DeleteBoardPacket.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\DeleteComponentPacket.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Packets\Packet.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Packets\PlaceComponentPacket.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Packets\Utils\PacketBuilder.cs" />

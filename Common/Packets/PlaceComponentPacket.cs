@@ -1,19 +1,16 @@
 ﻿using SavedObjects;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using UnityEngine;
 
 namespace Common.Packets
 {
     public class PlaceComponentPacket : Packet
     {
-        private static BinaryFormatter BinFormatter = new BinaryFormatter();
-
         public override PacketType Type => PacketType.PlaceComponent;
+        public override bool ShouldBroadcast => true;
 
+        public int NetID { get; set; }
         public SavedObjectV2 SavedObject { get; set; }
         public Vector3 LocalPosition { get; set; }
         public Vector3 EulerAngles { get; set; }
@@ -21,17 +18,9 @@ namespace Common.Packets
 
         protected override byte[] SerializeInner()
         {
-            byte[] objData;
-
-            using (MemoryStream mem = new MemoryStream())
-            {
-                BinFormatter.Serialize(mem, SavedObject);
-
-                objData = mem.ToArray();
-            }
-
             return new PacketBuilder()
-                .WriteByteArray(objData)
+                .WriteInt32(NetID)
+                .WriteBinaryObject(SavedObject)
                 .WriteInt32(ParentBoardID)
                 .WriteVector3(LocalPosition)
                 .WriteVector3(EulerAngles)
@@ -43,6 +32,7 @@ namespace Common.Packets
             var reader = new PacketReader(data);
 
             var packet = reader.ReadBasePacket<PlaceComponentPacket>();
+            packet.NetID = reader.ReadInt32();
             packet.SavedObject = reader.ReadBinaryObject<SavedObjectV2>();
             packet.ParentBoardID = reader.ReadInt32();
             packet.LocalPosition = reader.ReadVector3();

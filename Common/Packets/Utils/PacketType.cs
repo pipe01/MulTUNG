@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Common.Packets
+﻿namespace Common.Packets
 {
     public enum PacketType
     {
@@ -12,6 +8,7 @@ namespace Common.Packets
         PlaceBoard,
         DeleteBoard,
         PlaceComponent,
-        DeleteComponent
+        DeleteComponent,
+        CircuitUpdate
     }
 }

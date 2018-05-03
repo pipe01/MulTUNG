@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -13,7 +12,13 @@ namespace Common.Packets
 
         private MemoryStream Data = new MemoryStream();
 
-        public byte[] Done() => Data.ToArray();
+        public byte[] Done()
+        {
+            var data = Data.ToArray();
+            Data.Dispose();
+
+            return data;
+        }
 
         private PacketBuilder Write(byte data)
         {

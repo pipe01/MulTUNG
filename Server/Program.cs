@@ -1,9 +1,7 @@
-﻿using Common.Packets;
+﻿using Common;
+using Common.Packets;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
+using System.Net;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -14,13 +12,21 @@ namespace Server
         static void Main(string[] args) => new Program().Run(args);
 
         private NetworkServer Server = new NetworkServer();
+        private bool Exit = false;
 
         public void Run(string[] args)
         {
             Server.Start();
-            Console.WriteLine("Listening. Press the ENTER key to enter commands");
+            Console.WriteLine($"Listening on port {Constants.Port}. Press ENTER to enter commands");
+
+            Task.Run(() =>
+            {
+                string ip = new WebClient().DownloadString("http://api.ipify.org/");
+
+                Console.WriteLine("Your public IP address is " + ip);
+            });
             
-            while (true)
+            while (!Exit)
             {
                 var key = Console.ReadKey(true);
 
@@ -41,6 +47,8 @@ namespace Server
                     Log.FlushQueue();
                 }
             }
+
+            Console.WriteLine("Bye!");
         }
 
         private void ParseCommand(string cmd)
@@ -55,10 +63,30 @@ namespace Server
                     Height = 5,
                     Position = new Vector3(0, 0.5f, 0),
                     SenderID = -1,
-                    Time = 10
+                    Time = 10,
+                    BoardID = 0xB00B5
                 });
 
                 Console.WriteLine("Done!");
+            }
+            else if (cmd == "board del")
+            {
+                Console.WriteLine("Broadcasting test delete board packet.");
+
+                Server.Broadcast(new DeleteBoardPacket
+                {
+                    BoardID = 0xB00B5
+                });
+
+                Console.WriteLine("Done!");
+            }
+            else if (cmd == "quit" || cmd == "exit" || cmd == "stop")
+            {
+                Exit = true;
+            }
+            else if (cmd == "update" || cmd == "u")
+            {
+                
             }
         }
     }
