@@ -1,5 +1,5 @@
-﻿using Client.Packeting;
-using Client.Packeting.Packets;
+﻿using MulTUNG.Packeting;
+using MulTUNG.Packeting.Packets;
 using System;
 using System.Net.Sockets;
 using System.Threading;

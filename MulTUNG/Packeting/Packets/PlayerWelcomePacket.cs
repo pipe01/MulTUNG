@@ -1,4 +1,4 @@
-﻿namespace Client.Packeting.Packets
+﻿namespace MulTUNG.Packeting.Packets
 {
     public class PlayerWelcomePacket : Packet
     {

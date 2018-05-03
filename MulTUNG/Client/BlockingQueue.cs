@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 
-namespace Client
+namespace MulTUNG
 {
     internal class BlockingQueue<T> : IEnumerable<T>
     {

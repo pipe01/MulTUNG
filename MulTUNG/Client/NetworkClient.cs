@@ -1,5 +1,5 @@
-﻿using Client.Packeting;
-using Client.Packeting.Packets;
+﻿using MulTUNG.Packeting;
+using MulTUNG.Packeting.Packets;
 using PiTung;
 using PiTung.Console;
 using System;
@@ -10,7 +10,7 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Client
+namespace MulTUNG
 {
     internal class NetworkClient
     {
@@ -59,6 +59,12 @@ namespace Client
                 EverythingHider.HideEverything();
                 SceneManager.LoadScene("main menu");
             }
+        }
+
+        public void SetID(int id)
+        {
+            if (this.PlayerID == -2)
+                this.PlayerID = id;
         }
 
         private void UpdatePlayerStateLoop()
@@ -112,57 +118,9 @@ namespace Client
             var state = ar.AsyncState as NetState;
             
             var packet = PacketDeserializer.DeserializePacket(state.Buffer);
-            HandlePacket(packet);
+            PacketProcessor.Process(packet);
         }
-
-        private void HandlePacket(Packet packet)
-        {
-            if (packet is PlayerWelcomePacket wel)
-            {
-                IGConsole.Log("Your player ID is " + wel.YourID);
-
-                this.PlayerID = wel.YourID;
-            }
-            if (this.PlayerID == -2 || packet.SenderID == this.PlayerID)
-            {
-                return;
-            }
-
-            switch (packet)
-            {
-                case PlayerStatePacket state:
-                    if (state.PlayerID != this.PlayerID)
-                    {
-                        PlayerManager.UpdatePlayer(state);
-                    }
-
-                    break;
-                case PlaceBoardPacket board:
-                    if (board.AuthorID != this.PlayerID)
-                    {
-                        NetUtilitiesComponent.Instance.Enqueue(new PlaceBoardJob(board));
-                    }
-
-                    break;
-                case DeleteBoardPacket del:
-                    NetUtilitiesComponent.Instance.Enqueue(new DeleteBoardJob(del.BoardID));
-
-                    break;
-                case PlaceComponentPacket placeComp:
-                    NetUtilitiesComponent.Instance.Enqueue(new PlaceComponentJob(placeComp));
-
-                    break;
-                case DeleteComponentPacket delComp:
-                    NetUtilitiesComponent.Instance.Enqueue(new DeleteComponentJob(delComp.ComponentNetID));
-
-                    break;
-                case CircuitUpdatePacket imnotgonnausethis:
-                    MyFixedUpdate.Instance?.ForceUpdate();
-
-                    break;
-            }
-        }
-
+        
         public void SendPacket(Packet packet)
         {
             packet.SenderID = this.PlayerID;

@@ -1,4 +1,4 @@
-﻿namespace Client.Packeting
+﻿namespace MulTUNG.Packeting
 {
     public static class Constants
     {

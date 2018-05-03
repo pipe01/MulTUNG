@@ -1,9 +1,9 @@
-﻿using Client.Packeting.Packets;
+﻿using MulTUNG.Packeting.Packets;
 using References;
 using System.Linq;
 using UnityEngine;
 
-namespace Client
+namespace MulTUNG
 {
     public interface INetJob
     {

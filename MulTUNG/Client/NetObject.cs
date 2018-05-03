@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using UnityEngine;
 
-namespace Client
+namespace MulTUNG
 {
     public class NetObject : MonoBehaviour
     {

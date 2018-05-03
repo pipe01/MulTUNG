@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 
-namespace Client
+namespace MulTUNG
 {
     public class MyFixedUpdate : CustomFixedUpdate
     {

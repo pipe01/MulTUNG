@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Client
+namespace MulTUNG
 {
     public class NetUtilitiesComponent : MonoBehaviour
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Client.Packeting.Packets
+namespace MulTUNG.Packeting.Packets
 {
     public class DeleteComponentPacket : Packet
     {

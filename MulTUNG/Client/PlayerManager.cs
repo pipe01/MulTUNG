@@ -1,8 +1,8 @@
-﻿using Client.Packeting.Packets;
+﻿using MulTUNG.Packeting.Packets;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Client
+namespace MulTUNG
 {
     public static class PlayerManager
     {

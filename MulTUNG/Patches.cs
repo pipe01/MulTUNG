@@ -1,10 +1,10 @@
-﻿using Client.Packeting.Packets;
+﻿using MulTUNG.Packeting.Packets;
 using PiTung;
 using PiTung.Console;
 using SavedObjects;
 using UnityEngine;
 
-namespace Client
+namespace MulTUNG
 {
     [Target(typeof(BoardPlacer))]
     internal static class BoardPlacerPatch

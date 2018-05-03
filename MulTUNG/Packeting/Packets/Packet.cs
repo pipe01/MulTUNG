@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Client.Packeting.Packets
+namespace MulTUNG.Packeting.Packets
 {
     [Serializable]
     public abstract class Packet

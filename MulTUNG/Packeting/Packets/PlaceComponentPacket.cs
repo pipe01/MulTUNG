@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-namespace Client.Packeting.Packets
+namespace MulTUNG.Packeting.Packets
 {
     public class PlaceComponentPacket : Packet
     {

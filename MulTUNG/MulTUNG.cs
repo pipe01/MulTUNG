@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Client
+namespace MulTUNG
 {
     public class MulTUNG : Mod
     {
@@ -73,12 +73,6 @@ namespace Client
         {
             new NetworkServer().Start();
             
-            ThreadPool.QueueUserWorkItem(o =>
-            {
-                Thread.Sleep(400);
-                MulTUNG.NetClient.Connect("127.0.0.1");
-            });
-
             return true;
         }
     }

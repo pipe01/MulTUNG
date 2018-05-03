@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Client.Packeting.Packets
+namespace MulTUNG.Packeting.Packets
 {
     public static class PacketDeserializer
     {
