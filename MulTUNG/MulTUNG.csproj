@@ -58,7 +58,8 @@
     <Compile Include="Client\BlockingQueue.cs" />
     <Compile Include="MulTUNG.cs" />
     <Compile Include="Client\MyFixedUpdate.cs" />
-    <Compile Include="Client\NetObject.cs" />
+    <Compile Include="NetIOComponent.cs" />
+    <Compile Include="NetObject.cs" />
     <Compile Include="Client\NetJobs.cs" />
     <Compile Include="NetUtilitiesComponent.cs" />
     <Compile Include="Client\NetworkClient.cs" />
