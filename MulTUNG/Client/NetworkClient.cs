@@ -46,7 +46,7 @@ namespace MulTUNG
                 {
                     BeginReceive();
 
-                    Network.StartPositionUpdateThread(UpdateInterval);
+                    Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
 
                     StartSending();
                 }
