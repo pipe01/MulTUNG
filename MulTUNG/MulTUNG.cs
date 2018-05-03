@@ -16,8 +16,10 @@ namespace Client
 
         public override void BeforePatch()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             IGConsole.RegisterCommand<Command_connect>(this);
             IGConsole.RegisterCommand<Command_disconnect>(this);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         public override void Update()
