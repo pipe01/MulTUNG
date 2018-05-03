@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Common.Packets
+namespace Client.Packeting.Packets
 {
     public class PlayerStatePacket : Packet
     {

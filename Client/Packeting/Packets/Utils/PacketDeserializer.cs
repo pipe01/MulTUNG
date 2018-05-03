@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Common.Packets
+namespace Client.Packeting.Packets
 {
     public static class PacketDeserializer
     {

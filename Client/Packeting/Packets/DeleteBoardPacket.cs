@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Common.Packets
+namespace Client.Packeting.Packets
 {
     public class DeleteBoardPacket : Packet
     {

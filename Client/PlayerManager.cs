@@ -1,4 +1,4 @@
-﻿using Common.Packets;
+﻿using Client.Packeting.Packets;
 using System.Collections.Generic;
 using UnityEngine;
 

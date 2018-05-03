@@ -4,7 +4,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using UnityEngine;
 
-namespace Common.Packets
+namespace Client.Packeting.Packets
 {
     public class PacketReader
     {

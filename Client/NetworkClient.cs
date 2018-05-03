@@ -1,5 +1,5 @@
-﻿using Common;
-using Common.Packets;
+﻿using Client.Packeting;
+using Client.Packeting.Packets;
 using PiTung;
 using PiTung.Console;
 using System;

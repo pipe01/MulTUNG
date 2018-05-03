@@ -1,4 +1,4 @@
-﻿namespace Common.Packets
+﻿namespace Client.Packeting.Packets
 {
     public enum PacketType
     {

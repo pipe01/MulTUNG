@@ -8,20 +8,4 @@
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>Common</Import_RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Constants.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)NetState.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packets\CircuitUpdatePacket.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packets\DeleteBoardPacket.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packets\DeleteComponentPacket.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packets\Packet.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packets\PlaceComponentPacket.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packets\Utils\PacketBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packets\Utils\PacketReader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packets\Utils\PacketDeserializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packets\Utils\PacketType.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packets\PlaceBoardPacket.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packets\PlayerStatePacket.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Packets\PlayerWelcomePacket.cs" />
-  </ItemGroup>
 </Project>

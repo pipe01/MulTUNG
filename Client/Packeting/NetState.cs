@@ -1,4 +1,4 @@
-﻿namespace Common
+﻿namespace Client.Packeting
 {
     public class NetState
     {
