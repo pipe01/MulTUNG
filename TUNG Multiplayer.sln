@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MulTUNG", "Client\MulTUNG.csproj", "{AD3DE8E4-164B-4379-90F2-4DFBDC284449}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MulTUNG", "MulTUNG\MulTUNG.csproj", "{AD3DE8E4-164B-4379-90F2-4DFBDC284449}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
