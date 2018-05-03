@@ -55,13 +55,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BlockingQueue.cs" />
-    <Compile Include="Client.cs" />
-    <Compile Include="MyFixedUpdate.cs" />
-    <Compile Include="NetObject.cs" />
-    <Compile Include="NetJobs.cs" />
+    <Compile Include="Client\BlockingQueue.cs" />
+    <Compile Include="MulTUNG.cs" />
+    <Compile Include="Client\MyFixedUpdate.cs" />
+    <Compile Include="Client\NetObject.cs" />
+    <Compile Include="Client\NetJobs.cs" />
     <Compile Include="NetUtilitiesComponent.cs" />
-    <Compile Include="NetworkClient.cs" />
+    <Compile Include="Client\NetworkClient.cs" />
     <Compile Include="Packeting\Constants.cs" />
     <Compile Include="Packeting\NetState.cs" />
     <Compile Include="Packeting\Packets\CircuitUpdatePacket.cs" />
@@ -77,8 +77,12 @@
     <Compile Include="Packeting\Packets\Utils\PacketReader.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketType.cs" />
     <Compile Include="Patches.cs" />
-    <Compile Include="PlayerManager.cs" />
+    <Compile Include="Client\PlayerManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Server\Log.cs" />
+    <Compile Include="Server\NetworkServer.cs" />
+    <Compile Include="Server\Player.cs" />
+    <Compile Include="Server\World.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
