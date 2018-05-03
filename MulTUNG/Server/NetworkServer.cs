@@ -44,10 +44,12 @@ namespace Server
         {
             Listener = new TcpListener(IPAddress.Any, Constants.Port);
             Listener.Start();
-
+            
             StartCircuitUpdateClock();
 
             BeginAcceptTcpClient();
+
+            Log.WriteLine("Listening on port " + Constants.Port);
         }
 
         public void Broadcast(Packet packet, params int[] excludeIds)

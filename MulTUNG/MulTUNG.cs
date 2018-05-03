@@ -72,6 +72,7 @@ namespace Client
         public override bool Execute(IEnumerable<string> arguments)
         {
             new NetworkServer().Start();
+            MulTUNG.NetClient.Connect(NetworkServer.Instance.LocalEndPoint);
 
             return true;
         }
