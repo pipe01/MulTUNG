@@ -50,7 +50,7 @@ namespace Server
 
             BeginAcceptTcpClient();
 
-            Network.StartPositionUpdateThread();
+            Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
 
             Log.WriteLine("Listening on port " + Constants.Port);
         }
