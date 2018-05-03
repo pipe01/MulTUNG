@@ -1,5 +1,6 @@
 ﻿using PiTung;
 using PiTung.Console;
+using Server;
 using System;
 using System.Collections.Generic;
 
@@ -69,7 +70,7 @@ namespace Client
 
         public override bool Execute(IEnumerable<string> arguments)
         {
-
+            new NetworkServer().Start();
 
             return true;
         }
