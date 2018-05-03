@@ -118,7 +118,7 @@ namespace MulTUNG
             var state = ar.AsyncState as NetState;
             
             var packet = PacketDeserializer.DeserializePacket(state.Buffer);
-            PacketProcessor.Process(packet);
+            PacketProcessor.Process(packet, this.PlayerID);
         }
         
         public void SendPacket(Packet packet)

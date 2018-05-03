@@ -76,6 +76,7 @@
     <Compile Include="Packeting\Packets\Utils\PacketDeserializer.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketReader.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketType.cs" />
+    <Compile Include="PacketProcessor.cs" />
     <Compile Include="Patches.cs" />
     <Compile Include="Client\PlayerManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
