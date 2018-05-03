@@ -1,15 +1,21 @@
 ﻿using MulTUNG;
 using MulTUNG.Packeting.Packets;
+using PiTung;
 using PiTung.Console;
+using Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using UnityEngine;
 
 namespace MulTUNG
 {
     public static class Network
     {
+        public static bool Connected => (NetworkClient.Instance?.Connected ?? false) || (NetworkServer.Instance?.Running ?? false);
+
         public static void ProcessPacket(Packet packet, int playerId)
         {
             if (packet is PlayerWelcomePacket wel)
@@ -56,6 +62,30 @@ namespace MulTUNG
 
                     break;
             }
+        }
+
+        public static void StartPositionUpdateThread(int updateInterval)
+        {
+            new Thread(() =>
+            {
+                while (NetworkClient.Instance?.Connected ?? false)
+                {
+                    Thread.Sleep(updateInterval);
+
+                    if (ModUtilities.IsOnMainMenu)
+                        continue;
+
+                    var packet = new PlayerStatePacket
+                    {
+                        PlayerID = NetworkClient.Instance?.PlayerID ?? 0,
+                        Time = Time.time,
+                        Position = FirstPersonInteraction.FirstPersonCamera.transform.position,
+                        EulerAngles = FirstPersonInteraction.FirstPersonCamera.transform.eulerAngles
+                    };
+
+                    NetworkClient.Instance.SendPacket(packet);
+                }
+            }).Start();
         }
     }
 }

@@ -26,6 +26,8 @@ namespace Server
             }
         }
 
+        public bool Running => Listener != null;
+
         public IPEndPoint LocalEndPoint => Listener?.LocalEndpoint as IPEndPoint;
 
         private TimeSpan CircuitUpdateTime;
@@ -53,7 +55,7 @@ namespace Server
 
         public void Broadcast(Packet packet, params int[] excludeIds)
         {
-            Network.Process(packet, 0);
+            Network.ProcessPacket(packet, 0);
 
             Broadcast(packet.Serialize(), excludeIds);
         }

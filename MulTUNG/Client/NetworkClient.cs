@@ -14,12 +14,20 @@ namespace MulTUNG
 {
     internal class NetworkClient
     {
+        public static NetworkClient Instance { get; private set; }
+
         public TcpClient Client { get; private set; }
         public int PlayerID { get; private set; } = -2;
         public int UpdateInterval { get; set; } = 25;
+        public bool Connected => Client?.Connected ?? false;
 
         private BlockingQueue<Packet> SendQueue = new BlockingQueue<Packet>();
         private CustomFixedUpdate OriginalFixedUpdate = null;
+
+        public NetworkClient()
+        {
+            Instance = this;
+        }
 
         public void Connect(IPEndPoint endPoint)
         {
@@ -39,7 +47,7 @@ namespace MulTUNG
                 {
                     BeginReceive();
 
-                    new Thread(UpdatePlayerStateLoop).Start();
+                    Network.StartPositionUpdateThread(UpdateInterval);
 
                     StartSending();
                 }
@@ -66,26 +74,7 @@ namespace MulTUNG
             if (this.PlayerID == -2)
                 this.PlayerID = id;
         }
-
-        private void UpdatePlayerStateLoop()
-        {
-            while (Client.Connected)
-            {
-                Thread.Sleep(UpdateInterval);
-
-                if (ModUtilities.IsOnMainMenu)
-                    continue;
-                
-                SendPacket(new PlayerStatePacket
-                {
-                    PlayerID = this.PlayerID,
-                    Time = Time.time,
-                    Position = FirstPersonInteraction.FirstPersonCamera.transform.position,
-                    EulerAngles = FirstPersonInteraction.FirstPersonCamera.transform.eulerAngles
-                });
-            }
-        }
-
+        
         private void StartSending()
         {
             while (Client.Connected)
@@ -118,7 +107,7 @@ namespace MulTUNG
             var state = ar.AsyncState as NetState;
             
             var packet = PacketDeserializer.DeserializePacket(state.Buffer);
-            Network.Process(packet, this.PlayerID);
+            Network.ProcessPacket(packet, this.PlayerID);
         }
         
         public void SendPacket(Packet packet)
