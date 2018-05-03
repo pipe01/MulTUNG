@@ -3,6 +3,8 @@ using PiTung.Console;
 using Server;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace Client
 {
@@ -56,9 +58,7 @@ namespace Client
 
         public override bool Execute(IEnumerable<string> arguments)
         {
-            //string host = arguments.First();
-
-            MulTUNG.NetClient.Connect("localhost");
+            MulTUNG.NetClient.Connect(arguments.FirstOrDefault() ?? "127.0.0.1");
 
             return true;
         }
@@ -72,7 +72,12 @@ namespace Client
         public override bool Execute(IEnumerable<string> arguments)
         {
             new NetworkServer().Start();
-            MulTUNG.NetClient.Connect(NetworkServer.Instance.LocalEndPoint);
+            
+            ThreadPool.QueueUserWorkItem(o =>
+            {
+                Thread.Sleep(400);
+                MulTUNG.NetClient.Connect("127.0.0.1");
+            });
 
             return true;
         }
