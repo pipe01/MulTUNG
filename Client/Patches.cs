@@ -26,7 +26,7 @@ namespace Client
 
                 var packet = new PlaceBoardPacket
                 {
-                    AuthorID = Client.NetClient.PlayerID,
+                    AuthorID = MulTUNG.NetClient.PlayerID,
                     BoardID = id,
                     ParentBoardID = parent?.GetComponent<NetObject>()?.NetID ?? 0,
                     Width = boardComp.x,
@@ -35,7 +35,7 @@ namespace Client
                     EulerAngles = boardComp.transform.eulerAngles
                 };
                 
-                Client.NetClient.SendPacket(packet);
+                MulTUNG.NetClient.SendPacket(packet);
             }
         }
 
@@ -49,7 +49,7 @@ namespace Client
                 if (net != null)
                 {
                     IGConsole.Log("Send delete board with id " + net.NetID);
-                    Client.NetClient.SendPacket(new DeleteBoardPacket { BoardID = net.NetID });
+                    MulTUNG.NetClient.SendPacket(new DeleteBoardPacket { BoardID = net.NetID });
                 }
             }
         }
@@ -93,7 +93,7 @@ namespace Client
                 var netObj = __state.AddComponent<NetObject>();
                 netObj.NetID = Random.Range(int.MinValue, int.MaxValue);
 
-                Client.NetClient.SendPacket(new PlaceComponentPacket
+                MulTUNG.NetClient.SendPacket(new PlaceComponentPacket
                 {
                     NetID = netObj.NetID,
                     SavedObject = SavedObjectUtilities.CreateSavedObjectFrom(objInfo),
@@ -129,7 +129,7 @@ namespace Client
             {
                 if (!(NetUtilitiesComponent.Instance.CurrentJob is DeleteBoardJob))
                 {
-                    Client.NetClient.SendPacket(new DeleteBoardPacket
+                    MulTUNG.NetClient.SendPacket(new DeleteBoardPacket
                     {
                         BoardID = netObj.NetID
                     });
@@ -137,7 +137,7 @@ namespace Client
             }
             else //if (DestroyThis.GetComponent<ObjectInfo>()?.ComponentType != ComponentType.CircuitBoard)
             {
-                Client.NetClient.SendPacket(new DeleteComponentPacket
+                MulTUNG.NetClient.SendPacket(new DeleteComponentPacket
                 {
                     ComponentNetID = netObj.NetID
                 });

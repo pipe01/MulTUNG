@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Client
 {
-    public class Client : Mod
+    public class MulTUNG : Mod
     {
         public override string Name => "MulTUNG";
         public override string PackageName => "me.pipe01.MulTUNG";
@@ -39,7 +39,7 @@ namespace Client
 
         public override bool Execute(IEnumerable<string> arguments)
         {
-            Client.NetClient.Disconnect();
+            MulTUNG.NetClient.Disconnect();
 
             return true;
         }
@@ -54,7 +54,7 @@ namespace Client
         {
             //string host = arguments.First();
 
-            Client.NetClient.Connect("localhost");
+            MulTUNG.NetClient.Connect("localhost");
 
             return true;
         }
