@@ -61,4 +61,17 @@ namespace Client
             return true;
         }
     }
+
+    public class Command_host : Command
+    {
+        public override string Name => "host";
+        public override string Usage => Name;
+
+        public override bool Execute(IEnumerable<string> arguments)
+        {
+
+
+            return true;
+        }
+    }
 }
