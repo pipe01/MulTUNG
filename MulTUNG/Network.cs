@@ -87,12 +87,17 @@ namespace MulTUNG
                         EulerAngles = FirstPersonInteraction.FirstPersonCamera.transform.eulerAngles
                     };
 
-                    if (IsClient)
-                        NetworkClient.Instance.SendPacket(packet);
-                    else if (IsServer)
-                        NetworkServer.Instance.Broadcast(packet, ServerPlayerID);
+                    SendPacket(packet);
                 }
             }).Start();
+        }
+
+        public static void SendPacket(Packet packet)
+        {
+            if (IsClient)
+                NetworkClient.Instance.SendPacket(packet);
+            else if (IsServer)
+                NetworkServer.Instance.Broadcast(packet, ServerPlayerID);
         }
     }
 }
