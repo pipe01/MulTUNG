@@ -1,18 +1,17 @@
-﻿using MulTUNG.Packeting;
+﻿using MulTUNG;
+using MulTUNG.Packeting;
 using MulTUNG.Packeting.Packets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 
 namespace Server
 {
     internal class NetworkServer
     {
-        private static BinaryFormatter BinFormatter = new BinaryFormatter();
         public static NetworkServer Instance { get; private set; }
 
         private int _CircuitUpdateRate;
@@ -54,6 +53,8 @@ namespace Server
 
         public void Broadcast(Packet packet, params int[] excludeIds)
         {
+            PacketProcessor.Process(packet, 0);
+
             Broadcast(packet.Serialize(), excludeIds);
         }
 
