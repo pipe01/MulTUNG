@@ -4,6 +4,7 @@ using PiTung;
 using PiTung.Console;
 using System;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
@@ -20,7 +21,7 @@ namespace Client
         private BlockingQueue<Packet> SendQueue = new BlockingQueue<Packet>();
         private CustomFixedUpdate OriginalFixedUpdate = null;
 
-        public void Connect(string host)
+        public void Connect(IPEndPoint endPoint)
         {
             Disconnect();
 
@@ -32,7 +33,7 @@ namespace Client
 
             new Thread(() =>
             {
-                Client.Connect(host, Constants.Port);
+                Client.Connect(endPoint);
 
                 if (Client.Connected)
                 {
@@ -44,6 +45,8 @@ namespace Client
                 }
             }).Start();
         }
+
+        public void Connect(string host) => Connect(new IPEndPoint(IPAddress.Parse(host), Constants.Port));
 
         public void Disconnect()
         {

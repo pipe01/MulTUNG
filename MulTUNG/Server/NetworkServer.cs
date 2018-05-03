@@ -27,6 +27,8 @@ namespace Server
             }
         }
 
+        public IPEndPoint LocalEndPoint => Listener?.LocalEndpoint as IPEndPoint;
+
         private TimeSpan CircuitUpdateTime;
         private int PlayerIdCounter = 123;
         private TcpListener Listener;
