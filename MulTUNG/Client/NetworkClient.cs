@@ -18,7 +18,6 @@ namespace MulTUNG
 
         public TcpClient Client { get; private set; }
         public int PlayerID { get; private set; } = -2;
-        public int UpdateInterval { get; set; } = 25;
         public bool Connected => Client?.Connected ?? false;
 
         private BlockingQueue<Packet> SendQueue = new BlockingQueue<Packet>();

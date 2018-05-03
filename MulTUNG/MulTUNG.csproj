@@ -62,7 +62,7 @@
     <Compile Include="Client\NetJobs.cs" />
     <Compile Include="NetUtilitiesComponent.cs" />
     <Compile Include="Client\NetworkClient.cs" />
-    <Compile Include="Packeting\Constants.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Packeting\NetState.cs" />
     <Compile Include="Packeting\Packets\CircuitUpdatePacket.cs" />
     <Compile Include="Packeting\Packets\DeleteBoardPacket.cs" />

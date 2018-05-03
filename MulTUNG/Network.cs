@@ -14,7 +14,11 @@ namespace MulTUNG
 {
     public static class Network
     {
-        public static bool Connected => (NetworkClient.Instance?.Connected ?? false) || (NetworkServer.Instance?.Running ?? false);
+        public static bool Connected => IsClient || IsServer;
+        public static bool IsClient => NetworkClient.Instance?.Connected ?? false;
+        public static bool IsServer => NetworkServer.Instance?.Running ?? false;
+
+        public const int ServerPlayerID = 1;
 
         public static void ProcessPacket(Packet packet, int playerId)
         {
@@ -68,7 +72,7 @@ namespace MulTUNG
         {
             new Thread(() =>
             {
-                while (NetworkClient.Instance?.Connected ?? false)
+                while (Connected)
                 {
                     Thread.Sleep(updateInterval);
 
@@ -77,13 +81,16 @@ namespace MulTUNG
 
                     var packet = new PlayerStatePacket
                     {
-                        PlayerID = NetworkClient.Instance?.PlayerID ?? 0,
+                        PlayerID = NetworkClient.Instance?.PlayerID ?? ServerPlayerID,
                         Time = Time.time,
                         Position = FirstPersonInteraction.FirstPersonCamera.transform.position,
                         EulerAngles = FirstPersonInteraction.FirstPersonCamera.transform.eulerAngles
                     };
 
-                    NetworkClient.Instance.SendPacket(packet);
+                    if (IsClient)
+                        NetworkClient.Instance.SendPacket(packet);
+                    else if (IsServer)
+                        NetworkServer.Instance.Broadcast(packet, ServerPlayerID);
                 }
             }).Start();
         }
