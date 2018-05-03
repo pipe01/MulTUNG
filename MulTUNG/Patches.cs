@@ -35,7 +35,7 @@ namespace MulTUNG
                     EulerAngles = boardComp.transform.eulerAngles
                 };
                 
-                MulTUNG.NetClient.SendPacket(packet);
+                Network.SendPacket(packet);
             }
         }
 
@@ -49,7 +49,7 @@ namespace MulTUNG
                 if (net != null)
                 {
                     IGConsole.Log("Send delete board with id " + net.NetID);
-                    MulTUNG.NetClient.SendPacket(new DeleteBoardPacket { BoardID = net.NetID });
+                    Network.SendPacket(new DeleteBoardPacket { BoardID = net.NetID });
                 }
             }
         }
@@ -93,7 +93,7 @@ namespace MulTUNG
                 var netObj = __state.AddComponent<NetObject>();
                 netObj.NetID = Random.Range(int.MinValue, int.MaxValue);
 
-                MulTUNG.NetClient.SendPacket(new PlaceComponentPacket
+                Network.SendPacket(new PlaceComponentPacket
                 {
                     NetID = netObj.NetID,
                     SavedObject = SavedObjectUtilities.CreateSavedObjectFrom(objInfo),
@@ -129,7 +129,7 @@ namespace MulTUNG
             {
                 if (!(NetUtilitiesComponent.Instance.CurrentJob is DeleteBoardJob))
                 {
-                    MulTUNG.NetClient.SendPacket(new DeleteBoardPacket
+                    Network.SendPacket(new DeleteBoardPacket
                     {
                         BoardID = netObj.NetID
                     });
@@ -137,7 +137,7 @@ namespace MulTUNG
             }
             else //if (DestroyThis.GetComponent<ObjectInfo>()?.ComponentType != ComponentType.CircuitBoard)
             {
-                MulTUNG.NetClient.SendPacket(new DeleteComponentPacket
+                Network.SendPacket(new DeleteComponentPacket
                 {
                     ComponentNetID = netObj.NetID
                 });
