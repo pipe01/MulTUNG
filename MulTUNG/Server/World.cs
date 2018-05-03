@@ -16,7 +16,7 @@ namespace Server
 
         public static World LoadFromFolder(string folderPath)
         {
-            string regionPath = Path.Combine(folderPath, "regions", "world.tung");
+            string regionPath = Path.Combine(folderPath, $"regions{Path.DirectorySeparatorChar}world.tung");
 
             BinaryFormatter bin = new BinaryFormatter();
             List<SavedObjectV2> objs;
