@@ -20,6 +20,7 @@ namespace Client
 #pragma warning disable CS0618 // Type or member is obsolete
             IGConsole.RegisterCommand<Command_connect>(this);
             IGConsole.RegisterCommand<Command_disconnect>(this);
+            IGConsole.RegisterCommand<Command_host>(this);
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
