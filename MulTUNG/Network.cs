@@ -32,21 +32,17 @@ namespace MulTUNG
             {
                 return;
             }
-
+            
             switch (packet)
             {
                 case PlayerStatePacket state:
                     if (state.PlayerID != playerId)
-                    {
                         PlayerManager.UpdatePlayer(state);
-                    }
 
                     break;
                 case PlaceBoardPacket board:
                     if (board.AuthorID != playerId)
-                    {
                         NetUtilitiesComponent.Instance.Enqueue(new PlaceBoardJob(board));
-                    }
 
                     break;
                 case DeleteBoardPacket del:
@@ -58,11 +54,23 @@ namespace MulTUNG
 
                     break;
                 case DeleteComponentPacket delComp:
-                    NetUtilitiesComponent.Instance.Enqueue(new DeleteComponentJob(delComp.ComponentNetID));
+                    NetUtilitiesComponent.Instance.Enqueue(new DeleteComponentJob(delComp));
 
                     break;
                 case CircuitUpdatePacket imnotgonnausethis:
-                    MyFixedUpdate.Instance?.ForceUpdate();
+                    //MyFixedUpdate.Instance?.ForceUpdate();
+
+                    break;
+                case PlaceWirePacket placeWire:
+                    NetUtilitiesComponent.Instance.Enqueue(new PlaceWireJob(placeWire));
+                    
+                    break;
+                case DeleteWirePacket deleteWire:
+                    NetUtilitiesComponent.Instance.Enqueue(new DeleteWireJob(deleteWire));
+
+                    break;
+                case RotateComponentPacket rotateComp:
+                    NetUtilitiesComponent.Instance.Enqueue(new RotateComponentJob(rotateComp));
 
                     break;
             }
@@ -94,6 +102,11 @@ namespace MulTUNG
 
         public static void SendPacket(Packet packet)
         {
+#if DEBUG
+            if (!(packet is PlayerStatePacket))
+                IGConsole.Log("Send packet of type " + packet.GetType().Name);
+#endif
+
             if (IsClient)
                 NetworkClient.Instance.SendPacket(packet);
             else if (IsServer)

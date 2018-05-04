@@ -1,4 +1,5 @@
-﻿using MulTUNG.Packeting.Packets;
+﻿using Harmony;
+using MulTUNG.Packeting.Packets;
 using PiTung;
 using PiTung.Console;
 using SavedObjects;
@@ -135,7 +136,7 @@ namespace MulTUNG
                     });
                 }
             }
-            else //if (DestroyThis.GetComponent<ObjectInfo>()?.ComponentType != ComponentType.CircuitBoard)
+            else
             {
                 Network.SendPacket(new DeleteComponentPacket
                 {
@@ -145,13 +146,96 @@ namespace MulTUNG
         }
     }
 
+    [HarmonyPatch(typeof(StuffDeleter), "DestroyWire", new[] { typeof(GameObject) })]
+    internal static class StuffDeleterDestroyWirePatch
+    {
+        static void Prefix(GameObject wire)
+        {
+            var netObj = wire.GetComponent<NetObject>();
+
+            if (netObj != null)
+            {
+                Network.SendPacket(new DeleteWirePacket
+                {
+                    WireNetID = netObj.NetID
+                });
+            }
+        }
+    }
+
     [Target(typeof(BehaviorManager))]
     internal static class BehaviorManagerPatch
     {
         [PatchMethod]
-        public static void Awake()
+        public static bool OnCircuitLogicUpdate()
         {
-            MyFixedUpdate.NextInstanceIsNice = true;
+            return true;//!Network.IsClient;
+        }
+    }
+
+    [Target(typeof(WirePlacer))]
+    internal static class WirePlacerPatch
+    {
+        [PatchMethod]
+        public static void ConnectionFinal()
+        {
+            if (WirePlacer.CurrentWirePlacementIsValid())
+            {
+                var wireBeingPlaced = ModUtilities.GetStaticFieldValue<GameObject>(typeof(WirePlacer), "WireBeingPlaced");
+                var wire = wireBeingPlaced.GetComponent<Wire>();
+
+                var netObj = wireBeingPlaced.AddComponent<NetObject>();
+                netObj.NetID = Random.Range(int.MinValue, int.MaxValue);
+
+                var netObj1 = wire.Point1.parent.parent.gameObject.GetComponent<NetObject>();
+                var netObj2 = wire.Point2.parent.parent.gameObject.GetComponent<NetObject>();
+
+                if (netObj1 == null || netObj2 == null)
+                    return;
+                
+                int ioIndex1 = netObj1.IO.IndexOf(wire.Point1.parent.gameObject);
+                int ioIndex2 = netObj2.IO.IndexOf(wire.Point2.parent.gameObject);
+
+                if (ioIndex1 == -1 || ioIndex2 == -1)
+                    return;
+
+                Network.SendPacket(new PlaceWirePacket
+                {
+                    NetObj1Id = netObj1.NetID,
+                    NetObj2Id = netObj2.NetID,
+                    Point1Id = ioIndex1,
+                    Point2Id = ioIndex2,
+                    NetID = netObj.NetID
+                });
+            }
+        }
+    }
+
+    [Target(typeof(StuffRotater))]
+    internal static class StuffRotaterPatch
+    {
+        [PatchMethod]
+        public static void RotateThing(GameObject RotateThis, ref Vector3 __state)
+        {
+            __state = RotateThis.transform.localEulerAngles;
+        }
+
+        [PatchMethod(OriginalMethod = "RotateThing", PatchType = PatchType.Postfix)]
+        public static void RotateThingPostfix(GameObject RotateThis, ref Vector3 __state)
+        {
+            if (RotateThis.transform.localEulerAngles != __state && RotateThis.tag != "Wire")
+            {
+                var netObj = RotateThis.GetComponent<NetObject>();
+
+                if (netObj != null)
+                {
+                    Network.SendPacket(new RotateComponentPacket
+                    {
+                        ComponentID = netObj.NetID,
+                        EulerAngles = RotateThis.transform.localEulerAngles
+                    });
+                }
+            }
         }
     }
 }

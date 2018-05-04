@@ -9,6 +9,9 @@
         DeleteBoard,
         PlaceComponent,
         DeleteComponent,
-        CircuitUpdate
+        CircuitUpdate,
+        PlaceWire,
+        DeleteWire,
+        RotateComponent
     }
 }

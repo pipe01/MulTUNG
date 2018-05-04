@@ -1,5 +1,9 @@
-﻿using System;
+﻿using PiTung.Console;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace MulTUNG.Packeting.Packets
 {
@@ -14,6 +18,9 @@ namespace MulTUNG.Packeting.Packets
             [PacketType.PlaceComponent] = PlaceComponentPacket.Deserialize,
             [PacketType.DeleteComponent] = DeleteComponentPacket.Deserialize,
             [PacketType.CircuitUpdate] = _ => new CircuitUpdatePacket(),
+            [PacketType.PlaceWire] = PlaceWirePacket.Deserialize,
+            [PacketType.DeleteWire] = DeleteWirePacket.Deserialize,
+            [PacketType.RotateComponent] = RotateComponentPacket.Deserialize,
         };
 
         public static Packet DeserializePacket(byte[] data)

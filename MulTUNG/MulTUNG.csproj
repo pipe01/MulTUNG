@@ -38,6 +38,10 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\TUNG Console\PiTung Bootstrap\lib\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\TUNG Console\PiTung Bootstrap\lib\Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -50,17 +54,17 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\TUNG Console\PiTung Bootstrap\lib\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client\BlockingQueue.cs" />
     <Compile Include="MulTUNG.cs" />
-    <Compile Include="Client\MyFixedUpdate.cs" />
-    <Compile Include="NetIOComponent.cs" />
     <Compile Include="NetObject.cs" />
-    <Compile Include="Client\NetJobs.cs" />
+    <Compile Include="NetJobs.cs" />
     <Compile Include="NetUtilitiesComponent.cs" />
     <Compile Include="Client\NetworkClient.cs" />
     <Compile Include="Constants.cs" />
@@ -68,11 +72,14 @@
     <Compile Include="Packeting\Packets\CircuitUpdatePacket.cs" />
     <Compile Include="Packeting\Packets\DeleteBoardPacket.cs" />
     <Compile Include="Packeting\Packets\DeleteComponentPacket.cs" />
+    <Compile Include="Packeting\Packets\DeleteWirePacket.cs" />
     <Compile Include="Packeting\Packets\Packet.cs" />
     <Compile Include="Packeting\Packets\PlaceBoardPacket.cs" />
     <Compile Include="Packeting\Packets\PlaceComponentPacket.cs" />
+    <Compile Include="Packeting\Packets\PlaceWirePacket.cs" />
     <Compile Include="Packeting\Packets\PlayerStatePacket.cs" />
     <Compile Include="Packeting\Packets\PlayerWelcomePacket.cs" />
+    <Compile Include="Packeting\Packets\RotateComponentPacket.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketBuilder.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketDeserializer.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketReader.cs" />

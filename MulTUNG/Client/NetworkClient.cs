@@ -21,7 +21,6 @@ namespace MulTUNG
         public bool Connected => Client?.Connected ?? false;
 
         private BlockingQueue<Packet> SendQueue = new BlockingQueue<Packet>();
-        private CustomFixedUpdate OriginalFixedUpdate = null;
 
         public NetworkClient()
         {
@@ -31,9 +30,7 @@ namespace MulTUNG
         public void Connect(IPEndPoint endPoint)
         {
             Disconnect();
-
-            PatchCircuitUpdater();
-
+            
             Client = new TcpClient();
 
             IGConsole.Log("Connecting...");
@@ -115,23 +112,6 @@ namespace MulTUNG
             packet.Time = Time.time;
 
             SendQueue.Enqueue(packet);
-        }
-
-        private void PatchCircuitUpdater(bool restore = false)
-        {
-            var behaviorManager = GameObject.FindObjectOfType<BehaviorManager>();
-            CustomFixedUpdate newUpdater = null;
-
-            if (restore)
-            {
-                newUpdater = OriginalFixedUpdate;
-            }
-            else
-            {
-                newUpdater = new MyFixedUpdate(_ => { });
-            }
-
-            ModUtilities.SetFieldValue(behaviorManager, "CircuitLogicUpdate", newUpdater);
         }
     }
 }
