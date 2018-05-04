@@ -5,6 +5,7 @@
         Unknown,
         PlayerWelcome,
         PlayerState,
+        PlayerDisconnect,
         PlaceBoard,
         DeleteBoard,
         PlaceComponent,

@@ -7,7 +7,6 @@ namespace MulTUNG.Packeting.Packets
         public int PlayerID { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 EulerAngles { get; set; }
-        public bool Connected { get; set; } = true;
 
         public override bool ShouldBroadcast => true;
         public override PacketType Type => PacketType.PlayerState;
@@ -16,7 +15,6 @@ namespace MulTUNG.Packeting.Packets
         {
             return new PacketBuilder()
                 .WriteInt32(PlayerID)
-                .WriteBool(Connected)
                 .WriteVector3(Position)
                 .WriteVector3(EulerAngles)
                 .Done();
@@ -28,7 +26,6 @@ namespace MulTUNG.Packeting.Packets
 
             var packet = reader.ReadBasePacket<PlayerStatePacket>();
             packet.PlayerID = reader.ReadInt32();
-            packet.Connected = reader.ReadBool();
             packet.Position = reader.ReadVector3();
             packet.EulerAngles = reader.ReadVector3();
 

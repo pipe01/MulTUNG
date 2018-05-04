@@ -77,6 +77,7 @@
     <Compile Include="Packeting\Packets\PlaceBoardPacket.cs" />
     <Compile Include="Packeting\Packets\PlaceComponentPacket.cs" />
     <Compile Include="Packeting\Packets\PlaceWirePacket.cs" />
+    <Compile Include="Packeting\Packets\PlayerDisconnectPacket.cs" />
     <Compile Include="Packeting\Packets\PlayerStatePacket.cs" />
     <Compile Include="Packeting\Packets\PlayerWelcomePacket.cs" />
     <Compile Include="Packeting\Packets\RotateComponentPacket.cs" />

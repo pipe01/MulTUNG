@@ -13,6 +13,7 @@ namespace MulTUNG.Packeting.Packets
         {
             [PacketType.PlayerWelcome] = PlayerWelcomePacket.Deserialize,
             [PacketType.PlayerState] = PlayerStatePacket.Deserialize,
+            [PacketType.PlayerDisconnect] = PlayerDisconnectPacket.Deserialize,
             [PacketType.PlaceBoard] = PlaceBoardPacket.Deserialize,
             [PacketType.DeleteBoard] = DeleteBoardPacket.Deserialize,
             [PacketType.PlaceComponent] = PlaceComponentPacket.Deserialize,
