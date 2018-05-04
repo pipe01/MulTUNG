@@ -56,6 +56,7 @@ namespace MulTUNG
         {
             if (Client?.Client != null && Client.Connected)
             {
+                Network.SendPacket(new PlayerDisconnectPacket { PlayerID = this.PlayerID });
                 this.PlayerID = -2;
 
                 Client.Close();
