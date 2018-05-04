@@ -37,21 +37,22 @@ namespace MulTUNG
             }
 
             var player = Players[packet.PlayerID];
-
-            if (!packet.Connected)
-            {
-                GameObject.Destroy(player.Object);
-
-                Players.Remove(packet.PlayerID);
-
-                return;
-            }
             
             if (packet.Time < player.LastUpdateTime)
                 return;
 
             player.Object.transform.position = packet.Position;
             player.Object.transform.eulerAngles = packet.EulerAngles;
+        }
+
+        public static void WaveGoodbye(int playerId)
+        {
+            if (Players.TryGetValue(playerId, out var player))
+            {
+                GameObject.Destroy(player.Object);
+
+                Players.Remove(playerId);
+            }
         }
 
         private static GameObject MakePlayerModel()

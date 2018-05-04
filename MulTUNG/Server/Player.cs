@@ -35,9 +35,8 @@ namespace Server
             {
                 try
                 {
-                    NetworkServer.Instance.Broadcast(new PlayerStatePacket
+                    NetworkServer.Instance.Broadcast(new PlayerDisconnectPacket
                     {
-                        Connected = false,
                         PlayerID = this.ID
                     }, this.ID);
                 }

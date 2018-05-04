@@ -40,6 +40,10 @@ namespace MulTUNG
                         PlayerManager.UpdatePlayer(state);
 
                     break;
+                case PlayerDisconnectPacket disconnect:
+                    PlayerManager.WaveGoodbye(disconnect.PlayerID);
+
+                    break;
                 case PlaceBoardPacket board:
                     if (board.AuthorID != playerId)
                         NetUtilitiesComponent.Instance.Enqueue(new PlaceBoardJob(board));
