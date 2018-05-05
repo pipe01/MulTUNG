@@ -21,6 +21,13 @@ namespace MulTUNG
             }
         }
 
+        void Awake()
+        {
+            PlayerManager.BuildPlayerPrefab();
+
+            GameObject.Instantiate(PlayerManager.PlayerModelPrefab, new Vector3(181.5f, 27.0f, -143.1f), Quaternion.identity);
+        }
+
         public void Enqueue(INetJob job)
         {
             JobQueue.Enqueue(job);

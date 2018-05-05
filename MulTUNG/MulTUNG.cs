@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using UnityEngine;
 
 namespace MulTUNG
 {
@@ -31,6 +32,15 @@ namespace MulTUNG
         {
             if (ModUtilities.DummyComponent.gameObject.GetComponent<NetUtilitiesComponent>() == null)
                 ModUtilities.DummyComponent.gameObject.AddComponent<NetUtilitiesComponent>();
+
+            if (Input.GetKeyDown(KeyCode.U))
+                IGConsole.Log(FirstPersonInteraction.FirstPersonCamera.transform.position);
+        }
+
+        public override void OnGUI()
+        {
+            if (!ModUtilities.IsOnMainMenu)
+                ModUtilities.Graphics.DrawText(Time.time.ToString("0.00"), new Vector2(3, 3), Color.white, true);
         }
 
         public override void OnApplicationQuit()
@@ -73,7 +83,17 @@ namespace MulTUNG
         public override bool Execute(IEnumerable<string> arguments)
         {
             new NetworkServer().Start();
-            
+
+            ModUtilities.Graphics.CreateSphere(new Vector3(0, 0, 0), 2);
+
+            var obj = GameObject.Instantiate(PlayerManager.PlayerModelPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            obj.SetActive(true);
+
+            var collider = obj.AddComponent<MeshCollider>();
+            collider.sharedMesh = new ObjImporter().ImportFile(Properties.Resources.patrick);
+            collider.tag = "World";
+            obj.layer = LayerMask.NameToLayer("World");
+
             return true;
         }
     }

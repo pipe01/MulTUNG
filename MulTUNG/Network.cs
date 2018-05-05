@@ -100,6 +100,8 @@ namespace MulTUNG
                     };
 
                     SendPacket(packet);
+                    
+                    ModUtilities.Graphics.DrawText("Update", new Vector2(3, 10), Color.magenta, true);
                 }
             }).Start();
         }

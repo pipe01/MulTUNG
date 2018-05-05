@@ -79,11 +79,6 @@ namespace Server
                 if (packet == null)
                     return;
 
-                if (!(packet is PlayerStatePacket))
-                {
-                    Log.WriteLine($"Packet of type {packet.GetType().Name} received from {packet.SenderID}");
-                }
-                
                 if (packet.ShouldBroadcast)
                 {
                     NetworkServer.Instance.Broadcast(packet, packet.SenderID);
