@@ -74,7 +74,6 @@
     <Compile Include="NetUtilitiesComponent.cs" />
     <Compile Include="Client\NetworkClient.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="ObjImporter.cs" />
     <Compile Include="Packeting\NetState.cs" />
     <Compile Include="Packeting\Packets\SignalPacket.cs" />
     <Compile Include="Packeting\Packets\DeleteBoardPacket.cs" />
@@ -88,6 +87,7 @@
     <Compile Include="Packeting\Packets\PlayerStatePacket.cs" />
     <Compile Include="Packeting\Packets\PlayerWelcomePacket.cs" />
     <Compile Include="Packeting\Packets\RotateComponentPacket.cs" />
+    <Compile Include="Packeting\Packets\TransferDataPacket.cs" />
     <Compile Include="Packeting\Packets\Utils\SignalData.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketBuilder.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketDeserializer.cs" />
@@ -109,6 +109,7 @@
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\OBJLoader.cs" />
     <Compile Include="Utils\TextureLoader.cs" />
+    <Compile Include="Utils\Transfer.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

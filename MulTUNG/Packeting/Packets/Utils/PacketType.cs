@@ -14,5 +14,6 @@
         PlaceWire,
         DeleteWire,
         RotateComponent,
+        TransferData,
     }
 }

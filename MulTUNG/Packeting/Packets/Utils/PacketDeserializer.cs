@@ -11,9 +11,10 @@ namespace MulTUNG.Packeting.Packets
     {
         private static IDictionary<PacketType, Func<byte[], Packet>> Handlers = new Dictionary<PacketType, Func<byte[], Packet>>
         {
+            [PacketType.TransferData]       = TransferDataPacket.Deserialize,
             [PacketType.Signal]             = SignalPacket.Deserialize,
-            [PacketType.PlayerWelcome]      = PlayerWelcomePacket.Deserialize,
             [PacketType.PlayerState]        = PlayerStatePacket.Deserialize,
+            [PacketType.PlayerWelcome]      = PlayerWelcomePacket.Deserialize,
             [PacketType.PlayerDisconnect]   = PlayerDisconnectPacket.Deserialize,
             [PacketType.PlaceBoard]         = PlaceBoardPacket.Deserialize,
             [PacketType.DeleteBoard]        = DeleteBoardPacket.Deserialize,
