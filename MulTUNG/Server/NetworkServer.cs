@@ -1,12 +1,17 @@
 ﻿using MulTUNG;
 using MulTUNG.Packeting;
 using MulTUNG.Packeting.Packets;
+using MulTUNG.Packeting.Packets.Utils;
+using MulTUNG.Utils;
+using PiTung.Console;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using UnityEngine;
+using Network = MulTUNG.Network;
 
 namespace Server
 {
@@ -45,8 +50,11 @@ namespace Server
         {
             Listener = new TcpListener(IPAddress.Any, Constants.Port);
             Listener.Start();
-            
+
+            LoadWorld();
+
             StartCircuitUpdateClock();
+            StartPlayerClock();
 
             BeginAcceptTcpClient();
 
@@ -74,6 +82,72 @@ namespace Server
             }
         }
 
+        public Player GetPlayer(int id) => Players.SingleOrDefault(o => o.ID == id);
+
+        public void LoadWorld()
+        {
+            foreach (var item in GameObject.FindObjectsOfType<ObjectInfo>())
+            {
+                if (item.GetComponent<NetObject>() == null)
+                    item.gameObject.AddComponent<NetObject>().NetID = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+            }
+        }
+
+        public void SendWorld(Player player)
+        {
+            IGConsole.Log("Sending world to player");
+
+            var allObjs = GameObject.FindObjectsOfType<ObjectInfo>();
+            var boards = allObjs
+                .Where(o => o.ComponentType == ComponentType.CircuitBoard).ToList()
+                .PushToTop(o => o.transform.parent == null);
+
+            IGConsole.Log("Parents: " + string.Join("; ", boards.Select(o => o.transform.parent == null ? "Yes" : "No").ToArray()));
+
+            foreach (var item in 
+                boards.Concat(
+                allObjs.Where(o => o.ComponentType != ComponentType.Wire && o.ComponentType != ComponentType.CircuitBoard).Concat(
+                allObjs.Where(o => o.ComponentType == ComponentType.Wire))))
+            {
+                var netObj = item.GetComponent<NetObject>();
+
+                if (netObj == null)
+                    continue;
+
+                var type = item.ComponentType;
+
+                if (type == ComponentType.CircuitBoard)
+                {
+                    var board = item.GetComponent<CircuitBoard>();
+
+                    player.Send(new PlaceBoardPacket
+                    {
+                        BoardID = netObj.NetID,
+                        Width = board.x,
+                        Height = board.z,
+                        Position = item.transform.position,
+                        EulerAngles = item.transform.eulerAngles,
+                        ParentBoardID = item.transform.parent?.GetComponent<NetObject>()?.NetID ?? 0
+                    });
+                }
+                else if (type == ComponentType.Wire)
+                {
+                    var wire = item.GetComponent<Wire>();
+
+                    var packet = PlaceWirePacket.BuildFromLocalWire(wire);
+
+                    if (packet != null)
+                        player.Send(packet);
+                }
+                else
+                {
+                    player.Send(PlaceComponentPacket.BuildFromLocalComponent(item.gameObject));
+                }
+            }
+
+            player.Send(new SignalPacket(SignalData.WorldEnd));
+        }
+
         private void StartCircuitUpdateClock()
         {
             new Thread(() =>
@@ -82,7 +156,26 @@ namespace Server
                 {
                     Thread.Sleep(CircuitUpdateTime);
                     
-                    Broadcast(new CircuitUpdatePacket());
+                    //Broadcast(new SignalPacket(MulTUNG.Packeting.Packets.Utils.SignalData.CircuitUpdate));
+                }
+            }).Start();
+        }
+
+        private void StartPlayerClock()
+        {
+            new Thread(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(1000);
+
+                    foreach (var item in Players)
+                    {
+                        if (Time.time - item.LastUpdateTime > Constants.MaximumPlayerStateTime)
+                        {
+                            //IGConsole.Log($"Player {item.ID} hasn't updated in a while!");
+                        }
+                    }
                 }
             }).Start();
         }

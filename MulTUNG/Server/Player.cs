@@ -1,8 +1,13 @@
-﻿using MulTUNG.Packeting;
+﻿using MulTUNG;
+using MulTUNG.Packeting;
 using MulTUNG.Packeting.Packets;
+using MulTUNG.Packeting.Packets.Utils;
+using PiTung.Console;
 using System;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using UnityEngine;
 
 namespace Server
 {
@@ -10,14 +15,19 @@ namespace Server
     {
         public TcpClient Client { get; }
         public int ID { get; }
+        public float LastUpdateTime { get; private set; }
 
         public bool Connected => Client?.Client != null && Client.Connected;
+
+        private ManualResetEvent PingMre = new ManualResetEvent(false);
+        private int FailedPings = 0;
 
         public Player(TcpClient client, int id)
         {
             this.Client = client;
             this.ID = id;
 
+            BeginPing();
             BeginReceive();
         }
 
@@ -46,6 +56,37 @@ namespace Server
 
                 Log.WriteLine($"Player {this.ID} disconnected");
             }
+        }
+
+        private void BeginPing()
+        {
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                while (Connected)
+                {
+                    Thread.Sleep(Constants.PingInterval);
+
+                    Send(new SignalPacket(SignalData.Ping));
+
+                    bool received = PingMre.WaitOne(Constants.PingTimeout);
+                    PingMre.Reset();
+
+                    if (!received)
+                    {
+                        FailedPings++;
+
+                        if (FailedPings == Constants.MaxFailedPings - 1)
+                        {
+                            Log.WriteLine("Dropping player " + this.ID);
+                            Disconnect();
+                        }
+                    }
+                    else
+                    {
+                        FailedPings = 0;
+                    }
+                }
+            });
         }
 
         private void BeginReceive()
@@ -78,6 +119,16 @@ namespace Server
 
                 if (packet == null)
                     return;
+
+                if (packet is PlayerStatePacket)
+                    LastUpdateTime = Time.time;
+                else if (packet is SignalPacket signal)
+                {
+                    if (signal.Data == SignalData.Pong)
+                        PingMre.Set();
+                    else
+                        MulTUNG.Network.HandleSignalPacket(signal);
+                }
 
                 if (packet.ShouldBroadcast)
                 {

@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client\BlockingQueue.cs" />
+    <Compile Include="Client\RemotePlayer.cs" />
     <Compile Include="MulTUNG.cs" />
     <Compile Include="NetObject.cs" />
     <Compile Include="NetJobs.cs" />
@@ -75,7 +76,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="ObjImporter.cs" />
     <Compile Include="Packeting\NetState.cs" />
-    <Compile Include="Packeting\Packets\CircuitUpdatePacket.cs" />
+    <Compile Include="Packeting\Packets\SignalPacket.cs" />
     <Compile Include="Packeting\Packets\DeleteBoardPacket.cs" />
     <Compile Include="Packeting\Packets\DeleteComponentPacket.cs" />
     <Compile Include="Packeting\Packets\DeleteWirePacket.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Packeting\Packets\PlayerStatePacket.cs" />
     <Compile Include="Packeting\Packets\PlayerWelcomePacket.cs" />
     <Compile Include="Packeting\Packets\RotateComponentPacket.cs" />
+    <Compile Include="Packeting\Packets\Utils\SignalData.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketBuilder.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketDeserializer.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketReader.cs" />
@@ -104,6 +106,7 @@
     <Compile Include="Server\NetworkServer.cs" />
     <Compile Include="Server\Player.cs" />
     <Compile Include="Server\World.cs" />
+    <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\OBJLoader.cs" />
     <Compile Include="Utils\TextureLoader.cs" />
   </ItemGroup>
@@ -117,6 +120,7 @@
     <None Include="Resources\Image_2D_0001_0008.png2" />
     <None Include="Resources\Image_2D_0002_0009.png2" />
     <None Include="Resources\Image_2D_0003_0010.png2" />
+    <None Include="Resources\patrick.mtl" />
     <None Include="Resources\patrick.obj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

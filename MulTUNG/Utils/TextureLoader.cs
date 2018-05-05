@@ -18,7 +18,7 @@ public class TextureLoader : MonoBehaviour
             return LoadTGA(imageFile);
         }
     }
-
+    
     public static Texture2D LoadDDSManual(string ddsPath)
     {
         try
@@ -77,6 +77,24 @@ public class TextureLoader : MonoBehaviour
         }
         tex.SetPixels(pixels);
     }
+
+    public static Texture2D LoadTexture(byte[] data, string ext, bool normalMap = false)
+    {
+        if (ext == ".png" || ext == ".jpg")
+        {
+            Texture2D t2d = new Texture2D(1, 1);
+            t2d.LoadImage(data);
+            if (normalMap)
+                SetNormalMap(ref t2d);
+            return t2d;
+        }
+        else
+        {
+            Debug.Log("texture not supported : " + ext);
+        }
+        return null;
+    }
+
     public static Texture2D LoadTexture(string fn, bool normalMap = false)
     {
         if (!File.Exists(fn))

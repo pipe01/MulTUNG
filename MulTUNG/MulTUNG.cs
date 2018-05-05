@@ -4,9 +4,11 @@ using PiTung.Console;
 using Server;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MulTUNG
 {
@@ -17,6 +19,8 @@ namespace MulTUNG
         public override string Author => "pipe01";
         public override Version ModVersion => new Version("1.0.0");
 
+        public const string ForbiddenSaveName = "you shouldn't be seeing this";
+
         internal static NetworkClient NetClient = new NetworkClient();
 
         public override void BeforePatch()
@@ -26,6 +30,10 @@ namespace MulTUNG
             IGConsole.RegisterCommand<Command_disconnect>(this);
             IGConsole.RegisterCommand<Command_host>(this);
 #pragma warning restore CS0618 // Type or member is obsolete
+
+            string path = Application.persistentDataPath + "/saves/" + ForbiddenSaveName;
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
         }
 
         public override void Update()
@@ -69,7 +77,23 @@ namespace MulTUNG
 
         public override bool Execute(IEnumerable<string> arguments)
         {
-            MulTUNG.NetClient.Connect(arguments.FirstOrDefault() ?? "127.0.0.1");
+            if (!ModUtilities.IsOnMainMenu)
+            {
+                return true;
+            }
+
+            SaveManager.SaveName = MulTUNG.ForbiddenSaveName;
+            SceneManager.LoadScene("gameplay");
+            EverythingHider.HideEverything();
+
+            SceneManager.sceneLoaded += (a, b) =>
+            {
+                ThreadPool.QueueUserWorkItem(_ =>
+                {
+                    Thread.Sleep(3000);
+                    MulTUNG.NetClient.Connect(arguments.FirstOrDefault() ?? "127.0.0.1");
+                });
+            };
 
             return true;
         }
@@ -83,16 +107,14 @@ namespace MulTUNG
         public override bool Execute(IEnumerable<string> arguments)
         {
             new NetworkServer().Start();
+            
+            //var obj = GameObject.Instantiate(PlayerManager.PlayerModelPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            //obj.SetActive(true);
 
-            ModUtilities.Graphics.CreateSphere(new Vector3(0, 0, 0), 2);
-
-            var obj = GameObject.Instantiate(PlayerManager.PlayerModelPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            obj.SetActive(true);
-
-            var collider = obj.AddComponent<MeshCollider>();
-            collider.sharedMesh = new ObjImporter().ImportFile(Properties.Resources.patrick);
-            collider.tag = "World";
-            obj.layer = LayerMask.NameToLayer("World");
+            //var collider = obj.AddComponent<MeshCollider>();
+            //collider.sharedMesh = new ObjImporter().ImportFile(Properties.Resources.patrick);
+            //collider.tag = "World";
+            //obj.layer = LayerMask.NameToLayer("World");
 
             return true;
         }

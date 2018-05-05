@@ -1,5 +1,6 @@
 ﻿using MulTUNG;
 using MulTUNG.Packeting.Packets;
+using MulTUNG.Packeting.Packets.Utils;
 using PiTung;
 using PiTung.Console;
 using Server;
@@ -18,6 +19,8 @@ namespace MulTUNG
         public static bool IsClient => NetworkClient.Instance?.Connected ?? false;
         public static bool IsServer => NetworkServer.Instance?.Running ?? false;
 
+        private static int Counter = 0;
+
         public const int ServerPlayerID = 1;
 
         public static void ProcessPacket(Packet packet, int playerId)
@@ -28,10 +31,9 @@ namespace MulTUNG
 
                 MulTUNG.NetClient.SetID(wel.YourID);
             }
+
             if (packet.SenderID == playerId)
-            {
                 return;
-            }
             
             switch (packet)
             {
@@ -40,13 +42,19 @@ namespace MulTUNG
                         PlayerManager.UpdatePlayer(state);
 
                     break;
+                case SignalPacket signal:
+                    HandleSignalPacket(signal);
+
+                    break;
                 case PlayerDisconnectPacket disconnect:
                     PlayerManager.WaveGoodbye(disconnect.PlayerID);
 
                     break;
                 case PlaceBoardPacket board:
                     if (board.AuthorID != playerId)
+                    {
                         NetUtilitiesComponent.Instance.Enqueue(new PlaceBoardJob(board));
+                    }
 
                     break;
                 case DeleteBoardPacket del:
@@ -61,10 +69,6 @@ namespace MulTUNG
                     NetUtilitiesComponent.Instance.Enqueue(new DeleteComponentJob(delComp));
 
                     break;
-                case CircuitUpdatePacket imnotgonnausethis:
-                    //MyFixedUpdate.Instance?.ForceUpdate();
-
-                    break;
                 case PlaceWirePacket placeWire:
                     NetUtilitiesComponent.Instance.Enqueue(new PlaceWireJob(placeWire));
                     
@@ -75,6 +79,29 @@ namespace MulTUNG
                     break;
                 case RotateComponentPacket rotateComp:
                     NetUtilitiesComponent.Instance.Enqueue(new RotateComponentJob(rotateComp));
+
+                    break;
+            }
+        }
+
+        public static void HandleSignalPacket(SignalPacket signal)
+        {
+            switch (signal.Data)
+            {
+                case SignalData.CircuitUpdate:
+                    break;
+                case SignalData.RequestWorld:
+                    if (IsServer)
+                        NetworkServer.Instance.SendWorld(NetworkServer.Instance.GetPlayer(signal.SenderID));
+
+                    break;
+                case SignalData.WorldEnd:
+                    if (IsClient)
+                        NetworkClient.Instance.EndReceivingWorld();
+
+                    break;
+                case SignalData.Ping:
+                    Network.SendPacket(new SignalPacket(SignalData.Pong));
 
                     break;
             }
@@ -100,8 +127,9 @@ namespace MulTUNG
                     };
 
                     SendPacket(packet);
-                    
-                    ModUtilities.Graphics.DrawText("Update", new Vector2(3, 10), Color.magenta, true);
+
+                    if (Counter++ % 60 == 0)
+                        IGConsole.Log("Update pos");
                 }
             }).Start();
         }
@@ -110,7 +138,7 @@ namespace MulTUNG
         {
 #if DEBUG
             if (!(packet is PlayerStatePacket))
-                IGConsole.Log("Send packet of type " + packet.GetType().Name);
+                IGConsole.Log($"Send packet of type {packet.GetType().Name} at {Time.time:0.0}");
 #endif
 
             if (IsClient)

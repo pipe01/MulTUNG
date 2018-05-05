@@ -91,17 +91,7 @@ namespace MulTUNG
 
             if (objInfo != null && objInfo.ComponentType != ComponentType.CircuitBoard)
             {
-                var netObj = __state.AddComponent<NetObject>();
-                netObj.NetID = Random.Range(int.MinValue, int.MaxValue);
-
-                Network.SendPacket(new PlaceComponentPacket
-                {
-                    NetID = netObj.NetID,
-                    SavedObject = SavedObjectUtilities.CreateSavedObjectFrom(objInfo),
-                    LocalPosition = __state.transform.localPosition,
-                    EulerAngles = __state.transform.localEulerAngles,
-                    ParentBoardID = __state.transform.parent?.gameObject.GetComponent<NetObject>()?.NetID ?? 0
-                });
+                Network.SendPacket(PlaceComponentPacket.BuildFromLocalComponent(__state));
             }
         }
     }
@@ -184,29 +174,7 @@ namespace MulTUNG
                 var wireBeingPlaced = ModUtilities.GetStaticFieldValue<GameObject>(typeof(WirePlacer), "WireBeingPlaced");
                 var wire = wireBeingPlaced.GetComponent<Wire>();
 
-                var netObj = wireBeingPlaced.AddComponent<NetObject>();
-                netObj.NetID = Random.Range(int.MinValue, int.MaxValue);
-
-                var netObj1 = wire.Point1.parent.parent.gameObject.GetComponent<NetObject>();
-                var netObj2 = wire.Point2.parent.parent.gameObject.GetComponent<NetObject>();
-
-                if (netObj1 == null || netObj2 == null)
-                    return;
-                
-                int ioIndex1 = netObj1.IO.IndexOf(wire.Point1.parent.gameObject);
-                int ioIndex2 = netObj2.IO.IndexOf(wire.Point2.parent.gameObject);
-
-                if (ioIndex1 == -1 || ioIndex2 == -1)
-                    return;
-
-                Network.SendPacket(new PlaceWirePacket
-                {
-                    NetObj1Id = netObj1.NetID,
-                    NetObj2Id = netObj2.NetID,
-                    Point1Id = ioIndex1,
-                    Point2Id = ioIndex2,
-                    NetID = netObj.NetID
-                });
+                Network.SendPacket(PlaceWirePacket.BuildFromLocalWire(wire));
             }
         }
     }
@@ -237,5 +205,12 @@ namespace MulTUNG
                 }
             }
         }
+    }
+
+    [Target(typeof(SaveManager))]
+    internal static class SaveManagerPatch
+    {
+        [PatchMethod]
+        static bool SaveAllSynchronously() => !Network.IsClient;
     }
 }

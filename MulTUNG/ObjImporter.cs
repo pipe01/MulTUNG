@@ -3,6 +3,8 @@
  * or any other fancy things). 
  */
 
+#pragma warning disable RCS1037 // Remove trailing white-space.
+
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,7 +28,7 @@ public class ObjImporter
         public string name;
         public string fileName;
     }
-    
+
     // Use this for initialization
     public Mesh ImportFile(byte[] data)
     {

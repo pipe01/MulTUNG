@@ -11,6 +11,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Text;
+using PiTung.Console;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -27,24 +29,17 @@ public class OBJLoader
         public int[] indexes;
     }
 
+    public struct OBJFile
+    {
+        public byte[] ObjData;
+        public byte[] MtlData;
+        public IDictionary<string, byte[]> MtlImages;
+
+        public string[] ObjLines => Encoding.UTF8.GetString(ObjData).Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        public string[] MtlLines => Encoding.UTF8.GetString(MtlData).Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+    }
 
     //functions
-#if UNITY_EDITOR
-    [MenuItem("GameObject/Import From OBJ")]
-    static void ObjLoadMenu()
-    {
-        string pth = UnityEditor.EditorUtility.OpenFilePanel("Import OBJ", "", "obj");
-        if (!string.IsNullOrEmpty(pth))
-        {
-            System.Diagnostics.Stopwatch s = new System.Diagnostics.Stopwatch();
-            s.Start();
-            LoadOBJFile(pth);
-            Debug.Log("OBJ load took " + s.ElapsedMilliseconds + "ms");
-            s.Stop();
-        }
-        }
-#endif
-
     public static Vector3 ParseVectorFromCMPS(string[] cmps)
     {
         float x = float.Parse(cmps[1]);
@@ -81,14 +76,12 @@ public class OBJLoader
 
         return null;
     }
-    public static Material[] LoadMTLFile(string fn)
+    public static Material[] LoadMTLFile(OBJFile obj)
     {
         Material currentMaterial = null;
         List<Material> matlList = new List<Material>();
-        FileInfo mtlFileInfo = new FileInfo(fn);
-        string baseFileName = Path.GetFileNameWithoutExtension(fn);
-        string mtlFileDirectory = mtlFileInfo.Directory.FullName + Path.DirectorySeparatorChar;
-        foreach (string ln in File.ReadAllLines(fn))
+
+        foreach (string ln in obj.MtlLines)
         {
             string l = ln.Trim().Replace("  ", " ");
             string[] cmps = l.Split(' ');
@@ -110,20 +103,18 @@ public class OBJLoader
             else if (cmps[0] == "map_Kd")
             {
                 //TEXTURE
-                string fpth = OBJGetFilePath(data, mtlFileDirectory, baseFileName);
-                if (fpth != null)
-                    currentMaterial.SetTexture("_MainTex", TextureLoader.LoadTexture(fpth));
+                currentMaterial.SetTexture("_MainTex", TextureLoader.LoadTexture(obj.MtlImages[data], ".png"));
             }
-            else if (cmps[0] == "map_Bump")
-            {
-                //TEXTURE
-                string fpth = OBJGetFilePath(data, mtlFileDirectory, baseFileName);
-                if (fpth != null)
-                {
-                    currentMaterial.SetTexture("_BumpMap", TextureLoader.LoadTexture(fpth, true));
-                    currentMaterial.EnableKeyword("_NORMALMAP");
-                }
-            }
+            //else if (cmps[0] == "map_Bump")
+            //{
+            //    //TEXTURE
+            //    string fpth = OBJGetFilePath(data, mtlFileDirectory, baseFileName);
+            //    if (fpth != null)
+            //    {
+            //        currentMaterial.SetTexture("_BumpMap", TextureLoader.LoadTexture(fpth, true));
+            //        currentMaterial.EnableKeyword("_NORMALMAP");
+            //    }
+            //}
             else if (cmps[0] == "Ks")
             {
                 currentMaterial.SetColor("_SpecColor", ParseColorFromCMPS(cmps));
@@ -170,11 +161,8 @@ public class OBJLoader
         return matlList.ToArray();
     }
 
-    public static GameObject LoadOBJFile(string fn)
+    public static GameObject LoadOBJFile(string meshName, OBJFile obj)
     {
-
-        string meshName = Path.GetFileNameWithoutExtension(fn);
-
         bool hasNormals = false;
         //OBJ LISTS
         List<Vector3> vertices = new List<Vector3>();
@@ -193,10 +181,8 @@ public class OBJLoader
         string cmesh = "default";
         //CACHE
         Material[] materialCache = null;
-        //save this info for later
-        FileInfo OBJFileInfo = new FileInfo(fn);
 
-        foreach (string ln in File.ReadAllLines(fn))
+        foreach (string ln in obj.ObjLines)
         {
             if (ln.Length > 0 && ln[0] != '#')
             {
@@ -207,9 +193,7 @@ public class OBJLoader
                 if (cmps[0] == "mtllib")
                 {
                     //load cache
-                    string pth = OBJGetFilePath(data, OBJFileInfo.Directory.FullName + Path.DirectorySeparatorChar, meshName);
-                    if (pth != null)
-                        materialCache = LoadMTLFile(pth);
+                    materialCache = LoadMTLFile(obj);
 
                 }
                 else if ((cmps[0] == "g" || cmps[0] == "o") && splitByMaterial == false)
@@ -346,14 +330,14 @@ public class OBJLoader
         GameObject parentObject = new GameObject(meshName);
 
 
-        foreach (string obj in objectNames)
+        foreach (string item in objectNames)
         {
-            GameObject subObject = new GameObject(obj);
+            GameObject subObject = new GameObject(item);
             subObject.transform.parent = parentObject.transform;
             subObject.transform.localScale = new Vector3(-1, 1, 1);
             //Create mesh
             Mesh m = new Mesh();
-            m.name = obj;
+            m.name = item;
             //LISTS FOR REORDERING
             List<Vector3> processedVertices = new List<Vector3>();
             List<Vector3> processedNormals = new List<Vector3>();
@@ -363,7 +347,7 @@ public class OBJLoader
             //POPULATE MESH
             List<string> meshMaterialNames = new List<string>();
 
-            OBJFace[] ofaces = faceList.Where(x => x.meshName == obj).ToArray();
+            OBJFace[] ofaces = faceList.Where(x => x.meshName == item).ToArray();
             foreach (string mn in materialNames)
             {
                 OBJFace[] faces = ofaces.Where(x => x.materialName == mn).ToArray();

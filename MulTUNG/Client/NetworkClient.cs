@@ -20,6 +20,8 @@ namespace MulTUNG
         public int PlayerID { get; private set; } = -2;
         public bool Connected => Client?.Connected ?? false;
 
+        public bool ReceivingWorld { get; private set; }
+
         private BlockingQueue<Packet> SendQueue = new BlockingQueue<Packet>();
 
         public NetworkClient()
@@ -43,8 +45,8 @@ namespace MulTUNG
                 {
                     BeginReceive();
 
-                    Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
-
+                    //Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
+                    
                     StartSending();
                 }
             }).Start();
@@ -70,8 +72,20 @@ namespace MulTUNG
         {
             if (this.PlayerID == -2)
                 this.PlayerID = id;
+
+            IGConsole.Log("Request world");
+            Network.SendPacket(new SignalPacket(Packeting.Packets.Utils.SignalData.RequestWorld));
         }
-        
+
+        public void EndReceivingWorld()
+        {
+            IGConsole.Log("End receive world");
+
+            ReceivingWorld = false;
+
+            Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
+        }
+
         private void StartSending()
         {
             while (Client.Connected)

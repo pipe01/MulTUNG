@@ -3,6 +3,7 @@
     public enum PacketType
     {
         Unknown,
+        Signal,
         PlayerWelcome,
         PlayerState,
         PlayerDisconnect,
@@ -10,9 +11,8 @@
         DeleteBoard,
         PlaceComponent,
         DeleteComponent,
-        CircuitUpdate,
         PlaceWire,
         DeleteWire,
-        RotateComponent
+        RotateComponent,
     }
 }

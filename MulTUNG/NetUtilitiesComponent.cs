@@ -1,4 +1,5 @@
 ﻿using PiTung;
+using PiTung.Console;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,8 +7,7 @@ namespace MulTUNG
 {
     public class NetUtilitiesComponent : MonoBehaviour
     {
-        private static NetUtilitiesComponent _Instance;
-        public static NetUtilitiesComponent Instance => _Instance ?? (_Instance = ModUtilities.DummyComponent.gameObject.AddComponent<NetUtilitiesComponent>());
+        public static NetUtilitiesComponent Instance { get; private set; }
         
         private Queue<INetJob> JobQueue = new Queue<INetJob>();
 
@@ -15,9 +15,13 @@ namespace MulTUNG
 
         public NetUtilitiesComponent()
         {
-            if (_Instance != null)
+            if (Instance != null)
             {
                 Destroy(this);
+            }
+            else
+            {
+                Instance = this;
             }
         }
 
@@ -25,7 +29,7 @@ namespace MulTUNG
         {
             PlayerManager.BuildPlayerPrefab();
 
-            GameObject.Instantiate(PlayerManager.PlayerModelPrefab, new Vector3(181.5f, 27.0f, -143.1f), Quaternion.identity);
+            GameObject.Instantiate(PlayerManager.PlayerModelPrefab, new Vector3(181.5f, 25.0f, -143.1f), Quaternion.identity);
         }
 
         public void Enqueue(INetJob job)
@@ -35,12 +39,10 @@ namespace MulTUNG
 
         void Update()
         {
-            while (JobQueue.Count > 0)
+            if (JobQueue.Count > 0)
             {
                 CurrentJob = JobQueue.Dequeue();
-
                 CurrentJob.Do();
-
                 CurrentJob = null;
             }
         }

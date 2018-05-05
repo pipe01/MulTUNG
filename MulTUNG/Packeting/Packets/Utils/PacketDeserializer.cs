@@ -11,17 +11,17 @@ namespace MulTUNG.Packeting.Packets
     {
         private static IDictionary<PacketType, Func<byte[], Packet>> Handlers = new Dictionary<PacketType, Func<byte[], Packet>>
         {
-            [PacketType.PlayerWelcome] = PlayerWelcomePacket.Deserialize,
-            [PacketType.PlayerState] = PlayerStatePacket.Deserialize,
-            [PacketType.PlayerDisconnect] = PlayerDisconnectPacket.Deserialize,
-            [PacketType.PlaceBoard] = PlaceBoardPacket.Deserialize,
-            [PacketType.DeleteBoard] = DeleteBoardPacket.Deserialize,
-            [PacketType.PlaceComponent] = PlaceComponentPacket.Deserialize,
-            [PacketType.DeleteComponent] = DeleteComponentPacket.Deserialize,
-            [PacketType.CircuitUpdate] = _ => new CircuitUpdatePacket(),
-            [PacketType.PlaceWire] = PlaceWirePacket.Deserialize,
-            [PacketType.DeleteWire] = DeleteWirePacket.Deserialize,
-            [PacketType.RotateComponent] = RotateComponentPacket.Deserialize,
+            [PacketType.Signal]             = SignalPacket.Deserialize,
+            [PacketType.PlayerWelcome]      = PlayerWelcomePacket.Deserialize,
+            [PacketType.PlayerState]        = PlayerStatePacket.Deserialize,
+            [PacketType.PlayerDisconnect]   = PlayerDisconnectPacket.Deserialize,
+            [PacketType.PlaceBoard]         = PlaceBoardPacket.Deserialize,
+            [PacketType.DeleteBoard]        = DeleteBoardPacket.Deserialize,
+            [PacketType.PlaceComponent]     = PlaceComponentPacket.Deserialize,
+            [PacketType.DeleteComponent]    = DeleteComponentPacket.Deserialize,
+            [PacketType.PlaceWire]          = PlaceWirePacket.Deserialize,
+            [PacketType.DeleteWire]         = DeleteWirePacket.Deserialize,
+            [PacketType.RotateComponent]    = RotateComponentPacket.Deserialize,
         };
 
         public static Packet DeserializePacket(byte[] data)

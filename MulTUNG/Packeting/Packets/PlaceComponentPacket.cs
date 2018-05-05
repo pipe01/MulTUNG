@@ -16,6 +16,28 @@ namespace MulTUNG.Packeting.Packets
         public Vector3 EulerAngles { get; set; }
         public int ParentBoardID { get; set; }
 
+        public static PlaceComponentPacket BuildFromLocalComponent(GameObject component)
+        {
+            var netObj = component.GetComponent<NetObject>();
+
+            if (netObj == null)
+            {
+                netObj = component.AddComponent<NetObject>();
+                netObj.NetID = Random.Range(int.MinValue, int.MaxValue);
+            }
+
+            var objInfo = component.GetComponent<ObjectInfo>();
+
+            return new PlaceComponentPacket
+            {
+                NetID = netObj.NetID,
+                SavedObject = SavedObjectUtilities.CreateSavedObjectFrom(objInfo),
+                LocalPosition = component.transform.localPosition,
+                EulerAngles = component.transform.localEulerAngles,
+                ParentBoardID = component.transform.parent?.gameObject.GetComponent<NetObject>()?.NetID ?? 0
+            };
+        }
+
         protected override byte[] SerializeInner()
         {
             return new PacketBuilder()

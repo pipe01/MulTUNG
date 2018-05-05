@@ -99,5 +99,15 @@ namespace MulTUNG.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] patrick_mtl {
+            get {
+                object obj = ResourceManager.GetObject("patrick_mtl", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

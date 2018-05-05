@@ -33,7 +33,7 @@ namespace MulTUNG
         public override void Do()
         {
             GameObject parentBoard = NetObject.GetByNetId(Packet.ParentBoardID);
-
+            
             GameObject gameObject = Object.Instantiate(Prefabs.CircuitBoard, Packet.Position, Quaternion.Euler(Packet.EulerAngles), parentBoard?.transform);
 
             gameObject.AddComponent<ObjectInfo>().ComponentType = ComponentType.CircuitBoard;

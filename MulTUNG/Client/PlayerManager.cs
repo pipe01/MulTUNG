@@ -1,4 +1,5 @@
-﻿using MulTUNG.Packeting.Packets;
+﻿using MulTUNG.Client;
+using MulTUNG.Packeting.Packets;
 using PiTung.Console;
 using PiTung.Mod_utilities;
 using System.Collections.Generic;
@@ -9,12 +10,12 @@ namespace MulTUNG
 {
     public static class PlayerManager
     {
-        private class RemotePlayer
+        private class PlayerStruct
         {
             public GameObject Object { get; set; }
             public float LastUpdateTime { get; set; }
 
-            public RemotePlayer(GameObject obj)
+            public PlayerStruct(GameObject obj)
             {
                 this.Object = obj;
             }
@@ -28,7 +29,9 @@ namespace MulTUNG
         {
             if (!Players.ContainsKey(id))
             {
-                Players.Add(id, new RemotePlayer(MakePlayerModel()));
+                var obj = MakePlayerModel();
+
+                Players.Add(id, obj.AddComponent<RemotePlayer>());
             }
         }
 
@@ -44,15 +47,14 @@ namespace MulTUNG
             if (packet.Time < player.LastUpdateTime)
                 return;
 
-            player.Object.transform.position = packet.Position - new Vector3(0, 1.65f / 2, 0);
-            player.Object.transform.eulerAngles = packet.EulerAngles;
+            player.UpdateWithPacket(packet);
         }
 
         public static void WaveGoodbye(int playerId)
         {
             if (Players.TryGetValue(playerId, out var player))
             {
-                GameObject.Destroy(player.Object);
+                GameObject.Destroy(player.gameObject);
 
                 Players.Remove(playerId);
             }
@@ -73,7 +75,19 @@ namespace MulTUNG
 
         public static void BuildPlayerPrefab()
         {
-            PlayerModelPrefab = OBJLoader.LoadOBJFile(@"C:\Users\Pipe\Downloads\Patrick\patrick.obj");
+            OBJLoader.OBJFile file = new OBJLoader.OBJFile
+            {
+                ObjData = Properties.Resources.patrick,
+                MtlData = Properties.Resources.patrick_mtl,
+                MtlImages = new Dictionary<string, byte[]>()
+                {
+                    ["Image_2D_0001_0008.png"] = Properties.Resources.Image_2D_0001_0008,
+                    ["Image_2D_0002_0009.png"] = Properties.Resources.Image_2D_0002_0009,
+                    ["Image_2D_0003_0010.png"] = Properties.Resources.Image_2D_0003_0010,
+                }
+            };
+
+            PlayerModelPrefab = OBJLoader.LoadOBJFile("Patrick", file);
             PlayerModelPrefab.transform.position = new Vector3(-1000, -1000, -1000);
             PlayerModelPrefab.transform.localScale = new Vector3(.025f, .025f, .025f);
         }
