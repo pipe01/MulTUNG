@@ -142,7 +142,7 @@ namespace MulTUNG
 #endif
 
             if (IsClient)
-                NetworkClient.Instance.SendPacket(packet);
+                NetworkClient.Instance.Send(packet);
             else if (IsServer)
                 NetworkServer.Instance.Broadcast(packet, ServerPlayerID);
         }

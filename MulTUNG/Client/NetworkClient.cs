@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 
 namespace MulTUNG
 {
-    internal class NetworkClient
+    internal class NetworkClient : ISender
     {
         public static NetworkClient Instance { get; private set; }
 
@@ -68,6 +68,14 @@ namespace MulTUNG
             }
         }
 
+        public void Send(Packet packet)
+        {
+            packet.SenderID = this.PlayerID;
+            packet.Time = Time.time;
+
+            SendQueue.Enqueue(packet);
+        }
+
         public void SetID(int id)
         {
             if (this.PlayerID == -2)
@@ -119,14 +127,6 @@ namespace MulTUNG
             
             var packet = PacketDeserializer.DeserializePacket(state.Buffer);
             Network.ProcessPacket(packet, this.PlayerID);
-        }
-        
-        public void SendPacket(Packet packet)
-        {
-            packet.SenderID = this.PlayerID;
-            packet.Time = Time.time;
-
-            SendQueue.Enqueue(packet);
         }
     }
 }

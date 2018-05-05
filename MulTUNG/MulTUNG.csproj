@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="Client\BlockingQueue.cs" />
     <Compile Include="Client\RemotePlayer.cs" />
+    <Compile Include="ISender.cs" />
     <Compile Include="MulTUNG.cs" />
     <Compile Include="NetObject.cs" />
     <Compile Include="NetJobs.cs" />

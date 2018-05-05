@@ -15,7 +15,7 @@ using Network = MulTUNG.Network;
 
 namespace Server
 {
-    internal class NetworkServer
+    internal class NetworkServer : ISender
     {
         public static NetworkServer Instance { get; private set; }
 
@@ -62,6 +62,8 @@ namespace Server
 
             Log.WriteLine("Listening on port " + Constants.Port);
         }
+
+        public void Send(Packet packet) => Broadcast(packet);
 
         public void Broadcast(Packet packet, params int[] excludeIds)
         {

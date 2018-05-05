@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Server
 {
-    internal class Player
+    internal class Player : ISender
     {
         public TcpClient Client { get; }
         public int ID { get; }
