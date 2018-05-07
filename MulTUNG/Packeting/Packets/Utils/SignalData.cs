@@ -11,6 +11,9 @@ namespace MulTUNG.Packeting.Packets.Utils
         RequestWorld,
         WorldEnd,
         Ping,
-        Pong
+        Pong,
+        BeginTransfer,
+        AckTransfer,
+        EndTransfer,
     }
 }

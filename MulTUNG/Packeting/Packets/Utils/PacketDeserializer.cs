@@ -27,6 +27,9 @@ namespace MulTUNG.Packeting.Packets
 
         public static Packet DeserializePacket(byte[] data)
         {
+            if (data[0] == 0)
+                return null;
+
             return Handlers[(PacketType)data[0]](data);
         }
     }

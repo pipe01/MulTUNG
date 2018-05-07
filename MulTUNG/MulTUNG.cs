@@ -1,4 +1,5 @@
 ﻿using MulTUNG.Packeting.Packets;
+using MulTUNG.Utils;
 using PiTung;
 using PiTung.Console;
 using Server;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,7 +23,7 @@ namespace MulTUNG
 
         public const string ForbiddenSaveName = "you shouldn't be seeing this";
 
-        internal static NetworkClient NetClient = new NetworkClient();
+        //internal static NetworkClient NetClient = new NetworkClient();
 
         public override void BeforePatch()
         {
@@ -42,7 +44,27 @@ namespace MulTUNG
                 ModUtilities.DummyComponent.gameObject.AddComponent<NetUtilitiesComponent>();
 
             if (Input.GetKeyDown(KeyCode.U))
-                IGConsole.Log(FirstPersonInteraction.FirstPersonCamera.transform.position);
+            {
+                IGConsole.Log("Begin transfer");
+
+                string txt = "";
+
+                for (int i = 0; i < 8347; i++)
+                {
+                    txt += (char)UnityEngine.Random.Range(char.MinValue, char.MaxValue);
+                }
+
+                IGConsole.Log("Generated data, sending...");
+
+                byte[] data = Encoding.UTF8.GetBytes(txt);
+                IGConsole.Log("Size: " + data.Length);
+
+                ThreadPool.QueueUserWorkItem(_ =>
+                {
+                    using (MemoryStream mem = new MemoryStream(data))
+                        new Transfer(mem, NetworkServer.Instance).Send();
+                });
+            }
         }
 
         public override void OnGUI()
@@ -53,7 +75,7 @@ namespace MulTUNG
 
         public override void OnApplicationQuit()
         {
-            NetClient.Disconnect();
+            NetworkClient.Instance.Disconnect();
         }
     }
 
@@ -64,7 +86,7 @@ namespace MulTUNG
 
         public override bool Execute(IEnumerable<string> arguments)
         {
-            MulTUNG.NetClient.Disconnect();
+            NetworkClient.Instance.Disconnect();
 
             return true;
         }
@@ -91,7 +113,7 @@ namespace MulTUNG
                 ThreadPool.QueueUserWorkItem(_ =>
                 {
                     Thread.Sleep(3000);
-                    MulTUNG.NetClient.Connect(arguments.FirstOrDefault() ?? "127.0.0.1");
+                    NetworkClient.Instance.Connect(arguments.FirstOrDefault() ?? "127.0.0.1");
                 });
             };
 

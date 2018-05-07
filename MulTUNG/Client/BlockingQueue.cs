@@ -8,7 +8,7 @@ namespace MulTUNG
     internal class BlockingQueue<T> : IEnumerable<T>
     {
         private int _count = 0;
-
+        
         private Queue<T> _queue = new Queue<T>();
 
         public T Dequeue()

@@ -1,12 +1,15 @@
 ﻿using MulTUNG;
 using MulTUNG.Packeting.Packets;
 using MulTUNG.Packeting.Packets.Utils;
+using MulTUNG.Utils;
 using PiTung;
 using PiTung.Console;
 using Server;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using UnityEngine;
@@ -15,25 +18,52 @@ namespace MulTUNG
 {
     public static class Network
     {
+        private class PacketWaiter
+        {
+            public Predicate<Packet> Predicate;
+            public bool ContinueProcessing;
+            public ManualResetEvent Mre;
+
+            public Packet Packet;
+        }
+
         public static bool Connected => IsClient || IsServer;
         public static bool IsClient => NetworkClient.Instance?.Connected ?? false;
         public static bool IsServer => NetworkServer.Instance?.Running ?? false;
 
         private static int Counter = 0;
+        private static IList<PacketWaiter> WaitList = new List<PacketWaiter>();
 
         public const int ServerPlayerID = 1;
-
+        
         public static void ProcessPacket(Packet packet, int playerId)
         {
+            if (packet == null)
+                return;
+
             if (packet is PlayerWelcomePacket wel)
             {
                 IGConsole.Log("Your player ID is " + wel.YourID);
 
-                MulTUNG.NetClient.SetID(wel.YourID);
+                NetworkClient.Instance.SetID(wel.YourID);
             }
 
             if (packet.SenderID == playerId)
                 return;
+
+            foreach (var item in WaitList)
+            {
+                if (item.Predicate(packet))
+                {
+                    item.Mre.Set();
+                    item.Packet = packet;
+
+                    WaitList.Remove(item);
+
+                    if (!item.ContinueProcessing)
+                        return;
+                }
+            }
             
             switch (packet)
             {
@@ -104,7 +134,37 @@ namespace MulTUNG
                     Network.SendPacket(new SignalPacket(SignalData.Pong));
 
                     break;
+                case SignalData.BeginTransfer:
+                    IGConsole.Log("Begin receive transfer");
+                    ThreadPool.QueueUserWorkItem(_ =>
+                    {
+                        using (MemoryStream mem = new MemoryStream())
+                        {
+                            Transfer.Receive(mem);
+
+                            IGConsole.Log("Done receiving: " + mem.Length);
+                        }
+                    });
+
+                    break;
             }
+        }
+
+        public static Packet WaitForPacket(Predicate<Packet> predicate, bool continueProcessing = false)
+        {
+            ManualResetEvent mre = new ManualResetEvent(false);
+            var item = new PacketWaiter
+            {
+                Predicate = predicate,
+                Mre = mre,
+                ContinueProcessing = continueProcessing
+            };
+
+            WaitList.Add(item);
+
+            mre.WaitOne();
+
+            return item.Packet;
         }
 
         public static void StartPositionUpdateThread(int updateInterval)
@@ -128,7 +188,7 @@ namespace MulTUNG
 
                     SendPacket(packet);
 
-                    if (Counter++ % 60 == 0)
+                    if (Counter++ % 120 == 0)
                         IGConsole.Log("Update pos");
                 }
             }).Start();
@@ -137,8 +197,8 @@ namespace MulTUNG
         public static void SendPacket(Packet packet)
         {
 #if DEBUG
-            if (!(packet is PlayerStatePacket))
-                IGConsole.Log($"Send packet of type {packet.GetType().Name} at {Time.time:0.0}");
+            //if (!(packet is PlayerStatePacket))
+            //    IGConsole.Log($"Send packet of type {packet.GetType().Name} at {Time.time:0.0}");
 #endif
 
             if (IsClient)

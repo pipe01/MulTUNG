@@ -63,7 +63,7 @@ namespace Server
             Log.WriteLine("Listening on port " + Constants.Port);
         }
 
-        public void Send(Packet packet) => Broadcast(packet);
+        public void Send(Packet packet) => Broadcast(packet.Serialize());
 
         public void Broadcast(Packet packet, params int[] excludeIds)
         {

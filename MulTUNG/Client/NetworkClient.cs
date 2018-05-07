@@ -9,10 +9,11 @@ using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 namespace MulTUNG
 {
-    internal class NetworkClient : ISender
+    public class NetworkClient : ISender
     {
         public static NetworkClient Instance { get; private set; }
 
@@ -26,6 +27,9 @@ namespace MulTUNG
 
         public NetworkClient()
         {
+            if (Instance != null)
+                throw new ArgumentException("An instance of NetworkClient already exists!");
+
             Instance = this;
         }
 
@@ -44,7 +48,7 @@ namespace MulTUNG
                 if (Client.Connected)
                 {
                     BeginReceive();
-
+                    
                     //Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
                     
                     StartSending();
@@ -67,13 +71,14 @@ namespace MulTUNG
                 SceneManager.LoadScene("main menu");
             }
         }
-
+        
         public void Send(Packet packet)
         {
             packet.SenderID = this.PlayerID;
             packet.Time = Time.time;
 
             SendQueue.Enqueue(packet);
+            //Client.Client.Send(packet.Serialize());
         }
 
         public void SetID(int id)
@@ -81,10 +86,13 @@ namespace MulTUNG
             if (this.PlayerID == -2)
                 this.PlayerID = id;
 
-            IGConsole.Log("Request world");
-            Network.SendPacket(new SignalPacket(Packeting.Packets.Utils.SignalData.RequestWorld));
-        }
 
+            IGConsole.Log("Request world");
+            var pack = new SignalPacket(Packeting.Packets.Utils.SignalData.RequestWorld);
+
+            Send(pack);
+        }
+        
         public void EndReceivingWorld()
         {
             IGConsole.Log("End receive world");
@@ -120,8 +128,22 @@ namespace MulTUNG
 
         private void Received(IAsyncResult ar)
         {
-            var rec = Client.Client.EndReceive(ar);
+            int rec = 0;
+
+            try
+            {
+                rec = Client.Client.EndReceive(ar);
+            }
+            catch (ObjectDisposedException)
+            {
+                Disconnect();
+                return;
+            }
+
             BeginReceive();
+
+            if (rec == 0)
+                return;
 
             var state = ar.AsyncState as NetState;
             

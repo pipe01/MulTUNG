@@ -27,7 +27,7 @@ namespace MulTUNG
 
                 var packet = new PlaceBoardPacket
                 {
-                    AuthorID = MulTUNG.NetClient.PlayerID,
+                    AuthorID = NetworkClient.Instance.PlayerID,
                     BoardID = id,
                     ParentBoardID = parent?.GetComponent<NetObject>()?.NetID ?? 0,
                     Width = boardComp.x,
