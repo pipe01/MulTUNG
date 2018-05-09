@@ -10,77 +10,96 @@ using System.Threading;
 
 namespace MulTUNG.Utils
 {
-    public class Transfer
+    public static class Transfer
     {
-        private Stream DataStream;
-        private ISender Sender;
+        public static bool IsSending { get; private set; } = false;
+        public static bool IsReceiving { get; private set; } = false;
 
-        public Transfer(Stream data, ISender sender)
-        {
-            this.DataStream = data;
-            this.Sender = sender;
-        }
+        public static AutoResetEvent ContinueEvent { get; private set; } = new AutoResetEvent(false);
 
-        public void Send()
+        private static AutoResetEvent ReceiveEvent = new AutoResetEvent(false);
+
+        private static IList<TransferDataPacket> ReceivedPackets = new List<TransferDataPacket>();
+
+        public static void Send(Stream dataStream, ISender sender)
         {
-            IGConsole.Log("----SENDING");
+            if (IsReceiving || IsSending)
+                throw new Exception("Can't send more than once at the same time!");
 
             byte[] buffer = new byte[TransferDataPacket.DataBufferSize];
-            int count = 0;
             int read = 0;
             int totalRead = 0;
-            //long length = DataStream.Length;
-            
-            Sender.Send(new SignalPacket(SignalData.BeginTransfer));
-            WaitAck();
+            int i = 0;
 
-            while ((read = DataStream.Read(buffer, 0, buffer.Length)) != 0)
+            IsSending = true;
+
+            sender.Send(new SignalPacket(SignalData.BeginTransfer));
+            ContinueEvent.WaitOne();
+
+            while ((read = dataStream.Read(buffer, 0, buffer.Length)) != 0)
             {
-                IGConsole.Log("Send " + count);
-
                 totalRead += read;
 
-                Sender.Send(new TransferDataPacket
+                IGConsole.Log("Send " + i);
+                sender.Send(new TransferDataPacket
                 {
                     Data = buffer,
-                    Index = count++
+                    Length = read,
+                    Index = i++
                 });
 
-                WaitAck();
-
-                IGConsole.Log($"{totalRead}");///{length} ({totalRead / (float)length:0.0}%)");
+                ContinueEvent.WaitOne();
             }
-
-            Thread.Sleep(100);
-
-            Sender.Send(new SignalPacket(SignalData.EndTransfer));
-
-            IGConsole.Log("End transfer");
             
-            void WaitAck() => Network.WaitForPacket(o => o is SignalPacket signal && signal.Data == SignalData.AckTransfer);
+            sender.Send(new SignalPacket(SignalData.EndTransfer));
+
+            IsSending = false;
         }
 
-        public static void Receive(Stream outputStream)
+        public static byte[] ReceiveBytes()
         {
-            Network.WaitForPacket(o => o is SignalPacket signal && signal.Data == SignalData.BeginTransfer);
-            Network.SendPacket(new SignalPacket(SignalData.AckTransfer));
+            ReceiveEvent.WaitOne();
 
-            while (true)
+            using (MemoryStream mem = new MemoryStream())
             {
-                var packet = Network.WaitForPacket(o => (o is SignalPacket signal && signal.Data == SignalData.EndTransfer) || o is TransferDataPacket);
+                EndReceive(mem);
 
-                if (packet is TransferDataPacket data)
-                {
-                    outputStream.Write(data.Data, 0, data.Data.Length);
-                    IGConsole.Log("Transfer index: " + data.Index);
+                return mem.ToArray();
+            }
+        }
 
-                    Network.SendPacket(new SignalPacket(SignalData.AckTransfer));
-                }
-                else
+        public static void BeginReceive()
+        {
+            if (IsReceiving || IsSending)
+                throw new Exception("Can't transfer more than once at the same time!");
+
+            IsReceiving = true;
+            ReceivedPackets.Clear();
+
+            Network.SendPacket(new SignalPacket(SignalData.AckTransfer));
+        }
+
+        public static void EndReceive(Stream outputStream)
+        {
+            if (outputStream != null)
+            {
+                foreach (var item in ReceivedPackets.OrderBy(o => o.Index))
                 {
-                    break;
+                    outputStream.Write(item.Data, 0, item.Length);
                 }
             }
+            
+            ReceiveEvent.Set();
+
+            IsReceiving = false;
+            ReceivedPackets.Clear();
+        }
+
+        public static void ReceivePacket(TransferDataPacket packet)
+        {
+            ReceivedPackets.Add(packet);
+
+            Network.SendPacket(new SignalPacket(SignalData.AckTransfer));
         }
     }
 }

@@ -9,15 +9,17 @@ namespace MulTUNG.Packeting.Packets
     {
         public override PacketType Type => PacketType.TransferData;
 
-        public const int DataBufferSize = NetState.BufferSize - 10;
+        public const int DataBufferSize = 2000;//NetState.BufferSize - 10;
 
         public int Index { get; set; }
+        public int Length { get; set; }
         public byte[] Data { get; set; }
 
         protected override byte[] SerializeInner()
         {
             return new PacketBuilder()
                 .WriteInt32(Index)
+                .WriteInt32(Length)
                 .WriteByteArray(Data)
                 .Done();
         }
@@ -28,6 +30,7 @@ namespace MulTUNG.Packeting.Packets
 
             var packet = reader.ReadBasePacket<TransferDataPacket>();
             packet.Index = reader.ReadInt32();
+            packet.Length = reader.ReadInt32();
             packet.Data = reader.ReadByteArray();
 
             return packet;

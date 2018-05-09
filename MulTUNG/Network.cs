@@ -72,6 +72,10 @@ namespace MulTUNG
                         PlayerManager.UpdatePlayer(state);
 
                     break;
+                case TransferDataPacket transfer:
+                    Transfer.ReceivePacket(transfer);
+
+                    break;
                 case SignalPacket signal:
                     HandleSignalPacket(signal);
 
@@ -125,26 +129,21 @@ namespace MulTUNG
                         NetworkServer.Instance.SendWorld(NetworkServer.Instance.GetPlayer(signal.SenderID));
 
                     break;
-                case SignalData.WorldEnd:
-                    if (IsClient)
-                        NetworkClient.Instance.EndReceivingWorld();
-
-                    break;
                 case SignalData.Ping:
                     Network.SendPacket(new SignalPacket(SignalData.Pong));
 
                     break;
                 case SignalData.BeginTransfer:
-                    IGConsole.Log("Begin receive transfer");
-                    ThreadPool.QueueUserWorkItem(_ =>
-                    {
-                        using (MemoryStream mem = new MemoryStream())
-                        {
-                            Transfer.Receive(mem);
+                    Transfer.BeginReceive();
 
-                            IGConsole.Log("Done receiving: " + mem.Length);
-                        }
-                    });
+                    break;
+                case SignalData.EndTransfer:
+                    Transfer.EndReceive(null);
+
+                    break;
+                case SignalData.AckTransfer:
+                    if (Transfer.IsSending)
+                        Transfer.ContinueEvent.Set();
 
                     break;
             }

@@ -70,6 +70,7 @@
     <Compile Include="Client\RemotePlayer.cs" />
     <Compile Include="ISender.cs" />
     <Compile Include="MulTUNG.cs" />
+    <Compile Include="MyDebug.cs" />
     <Compile Include="NetObject.cs" />
     <Compile Include="NetJobs.cs" />
     <Compile Include="NetUtilitiesComponent.cs" />

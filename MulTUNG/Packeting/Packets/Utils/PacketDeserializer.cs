@@ -27,10 +27,12 @@ namespace MulTUNG.Packeting.Packets
 
         public static Packet DeserializePacket(byte[] data)
         {
-            if (data[0] == 0)
+            Func<byte[], Packet> handler;
+
+            if (data[0] == 0 || !Handlers.TryGetValue((PacketType)data[0], out handler))
                 return null;
 
-            return Handlers[(PacketType)data[0]](data);
+            return handler(data);
         }
     }
 }

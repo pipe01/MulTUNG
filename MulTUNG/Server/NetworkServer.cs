@@ -4,11 +4,14 @@ using MulTUNG.Packeting.Packets;
 using MulTUNG.Packeting.Packets.Utils;
 using MulTUNG.Utils;
 using PiTung.Console;
+using SavedObjects;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using UnityEngine;
 using Network = MulTUNG.Network;
@@ -69,6 +72,9 @@ namespace Server
         {
             Network.ProcessPacket(packet, 0);
 
+            if (!(packet is PlayerStatePacket))
+                MyDebug.Log($"Server broadcast: {packet.GetType().Name}" + (packet is SignalPacket signal ? $" ({signal.Data.ToString()})" : ""));
+
             Broadcast(packet.Serialize(), excludeIds);
         }
 
@@ -99,55 +105,19 @@ namespace Server
         {
             IGConsole.Log("Sending world to player");
 
-            var allObjs = GameObject.FindObjectsOfType<ObjectInfo>();
-            var boards = allObjs
-                .Where(o => o.ComponentType == ComponentType.CircuitBoard).ToList()
-                .PushToTop(o => o.transform.parent == null);
+            List<SavedObjectV2> topLevelObjects = SaveManager.GetTopLevelObjects();
 
-            IGConsole.Log("Parents: " + string.Join("; ", boards.Select(o => o.transform.parent == null ? "Yes" : "No").ToArray()));
+            BinaryFormatter bin = new BinaryFormatter();
 
-            foreach (var item in 
-                boards.Concat(
-                allObjs.Where(o => o.ComponentType != ComponentType.Wire && o.ComponentType != ComponentType.CircuitBoard).Concat(
-                allObjs.Where(o => o.ComponentType == ComponentType.Wire))))
+            using (MemoryStream mem = new MemoryStream())
             {
-                var netObj = item.GetComponent<NetObject>();
+                bin.Serialize(mem, topLevelObjects);
 
-                if (netObj == null)
-                    continue;
+                mem.Position = 0;
 
-                var type = item.ComponentType;
-
-                if (type == ComponentType.CircuitBoard)
-                {
-                    var board = item.GetComponent<CircuitBoard>();
-
-                    player.Send(new PlaceBoardPacket
-                    {
-                        BoardID = netObj.NetID,
-                        Width = board.x,
-                        Height = board.z,
-                        Position = item.transform.position,
-                        EulerAngles = item.transform.eulerAngles,
-                        ParentBoardID = item.transform.parent?.GetComponent<NetObject>()?.NetID ?? 0
-                    });
-                }
-                else if (type == ComponentType.Wire)
-                {
-                    var wire = item.GetComponent<Wire>();
-
-                    var packet = PlaceWirePacket.BuildFromLocalWire(wire);
-
-                    if (packet != null)
-                        player.Send(packet);
-                }
-                else
-                {
-                    player.Send(PlaceComponentPacket.BuildFromLocalComponent(item.gameObject));
-                }
+                //TODO Add a Semaphore in order to prevent sending the world to multiple players at once
+                Transfer.Send(mem, player);
             }
-
-            player.Send(new SignalPacket(SignalData.WorldEnd));
         }
 
         private void StartCircuitUpdateClock()

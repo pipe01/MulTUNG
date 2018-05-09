@@ -40,7 +40,7 @@ namespace DummyClient
 
             new NetUtilitiesComponent();
 
-            new NetworkClient().Connect(host);
+            NetworkClient.Instance.Connect(host);
 
             ThreadPool.QueueUserWorkItem(_ =>
             {

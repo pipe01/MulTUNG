@@ -35,7 +35,9 @@ namespace Server
         {
             if (!Connected)
                 return;
-            
+
+            MyDebug.Log($"Send to player {ID}: {packet.GetType().Name}" + (packet is SignalPacket signal ? $" ({signal.Data.ToString()})" : ""));
+
             Client.Client.Send(packet.Serialize());
         }
 

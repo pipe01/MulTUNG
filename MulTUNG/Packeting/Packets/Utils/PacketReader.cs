@@ -6,15 +6,24 @@ using UnityEngine;
 
 namespace MulTUNG.Packeting.Packets
 {
-    public class PacketReader
+    public class PacketReader : IDisposable
     {
         private static BinaryFormatter BinFormatter = new BinaryFormatter();
         
         private readonly MemoryStream Data;
 
-        public PacketReader(byte[] data)
+        public PacketReader(byte[] data) : this(data, 0, data.Length)
+        {
+        }
+
+        public PacketReader(byte[] data, int offset, int length)
         {
             this.Data = new MemoryStream(data);
+        }
+        
+        public void Dispose()
+        {
+            this.Data.Dispose();
         }
 
         private byte[] Read(int count)

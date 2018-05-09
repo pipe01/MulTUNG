@@ -9,7 +9,6 @@ namespace MulTUNG.Packeting.Packets.Utils
     {
         CircuitUpdate,
         RequestWorld,
-        WorldEnd,
         Ping,
         Pong,
         BeginTransfer,

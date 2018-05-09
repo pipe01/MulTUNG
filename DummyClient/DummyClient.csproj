@@ -35,6 +35,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="PiTung, Version=2.3.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\TUNG Console\PiTung Bootstrap\bin\Debug\PiTung.dll</HintPath>
@@ -61,10 +65,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\lib\Harmony\Harmony\Harmony.csproj">
-      <Project>{c971aa7f-377f-4f0c-b026-d57b610b1be4}</Project>
-      <Name>Harmony</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MulTUNG\MulTUNG.csproj">
       <Project>{ad3de8e4-164b-4379-90f2-4dfbdc284449}</Project>
       <Name>MulTUNG</Name>

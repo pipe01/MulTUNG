@@ -10,12 +10,17 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using MulTUNG.Utils;
+using System.Collections.Generic;
+using SavedObjects;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace MulTUNG
 {
     public class NetworkClient : ISender
     {
-        public static NetworkClient Instance { get; private set; }
+        public static NetworkClient Instance { get; private set; } = new NetworkClient();
 
         public TcpClient Client { get; private set; }
         public int PlayerID { get; private set; } = -2;
@@ -27,7 +32,7 @@ namespace MulTUNG
 
         public NetworkClient()
         {
-            if (Instance != null)
+            if (Instance != null && Instance != this)
                 throw new ArgumentException("An instance of NetworkClient already exists!");
 
             Instance = this;
@@ -36,7 +41,7 @@ namespace MulTUNG
         public void Connect(IPEndPoint endPoint)
         {
             Disconnect();
-            
+
             Client = new TcpClient();
 
             IGConsole.Log("Connecting...");
@@ -91,22 +96,43 @@ namespace MulTUNG
             var pack = new SignalPacket(Packeting.Packets.Utils.SignalData.RequestWorld);
 
             Send(pack);
+
+            var worldData = Transfer.ReceiveBytes();
+            MyDebug.Log("Received data: " + worldData.Length);
+            
+            List<SavedObjectV2> topLevelObjects;
+
+            using (MemoryStream mem = new MemoryStream(worldData))
+            {
+                topLevelObjects = (List<SavedObjectV2>)new BinaryFormatter().Deserialize(mem);
+            }
+
+            //MegaMeshManager.ClearReferences();
+            //BehaviorManager.AllowedToUpdate = false;
+            //BehaviorManager.ClearAllLists();
+
+            //foreach (ObjectInfo objectInfo in GameObject.FindObjectsOfType<ObjectInfo>())
+            //{
+            //    GameObject.Destroy(objectInfo.gameObject);
+            //}
+
+            //if (topLevelObjects != null)
+            //{
+            //    foreach (SavedObjectV2 save in topLevelObjects)
+            //    {
+            //        SavedObjectUtilities.LoadSavedObject(save, null);
+            //    }
+            //}
+            //SaveManager.RecalculateAllClustersEverywhereWithDelay();
         }
         
-        public void EndReceivingWorld()
-        {
-            IGConsole.Log("End receive world");
-
-            ReceivingWorld = false;
-
-            Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
-        }
-
         private void StartSending()
         {
             while (Client.Connected)
             {
                 var packet = SendQueue.Dequeue();
+
+                MyDebug.Log($"Send: {packet.GetType().Name}" + (packet is SignalPacket signal ? $" ({signal.Data.ToString()})" : ""));
 
                 try
                 {
@@ -148,6 +174,13 @@ namespace MulTUNG
             var state = ar.AsyncState as NetState;
             
             var packet = PacketDeserializer.DeserializePacket(state.Buffer);
+
+            if (packet == null)
+                return;
+
+            if (!(packet is PlayerStatePacket))
+                MyDebug.Log($"Received: {packet.GetType().Name}" + (packet is SignalPacket signal ? $" ({signal.Data.ToString()})" : ""));
+
             Network.ProcessPacket(packet, this.PlayerID);
         }
     }
