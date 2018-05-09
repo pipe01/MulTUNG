@@ -12,13 +12,15 @@ namespace MulTUNG.Packeting.Packets
         
         private readonly MemoryStream Data;
 
+        public int PacketSize { get; }
+
         public PacketReader(byte[] data) : this(data, 0, data.Length)
         {
         }
 
         public PacketReader(byte[] data, int offset, int length)
         {
-            this.Data = new MemoryStream(data);
+            this.Data = new MemoryStream(data, offset, length);
         }
         
         public void Dispose()

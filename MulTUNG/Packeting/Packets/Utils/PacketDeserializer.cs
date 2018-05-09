@@ -25,12 +25,21 @@ namespace MulTUNG.Packeting.Packets
             [PacketType.RotateComponent]    = RotateComponentPacket.Deserialize,
         };
 
-        public static Packet DeserializePacket(byte[] data)
+        public static Packet DeserializePacket(byte[] data, out int length)
         {
-            Func<byte[], Packet> handler;
+            byte[] packetSizeBytes = new byte[sizeof(int)];
+            Array.Copy(data, 0, packetSizeBytes, 0, sizeof(int));
 
-            if (data[0] == 0 || !Handlers.TryGetValue((PacketType)data[0], out handler))
+            length = BitConverter.ToInt32(packetSizeBytes, 0) + sizeof(int);
+
+            Func<byte[], Packet> handler;
+            byte packetTypeByte = data[sizeof(int)];
+
+            if (packetTypeByte == 0 || !Handlers.TryGetValue((PacketType)packetTypeByte, out handler))
+            {
+                length = -1;
                 return null;
+            }
 
             return handler(data);
         }

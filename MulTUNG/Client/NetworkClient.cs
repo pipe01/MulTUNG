@@ -90,8 +90,7 @@ namespace MulTUNG
         {
             if (this.PlayerID == -2)
                 this.PlayerID = id;
-
-
+            
             IGConsole.Log("Request world");
             var pack = new SignalPacket(Packeting.Packets.Utils.SignalData.RequestWorld);
 
@@ -172,16 +171,29 @@ namespace MulTUNG
                 return;
 
             var state = ar.AsyncState as NetState;
-            
-            var packet = PacketDeserializer.DeserializePacket(state.Buffer);
 
-            if (packet == null)
-                return;
+            int i = 0;
+            while (ReadPacket(ref i)) ;
 
-            if (!(packet is PlayerStatePacket))
-                MyDebug.Log($"Received: {packet.GetType().Name}" + (packet is SignalPacket signal ? $" ({signal.Data.ToString()})" : ""));
+            bool ReadPacket(ref int index)
+            {
+                byte[] packetData = new byte[NetState.BufferSize];
+                Array.Copy(state.Buffer, index, packetData, 0, state.Buffer.Length - index);
 
-            Network.ProcessPacket(packet, this.PlayerID);
+                var packet = PacketDeserializer.DeserializePacket(packetData, out int packetLength);
+
+                if (packet == null)
+                    return false;
+
+                index += packetLength;
+
+                if (!(packet is PlayerStatePacket))
+                    MyDebug.Log($"Received: {packet.GetType().Name}" + (packet is SignalPacket signal ? $" ({signal.Data.ToString()})" : ""));
+
+                Network.ProcessPacket(packet, this.PlayerID);
+
+                return true;
+            }
         }
     }
 }

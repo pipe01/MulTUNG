@@ -12,10 +12,21 @@ namespace MulTUNG.Packeting.Packets
 
         private MemoryStream Data = new MemoryStream();
 
+        public PacketBuilder()
+        {
+            var data = new byte[sizeof(int)];
+
+            Data.Write(data, 0, data.Length);
+        }
+
         public byte[] Done()
         {
             var data = Data.ToArray();
             Data.Dispose();
+
+            byte[] packetSizeBytes = BitConverter.GetBytes(data.Length - sizeof(int));
+
+            Array.Copy(packetSizeBytes, 0, data, 0, packetSizeBytes.Length);
 
             return data;
         }

@@ -117,7 +117,7 @@ namespace Server
 
                 BeginReceive();
 
-                var packet = PacketDeserializer.DeserializePacket(st.Buffer);
+                var packet = PacketDeserializer.DeserializePacket(st.Buffer, out int _); //TODO Correct packet reading
 
                 if (packet == null)
                     return;
