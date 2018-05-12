@@ -84,5 +84,25 @@ namespace Packet_Log_Viewer
 
             new frmHexViewer(data).Show();
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            var args = Environment.GetCommandLineArgs();
+
+            if (args.Length > 1)
+            {
+                try
+                {
+                    Log = PacketLog.Load(args[1]);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Unable to open log file. Details: \n" + ex, "Error", MessageBoxButtons.OK);
+                    return;
+                }
+
+                LoadLog(Log);
+            }
+        }
     }
 }
