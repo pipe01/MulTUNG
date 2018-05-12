@@ -50,7 +50,6 @@ namespace MulTUNG
 
                 if (net != null)
                 {
-                    IGConsole.Log("Send delete board with id " + net.NetID);
                     Network.SendPacket(new DeleteBoardPacket { BoardID = net.NetID });
                 }
             }

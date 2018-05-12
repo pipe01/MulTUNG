@@ -30,7 +30,6 @@ namespace MulTUNG.Packeting.Packets
             var objInfo = component.GetComponent<ObjectInfo>();
 
             int parentId = component.transform.parent?.gameObject.GetComponent<NetObject>()?.NetID ?? 0;
-            IGConsole.Log("Component parent ID: " + parentId);
 
             return new PlaceComponentPacket
             {
