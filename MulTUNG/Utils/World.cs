@@ -27,14 +27,14 @@ namespace MulTUNG.Utils
             world.TopLevelObjects = SaveManager.GetTopLevelObjects();
 
             //Create a new queue that will store all of the objects' net IDs in order
-            Queue<int> netIds = new Queue<int>();
+            Queue<KeyValuePair<Vector3, int>> netIds = new Queue<KeyValuePair<Vector3, int>>();
 
             foreach (var item in GameObject.FindObjectsOfType<NetObject>())
             {
-                netIds.Enqueue(item.NetID);
+                netIds.Enqueue(new KeyValuePair<Vector3, int>(item.transform.position, item.NetID));
             }
 
-            world.NetIDs = netIds.ToList();
+            world.NetIDs = netIds.ToDictionary(o => (SerializableVector3)o.Key, o => o.Value);
 
             BinaryFormatter bin = new BinaryFormatter();
 
@@ -68,12 +68,12 @@ namespace MulTUNG.Utils
             //Run on Unity thread
             MulTUNG.SynchronizationContext.Send(o =>
             {
-                var netIds = (Queue<int>)o;
+                var netIds = (Dictionary<SerializableVector3, int>)o;
 
                 //Load all the objects from the save
                 foreach (var item in world.TopLevelObjects)
                 {
-                    var obj = SavedObjectUtilities.LoadSavedObject(item);
+                    SavedObjectUtilities.LoadSavedObject(item);
                 }
 
                 //Add a NetObject component to all of them
@@ -82,18 +82,18 @@ namespace MulTUNG.Utils
                 //Go through each NetObject and assign them an ID taken from the net IDs queue
                 foreach (var item in GameObject.FindObjectsOfType<NetObject>())
                 {
-                    item.NetID = netIds.Dequeue();
+                    item.NetID = netIds[item.transform.position];
                 }
 
                 SaveManager.RecalculateAllClustersEverywhereWithDelay();
-            }, new Queue<int>(world.NetIDs));
+            }, world.NetIDs);
         }
         
         [Serializable]
         private class SavedWorld
         {
             public List<SavedObjectV2> TopLevelObjects;
-            public List<int> NetIDs;
+            public Dictionary<SerializableVector3, int> NetIDs;
         }
     }
 }
