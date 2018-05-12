@@ -112,7 +112,6 @@
     <Compile Include="Server\Log.cs" />
     <Compile Include="Server\NetworkServer.cs" />
     <Compile Include="Server\Player.cs" />
-    <Compile Include="Utils\SavedNetObject.cs" />
     <Compile Include="Utils\World.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\OBJLoader.cs" />

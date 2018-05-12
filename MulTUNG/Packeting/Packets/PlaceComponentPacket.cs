@@ -1,4 +1,5 @@
-﻿using SavedObjects;
+﻿using PiTung.Console;
+using SavedObjects;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
@@ -28,13 +29,16 @@ namespace MulTUNG.Packeting.Packets
 
             var objInfo = component.GetComponent<ObjectInfo>();
 
+            int parentId = component.transform.parent?.gameObject.GetComponent<NetObject>()?.NetID ?? 0;
+            IGConsole.Log("Component parent ID: " + parentId);
+
             return new PlaceComponentPacket
             {
                 NetID = netObj.NetID,
                 SavedObject = SavedObjectUtilities.CreateSavedObjectFrom(objInfo),
                 LocalPosition = component.transform.localPosition,
                 EulerAngles = component.transform.localEulerAngles,
-                ParentBoardID = component.transform.parent?.gameObject.GetComponent<NetObject>()?.NetID ?? 0
+                ParentBoardID = parentId
             };
         }
 
