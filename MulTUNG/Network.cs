@@ -96,6 +96,10 @@ namespace MulTUNG
                     World.Deserialize(world.Data);
 
                     break;
+                case UserInputPacket input:
+                    ComponentActions.DoAction(input);
+
+                    break;
             }
         }
 

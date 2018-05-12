@@ -30,7 +30,7 @@ namespace DummyClient
             HarmonyInstance.DEBUG = true;
             
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
-
+            
             Console.Write("Host (127.0.0.1): ");
             string host = Console.ReadLine();
 

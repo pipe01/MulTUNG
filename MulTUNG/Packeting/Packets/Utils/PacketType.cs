@@ -15,6 +15,7 @@
         PlaceWire,
         DeleteWire,
         RotateComponent,
-        WorldData
+        WorldData,
+        UserInput
     }
 }

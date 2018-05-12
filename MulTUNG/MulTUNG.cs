@@ -23,13 +23,12 @@ namespace MulTUNG
         public override string PackageName => "me.pipe01.MulTUNG";
         public override string Author => "pipe01";
         public override Version ModVersion => new Version("1.0.0");
+        public override string UpdateUrl => "http://pipe0481.heliohost.org/pitung/mods/manifest.ptm";
 
         public const string ForbiddenSaveName = "you shouldn't be seeing this";
 
         public static SynchronizationContext SynchronizationContext;
-
-        //internal static NetworkClient NetClient = new NetworkClient();
-
+        
         public override void BeforePatch()
         {
 #pragma warning disable CS0618 // Type or member is obsolete

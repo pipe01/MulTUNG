@@ -9,22 +9,25 @@ namespace MulTUNG.Packeting.Packets
 {
     public static class PacketDeserializer
     {
-        private static IDictionary<PacketType, Func<IReader, Packet>> Handlers = new Dictionary<PacketType, Func<IReader, Packet>>
+        private static IDictionary<PacketType, Func<IReader, Packet>> Handlers = new Dictionary<PacketType, Func<IReader, Packet>>();
+
+        static PacketDeserializer()
         {
-            [PacketType.Signal]             = SignalPacket.Deserialize,
-            [PacketType.PlayerState]        = PlayerStatePacket.Deserialize,
-            [PacketType.StateList]          = StateListPacket.Deserialize,
-            [PacketType.PlayerWelcome]      = PlayerWelcomePacket.Deserialize,
-            [PacketType.PlayerDisconnect]   = PlayerDisconnectPacket.Deserialize,
-            [PacketType.PlaceBoard]         = PlaceBoardPacket.Deserialize,
-            [PacketType.DeleteBoard]        = DeleteBoardPacket.Deserialize,
-            [PacketType.PlaceComponent]     = PlaceComponentPacket.Deserialize,
-            [PacketType.DeleteComponent]    = DeleteComponentPacket.Deserialize,
-            [PacketType.PlaceWire]          = PlaceWirePacket.Deserialize,
-            [PacketType.DeleteWire]         = DeleteWirePacket.Deserialize,
-            [PacketType.RotateComponent]    = RotateComponentPacket.Deserialize,
-            [PacketType.WorldData]          = WorldDataPacket.Deserialize,
-        };
+            Assembly ass = Assembly.GetExecutingAssembly();
+            string @namespace = typeof(Packet).Namespace + ".";
+
+            foreach (PacketType item in Enum.GetValues(typeof(PacketType)))
+            {
+                var cls = ass.GetType(@namespace + item.ToString() + "Packet");
+
+                if (cls == null)
+                    continue;
+
+                var method = cls.GetMethod("Deserialize", BindingFlags.Public | BindingFlags.Static);
+
+                Handlers.Add(item, (Func<IReader, Packet>)Delegate.CreateDelegate(typeof(Func<IReader, Packet>), method));
+            }
+        }
 
         public static Packet DeserializePacket(IReader reader)
         {

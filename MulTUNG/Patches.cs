@@ -1,5 +1,6 @@
 ﻿using Harmony;
 using MulTUNG.Packeting.Packets;
+using MulTUNG.Utils;
 using PiTung;
 using PiTung.Console;
 using SavedObjects;
@@ -68,7 +69,7 @@ namespace MulTUNG
             }
         }
 
-        [PatchMethod(OriginalMethod = "ExecuteSelectedAction", PatchType = PatchType.Postfix)]
+        [PatchMethod("ExecuteSelectedAction", PatchType.Postfix)]
         public static void ExecuteSelectedActionPostfix()
         {
             BoardPlacerPatch.IsTryingToMoveBoard = false;
@@ -84,7 +85,7 @@ namespace MulTUNG
             __state = StuffPlacer.GetThingBeingPlaced;
         }
 
-        [PatchMethod(OriginalMethod = "PlaceThingBeingPlaced", PatchType = PatchType.Postfix)]
+        [PatchMethod("PlaceThingBeingPlaced", PatchType.Postfix)]
         public static void PlaceThingBeingPlacedPostfix(ref GameObject __state)
         {
             var objInfo = __state.GetComponent<ObjectInfo>();
@@ -105,7 +106,7 @@ namespace MulTUNG
             __state = DestroyThis?.tag == "CircuitBoard";
         }
 
-        [PatchMethod(OriginalMethod = "DeleteThing", PatchType = PatchType.Postfix)]
+        [PatchMethod("DeleteThing", PatchType.Postfix)]
         public static void DeleteThingPostfix(GameObject DestroyThis)
         {
             if (DestroyThis == null)
@@ -188,7 +189,7 @@ namespace MulTUNG
             __state = RotateThis.transform.localEulerAngles;
         }
 
-        [PatchMethod(OriginalMethod = "RotateThing", PatchType = PatchType.Postfix)]
+        [PatchMethod("RotateThing", PatchType.Postfix)]
         public static void RotateThingPostfix(GameObject RotateThis, ref Vector3 __state)
         {
             if (RotateThis.transform.localEulerAngles != __state && RotateThis.tag != "Wire")
@@ -212,5 +213,27 @@ namespace MulTUNG
     {
         [PatchMethod]
         static bool SaveAllSynchronously() => !Network.IsClient;
+    }
+
+    [Target(typeof(Button))]
+    internal static class ButtonPatch
+    {
+        [PatchMethod(PatchType.Postfix)]
+        public static void ButtonDown(Button __instance)
+        {
+            var netObj = __instance.GetComponent<NetObject>();
+
+            if (netObj == null || ComponentActions.CurrentlyActing.Contains(netObj.NetID))
+                return;
+            
+            var packet = new UserInputPacket
+            {
+                NetID = netObj.NetID,
+                Receiver = UserInputPacket.UserInputReceiver.Button,
+                State = __instance.output.On
+            };
+
+            Network.SendPacket(packet);
+        }
     }
 }

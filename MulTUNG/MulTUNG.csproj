@@ -94,6 +94,7 @@
     <Compile Include="Packeting\Packets\RotateComponentPacket.cs" />
     <Compile Include="Packeting\Packets\PlayerStatePacket.cs" />
     <Compile Include="Packeting\Packets\StateListPacket.cs" />
+    <Compile Include="Packeting\Packets\UserInputPacket.cs" />
     <Compile Include="Packeting\Packets\Utils\SignalData.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketBuilder.cs" />
     <Compile Include="Packeting\Packets\Utils\PacketDeserializer.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Server\Log.cs" />
     <Compile Include="Server\NetworkServer.cs" />
     <Compile Include="Server\Player.cs" />
+    <Compile Include="Utils\ComponentActions.cs" />
     <Compile Include="Utils\World.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\OBJLoader.cs" />
