@@ -18,20 +18,18 @@ namespace MulTUNG.Packeting.Packets
         protected override byte[] SerializeInner()
         {
             return new PacketBuilder()
-                .WriteInt32(BoardID)
-                .WriteInt32(ParentBoardID)
-                .WriteInt32(AuthorID)
-                .WriteInt32(Width)
-                .WriteInt32(Height)
-                .WriteVector3(Position)
-                .WriteVector3(EulerAngles)
+                .Write(BoardID)
+                .Write(ParentBoardID)
+                .Write(AuthorID)
+                .Write(Width)
+                .Write(Height)
+                .Write(Position)
+                .Write(EulerAngles)
                 .Done();
         }
 
-        public static PlaceBoardPacket Deserialize(byte[] data)
+        public static PlaceBoardPacket Deserialize(IReader reader)
         {
-            var reader = new PacketReader(data);
-
             var packet = reader.ReadBasePacket<PlaceBoardPacket>();
             packet.BoardID = reader.ReadInt32();
             packet.ParentBoardID = reader.ReadInt32();

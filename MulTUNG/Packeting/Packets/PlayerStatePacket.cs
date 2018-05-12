@@ -1,35 +1,39 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
 
 namespace MulTUNG.Packeting.Packets
 {
     public class PlayerStatePacket : Packet
     {
+        public override PacketType Type => PacketType.PlayerState;
+        //public override bool ShouldBroadcast => true;
+
         public int PlayerID { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 EulerAngles { get; set; }
 
-        public override bool ShouldBroadcast => true;
-        public override PacketType Type => PacketType.PlayerState;
-
         protected override byte[] SerializeInner()
         {
             return new PacketBuilder()
-                .WriteInt32(PlayerID)
-                .WriteVector3(Position)
-                .WriteVector3(EulerAngles)
+                .Write(PlayerID)
+                .Write(Position)
+                .Write(EulerAngles)
                 .Done();
         }
 
-        public static PlayerStatePacket Deserialize(byte[] data)
+        public static PlayerStatePacket Deserialize(IReader reader)
         {
-            var reader = new PacketReader(data);
-
             var packet = reader.ReadBasePacket<PlayerStatePacket>();
             packet.PlayerID = reader.ReadInt32();
             packet.Position = reader.ReadVector3();
             packet.EulerAngles = reader.ReadVector3();
-
+            
             return packet;
         }
+
+        public override string ToString() => Position.ToString();
     }
 }

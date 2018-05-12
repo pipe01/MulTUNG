@@ -17,15 +17,13 @@ namespace MulTUNG.Packeting.Packets
         protected override byte[] SerializeInner()
         {
             return new PacketBuilder()
-                .WriteInt32(ComponentID)
-                .WriteVector3(EulerAngles)
+                .Write(ComponentID)
+                .Write(EulerAngles)
                 .Done();
         }
 
-        public static RotateComponentPacket Deserialize(byte[] data)
+        public static RotateComponentPacket Deserialize(IReader reader)
         {
-            var reader = new PacketReader(data);
-
             var packet = reader.ReadBasePacket<RotateComponentPacket>();
             packet.ComponentID = reader.ReadInt32();
             packet.EulerAngles = reader.ReadVector3();

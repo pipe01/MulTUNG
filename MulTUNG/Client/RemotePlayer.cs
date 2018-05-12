@@ -18,8 +18,10 @@ namespace MulTUNG.Client
         private Quaternion LastRotation = Quaternion.identity,
                            NextRotation = Quaternion.identity;
 
-        private float TimeBetweenStates = 0;
+        private float TimeBetweenStates = 0.01f;
         private float LastStateTime = 0;
+
+        public PlayerState LastState;
 
         void FixedUpdate()
         {
@@ -29,11 +31,13 @@ namespace MulTUNG.Client
             transform.rotation = Quaternion.Lerp(LastRotation, NextRotation, t);
         }
 
-        public void UpdateWithPacket(PlayerStatePacket state)
+        public void UpdateState(PlayerState state)
         {
             //if (state.Time < LastStateTime)
             //    return;
-            
+
+            LastState = state;
+
             TimeBetweenStates = Time.time - LastStateTime;
             LastStateTime = Time.time;
 

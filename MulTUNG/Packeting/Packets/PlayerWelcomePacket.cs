@@ -9,14 +9,12 @@
         protected override byte[] SerializeInner()
         {
             return new PacketBuilder()
-                .WriteInt32(YourID)
+                .Write(YourID)
                 .Done();
         }
 
-        public static PlayerWelcomePacket Deserialize(byte[] data)
+        public static PlayerWelcomePacket Deserialize(IReader reader)
         {
-            var reader = new PacketReader(data);
-
             var packet = reader.ReadBasePacket<PlayerWelcomePacket>();
             packet.YourID = reader.ReadInt32();
 

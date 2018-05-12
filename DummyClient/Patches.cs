@@ -1,5 +1,6 @@
 ﻿using Harmony;
 using MulTUNG;
+using MulTUNG.Client;
 using PiTung.Console;
 using System;
 using UnityEngine;
@@ -37,7 +38,7 @@ namespace DummyClient
             if (!Log.PrintLines)
                 Log.WriteLine(value);
 
-            return Log.PrintLines;
+            return true;//Log.PrintLines;
         }
     }
 
@@ -48,7 +49,7 @@ namespace DummyClient
     }
 
     [HarmonyPatch(typeof(PlayerManager), "UpdatePlayer")]
-    static class UpdatePlayerPatch
+    static class WaveGoodbyePatch
     {
         static bool Prefix() => false;
     }

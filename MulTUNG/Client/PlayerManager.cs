@@ -4,6 +4,7 @@ using PiTung.Console;
 using PiTung.Mod_utilities;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 
 namespace MulTUNG
@@ -23,51 +24,87 @@ namespace MulTUNG
 
         public static GameObject PlayerModelPrefab { get; private set; }
 
-        private static IDictionary<int, RemotePlayer> Players = new Dictionary<int, RemotePlayer>();
-        
+        private static IDictionary<int, RemotePlayer> PlayersInner = new Dictionary<int, RemotePlayer>();
+
+        public static RemotePlayer[] Players => PlayersInner.Values.ToArray();
+
         public static void NewPlayer(int id)
         {
-            if (!Players.ContainsKey(id))
+            //If the player already exists, don't do anything
+            if (!PlayersInner.ContainsKey(id))
             {
+                //Instantiate a new player from the prefab
                 var obj = MakePlayerModel();
 
-                Players.Add(id, obj.AddComponent<RemotePlayer>());
+                //Add a RemotePlayer component
+                var remotePlayer = obj.AddComponent<RemotePlayer>();
+
+                //Add it to the players registry
+                PlayersInner.Add(id, remotePlayer);
             }
         }
 
-        public static void UpdatePlayer(PlayerStatePacket packet)
+        public static void UpdateStates(StateListPacket states)
         {
-            if (!Players.ContainsKey(packet.PlayerID))
+            foreach (var item in states.States)
             {
-                NewPlayer(packet.PlayerID);
+                if (item.Key == Network.PlayerID)
+                    continue;
+                
+                UpdatePlayer(item.Value);
+            }
+        }
+
+        public static void UpdatePlayer(PlayerState state)
+        {
+            //If the player doesn't exist
+            if (!PlayersInner.ContainsKey(state.PlayerID))
+            {
+                //Create it
+                NewPlayer(state.PlayerID);
             }
 
-            var player = Players[packet.PlayerID];
-            
-            if (packet.Time < player.LastUpdateTime)
+            var player = PlayersInner[state.PlayerID];
+
+            //If this packet somehow has an earlier time than the last received packet, skip it
+            if (state.Time < player.LastUpdateTime)
                 return;
 
-            player.UpdateWithPacket(packet);
+            //Update the RemotePlayer
+            player.UpdateState(state);
         }
 
         public static void WaveGoodbye(int playerId)
         {
-            if (Players.TryGetValue(playerId, out var player))
+            if (PlayersInner.TryGetValue(playerId, out var player))
             {
                 GameObject.Destroy(player.gameObject);
 
-                Players.Remove(playerId);
+                PlayersInner.Remove(playerId);
             }
         }
 
         private static GameObject MakePlayerModel()
         {
             if (PlayerModelPrefab == null)
-                return null;
+            {
+                //Load model on Unity's main thread
+                MulTUNG.SynchronizationContext.Send(_ => BuildPlayerPrefab(), null);
 
+                //Check if the prefab is still null
+                if (PlayerModelPrefab == null)
+                {
+                    IGConsole.Error("Couldn't load player model!");
+                    return null;
+                }
+            }
+
+            //Create a new parent object that will contain the model
             GameObject player = new GameObject("Remote Player");
             GameObject newModel = GameObject.Instantiate(PlayerModelPrefab, player.transform);
             newModel.SetActive(true);
+
+            //Offset its local position by half of the model height
             newModel.transform.localPosition = new Vector3(0, -1.65f / 2, 0);
             
             return player;

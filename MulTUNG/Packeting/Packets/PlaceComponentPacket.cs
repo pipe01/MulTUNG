@@ -41,18 +41,16 @@ namespace MulTUNG.Packeting.Packets
         protected override byte[] SerializeInner()
         {
             return new PacketBuilder()
-                .WriteInt32(NetID)
+                .Write(NetID)
                 .WriteBinaryObject(SavedObject)
-                .WriteInt32(ParentBoardID)
-                .WriteVector3(LocalPosition)
-                .WriteVector3(EulerAngles)
+                .Write(ParentBoardID)
+                .Write(LocalPosition)
+                .Write(EulerAngles)
                 .Done();
         }
 
-        public static PlaceComponentPacket Deserialize(byte[] data)
+        public static PlaceComponentPacket Deserialize(IReader reader)
         {
-            var reader = new PacketReader(data);
-
             var packet = reader.ReadBasePacket<PlaceComponentPacket>();
             packet.NetID = reader.ReadInt32();
             packet.SavedObject = reader.ReadBinaryObject<SavedObjectV2>();
@@ -62,5 +60,7 @@ namespace MulTUNG.Packeting.Packets
 
             return packet;
         }
+
+        public override string ToString() => $"{ParentBoardID}.{NetID}";
     }
 }

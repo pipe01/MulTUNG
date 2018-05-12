@@ -23,8 +23,8 @@ namespace MulTUNG.Packeting.Packets
             var netObj = wireBeingPlaced.AddComponent<NetObject>();
             netObj.NetID = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 
-            var netObj1 = wire.Point1.parent.parent.gameObject.GetComponent<NetObject>();
-            var netObj2 = wire.Point2.parent.parent.gameObject.GetComponent<NetObject>();
+            var netObj1 = wire.Point1?.parent?.parent?.gameObject?.GetComponent<NetObject>();
+            var netObj2 = wire.Point2?.parent?.parent?.gameObject?.GetComponent<NetObject>();
 
             if (netObj1 == null || netObj2 == null)
                 return null;
@@ -48,18 +48,16 @@ namespace MulTUNG.Packeting.Packets
         protected override byte[] SerializeInner()
         {
             return new PacketBuilder()
-                .WriteInt32(NetObj1Id)
-                .WriteInt32(Point1Id)
-                .WriteInt32(NetObj2Id)
-                .WriteInt32(Point2Id)
-                .WriteInt32(NetID)
+                .Write(NetObj1Id)
+                .Write(Point1Id)
+                .Write(NetObj2Id)
+                .Write(Point2Id)
+                .Write(NetID)
                 .Done();
         }
 
-        public static PlaceWirePacket Deserialize(byte[] data)
+        public static PlaceWirePacket Deserialize(IReader reader)
         {
-            var reader = new PacketReader(data);
-
             var packet = reader.ReadBasePacket<PlaceWirePacket>();
             packet.NetObj1Id = reader.ReadInt32();
             packet.Point1Id = reader.ReadInt32();

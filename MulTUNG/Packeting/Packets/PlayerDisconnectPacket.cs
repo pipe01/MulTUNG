@@ -17,10 +17,8 @@ namespace MulTUNG.Packeting.Packets
             return BitConverter.GetBytes(PlayerID);
         }
 
-        public static PlayerDisconnectPacket Deserialize(byte[] data)
+        public static PlayerDisconnectPacket Deserialize(IReader reader)
         {
-            var reader = new PacketReader(data);
-
             var packet = reader.ReadBasePacket<PlayerDisconnectPacket>();
             packet.PlayerID = reader.ReadInt32();
 

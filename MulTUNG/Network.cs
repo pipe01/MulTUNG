@@ -18,23 +18,13 @@ namespace MulTUNG
 {
     public static class Network
     {
-        private class PacketWaiter
-        {
-            public Predicate<Packet> Predicate;
-            public bool ContinueProcessing;
-            public ManualResetEvent Mre;
-
-            public Packet Packet;
-        }
-
         public static bool Connected => IsClient || IsServer;
         public static bool IsClient => NetworkClient.Instance?.Connected ?? false;
         public static bool IsServer => NetworkServer.Instance?.Running ?? false;
 
-        private static int Counter = 0;
-        private static IList<PacketWaiter> WaitList = new List<PacketWaiter>();
-
-        public const int ServerPlayerID = 1;
+        public static int PlayerID => IsClient ? NetworkClient.Instance.PlayerID : ServerPlayerID;
+        
+        public const int ServerPlayerID = 0;
         
         public static void ProcessPacket(Packet packet, int playerId)
         {
@@ -43,37 +33,24 @@ namespace MulTUNG
 
             if (packet is PlayerWelcomePacket wel)
             {
-                IGConsole.Log("Your player ID is " + wel.YourID);
-
                 NetworkClient.Instance.SetID(wel.YourID);
-            }
-
-            if (packet.SenderID == playerId)
                 return;
-
-            foreach (var item in WaitList)
-            {
-                if (item.Predicate(packet))
-                {
-                    item.Mre.Set();
-                    item.Packet = packet;
-
-                    WaitList.Remove(item);
-
-                    if (!item.ContinueProcessing)
-                        return;
-                }
             }
+            
+            if (packet.SenderID == playerId && !(packet is StateListPacket))
+                return;
             
             switch (packet)
             {
                 case PlayerStatePacket state:
-                    if (state.PlayerID != playerId)
-                        PlayerManager.UpdatePlayer(state);
+                    if (IsServer)
+                    {
+                        NetworkServer.Instance.UpdatePlayerState(state);
+                    }
 
                     break;
-                case TransferDataPacket transfer:
-                    Transfer.ReceivePacket(transfer);
+                case StateListPacket states:
+                    PlayerManager.UpdateStates(states);
 
                     break;
                 case SignalPacket signal:
@@ -115,6 +92,10 @@ namespace MulTUNG
                     NetUtilitiesComponent.Instance.Enqueue(new RotateComponentJob(rotateComp));
 
                     break;
+                case WorldDataPacket world:
+                    World.Deserialize(world.Data);
+
+                    break;
             }
         }
 
@@ -126,84 +107,61 @@ namespace MulTUNG
                     break;
                 case SignalData.RequestWorld:
                     if (IsServer)
-                        NetworkServer.Instance.SendWorld(NetworkServer.Instance.GetPlayer(signal.SenderID));
-
-                    break;
-                case SignalData.Ping:
-                    Network.SendPacket(new SignalPacket(SignalData.Pong));
-
-                    break;
-                case SignalData.BeginTransfer:
-                    Transfer.BeginReceive();
-
-                    break;
-                case SignalData.EndTransfer:
-                    Transfer.EndReceive(null);
-
-                    break;
-                case SignalData.AckTransfer:
-                    if (Transfer.IsSending)
-                        Transfer.ContinueEvent.Set();
+                        NetworkServer.Instance.SendWorld(signal.SenderID);
 
                     break;
             }
         }
-
-        public static Packet WaitForPacket(Predicate<Packet> predicate, bool continueProcessing = false)
-        {
-            ManualResetEvent mre = new ManualResetEvent(false);
-            var item = new PacketWaiter
-            {
-                Predicate = predicate,
-                Mre = mre,
-                ContinueProcessing = continueProcessing
-            };
-
-            WaitList.Add(item);
-
-            mre.WaitOne();
-
-            return item.Packet;
-        }
-
+        
         public static void StartPositionUpdateThread(int updateInterval)
         {
-            new Thread(() =>
+            //The timer will start after 500ms have elapsed
+            Timer timer = null;
+            timer = new Timer(_ =>
             {
-                while (Connected)
+                if (!Connected || ModUtilities.IsOnMainMenu)
                 {
-                    Thread.Sleep(updateInterval);
-
-                    if (ModUtilities.IsOnMainMenu)
-                        continue;
-
-                    var packet = new PlayerStatePacket
-                    {
-                        PlayerID = NetworkClient.Instance?.PlayerID ?? ServerPlayerID,
-                        Time = Time.time,
-                        Position = FirstPersonInteraction.FirstPersonCamera.transform.position,
-                        EulerAngles = FirstPersonInteraction.FirstPersonCamera.transform.eulerAngles
-                    };
-
-                    SendPacket(packet);
-
-                    if (Counter++ % 120 == 0)
-                        IGConsole.Log("Update pos");
+                    timer.Dispose();
+                    return;
                 }
-            }).Start();
+                
+                SendState();
+
+                if (IsServer)
+                {
+                    NetworkServer.Instance.SendStatesToPlayers();
+                }
+                
+                //if (Counter++ % 120 == 0)
+                //    IGConsole.Log("Update pos");
+            }, null, 500, updateInterval);
+        }
+
+        private static void SendState()
+        {
+            var packet = new PlayerStatePacket
+            {
+                PlayerID = PlayerID,
+                Position = FirstPersonInteraction.FirstPersonCamera.transform.position,
+                EulerAngles = FirstPersonInteraction.FirstPersonCamera.transform.eulerAngles
+            };
+
+            if (IsClient)
+                Network.SendPacket(packet);
+            else
+                Network.ProcessPacket(packet, 0);
         }
 
         public static void SendPacket(Packet packet)
         {
-#if DEBUG
-            //if (!(packet is PlayerStatePacket))
-            //    IGConsole.Log($"Send packet of type {packet.GetType().Name} at {Time.time:0.0}");
-#endif
-
             if (IsClient)
+            {
                 NetworkClient.Instance.Send(packet);
+            }
             else if (IsServer)
-                NetworkServer.Instance.Broadcast(packet, ServerPlayerID);
+            {
+                NetworkServer.Instance.Send(packet);
+            }
         }
     }
 }

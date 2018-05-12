@@ -15,19 +15,13 @@ namespace MulTUNG.Packeting.Packets
         public PacketBuilder()
         {
             var data = new byte[sizeof(int)];
-
-            Data.Write(data, 0, data.Length);
         }
 
         public byte[] Done()
         {
             var data = Data.ToArray();
             Data.Dispose();
-
-            byte[] packetSizeBytes = BitConverter.GetBytes(data.Length - sizeof(int));
-
-            Array.Copy(packetSizeBytes, 0, data, 0, packetSizeBytes.Length);
-
+            
             return data;
         }
 
@@ -38,40 +32,40 @@ namespace MulTUNG.Packeting.Packets
             return this;
         }
 
-        public PacketBuilder Write(byte[] data)
+        public PacketBuilder WriteRaw(byte[] data)
         {
             Data.Write(data, 0, data.Length);
 
             return this;
         }
 
-        public PacketBuilder WritePacketType(PacketType d) => Write((byte)d);
+        public PacketBuilder Write(PacketType d) => Write((byte)d);
 
-        public PacketBuilder WriteInt32(int d) => Write(BitConverter.GetBytes(d));
+        public PacketBuilder Write(int d) => WriteRaw(BitConverter.GetBytes(d));
 
-        public PacketBuilder WriteInt64(long d) => Write(BitConverter.GetBytes(d));
+        public PacketBuilder Write(long d) => WriteRaw(BitConverter.GetBytes(d));
 
-        public PacketBuilder WriteFloat(float d) => Write(BitConverter.GetBytes(d));
+        public PacketBuilder Write(float d) => WriteRaw(BitConverter.GetBytes(d));
 
-        public PacketBuilder WriteBool(bool d) => Write(BitConverter.GetBytes(d));
+        public PacketBuilder Write(bool d) => WriteRaw(BitConverter.GetBytes(d));
 
-        public PacketBuilder WriteVector3(Vector3 d) =>
-                 WriteFloat(d.x)
-                .WriteFloat(d.y)
-                .WriteFloat(d.z);
+        public PacketBuilder Write(Vector3 d) =>
+                 Write(d.x)
+                .Write(d.y)
+                .Write(d.z);
 
-        public PacketBuilder WriteString(string d)
+        public PacketBuilder Write(string d)
         {
-            WriteInt32(d.Length);
-            Write(Encoding.UTF8.GetBytes(d));
+            Write(d.Length);
+            WriteRaw(Encoding.UTF8.GetBytes(d));
 
             return this;
         }
 
-        public PacketBuilder WriteByteArray(byte[] d)
+        public PacketBuilder Write(byte[] d)
         {
-            WriteInt32(d.Length);
-            Write(d);
+            Write(d.Length);
+            WriteRaw(d);
 
             return this;
         }

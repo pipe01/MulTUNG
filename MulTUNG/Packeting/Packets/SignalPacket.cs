@@ -26,14 +26,14 @@ namespace MulTUNG.Packeting.Packets
             return BitConverter.GetBytes((int)Data);
         }
 
-        public static SignalPacket Deserialize(byte[] data)
+        public static SignalPacket Deserialize(IReader reader)
         {
-            var reader = new PacketReader(data);
-
             var packet = reader.ReadBasePacket<SignalPacket>();
             packet.Data = (SignalData)reader.ReadInt32();
 
             return packet;
         }
+
+        public override string ToString() => Data.ToString();
     }
 }

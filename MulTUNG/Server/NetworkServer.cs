@@ -1,7 +1,7 @@
-﻿using MulTUNG;
-using MulTUNG.Packeting;
+﻿using Lidgren.Network;
+using MulTUNG;
 using MulTUNG.Packeting.Packets;
-using MulTUNG.Packeting.Packets.Utils;
+using MulTUNG.Server;
 using MulTUNG.Utils;
 using PiTung.Console;
 using SavedObjects;
@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using UnityEngine;
@@ -18,7 +17,7 @@ using Network = MulTUNG.Network;
 
 namespace Server
 {
-    internal class NetworkServer : ISender
+    public class NetworkServer : ISender
     {
         public static NetworkServer Instance { get; private set; }
 
@@ -34,14 +33,15 @@ namespace Server
             }
         }
 
-        public bool Running => Listener != null;
+        public bool Running => Server?.Status == NetPeerStatus.Running;
 
-        public IPEndPoint LocalEndPoint => Listener?.LocalEndpoint as IPEndPoint;
+        public IPEndPoint LocalEndPoint => null;//Listener?.LocalEndpoint as IPEndPoint;
 
         private TimeSpan CircuitUpdateTime;
         private int PlayerIdCounter = 123;
-        private TcpListener Listener;
-        private IList<Player> Players = new List<Player>();
+
+        private NetServer Server;
+        private IDictionary<int, Player> Players = new Dictionary<int, Player>();
 
         public NetworkServer()
         {
@@ -51,124 +51,151 @@ namespace Server
 
         public void Start()
         {
-            Listener = new TcpListener(IPAddress.Any, Constants.Port);
-            Listener.Start();
+            NetPeerConfiguration config = new NetPeerConfiguration("MulTUNG");
+            config.Port = Constants.Port;
 
-            LoadWorld();
+            Server = new NetServer(config);
+            Server.Start();
 
-            StartCircuitUpdateClock();
-            StartPlayerClock();
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                NetIncomingMessage msg;
+                while (Server != null)
+                {
+                    msg = Server.WaitMessage(int.MaxValue);
 
-            BeginAcceptTcpClient();
+                    if (msg == null)
+                        continue;
+
+                    HandleMessage(msg);
+
+                    Server.Recycle(msg);
+                }
+            });
+
+            World.AddNetObjects();
+            World.Serialize();
+
+            //StartCircuitUpdateClock();
 
             Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
 
             Log.WriteLine("Listening on port " + Constants.Port);
         }
 
-        public void Send(Packet packet) => Broadcast(packet.Serialize());
+        private void HandleMessage(NetIncomingMessage msg)
+        {
+            switch (msg.MessageType)
+            {
+                case NetIncomingMessageType.Data:
+                    var packet = PacketDeserializer.DeserializePacket(new MessagePacketReader(msg));
 
-        public void Broadcast(Packet packet, params int[] excludeIds)
+                    PacketLog.LogReceive(packet);
+
+                    if (packet.ShouldBroadcast)
+                        Broadcast(packet, packet.ReliableBroadcast ? NetDeliveryMethod.ReliableOrdered : NetDeliveryMethod.UnreliableSequenced);
+                    else
+                        Network.ProcessPacket(packet, Network.ServerPlayerID);
+
+                    break;
+                case NetIncomingMessageType.StatusChanged:
+                    var status = (NetConnectionStatus)msg.ReadByte();
+
+                    if (status == NetConnectionStatus.Connected)
+                    {
+                        IGConsole.Log("Connected: " + msg.SenderEndPoint);
+
+                        int id = PlayerIdCounter++;
+
+                        msg.SenderConnection.SendMessage(new PlayerWelcomePacket
+                        {
+                            YourID = id
+                        }.GetMessage(Server), NetDeliveryMethod.ReliableOrdered, 0);
+
+                        var player = new Player(id, msg.SenderConnection);
+
+                        IGConsole.Log("ID " + player.ID);
+
+                        Players.Add(id, player);
+                    }
+                    else if (status == NetConnectionStatus.Disconnected)
+                    {
+                        int id = Players.Keys.SingleOrDefault(o => Players[o].Connection == msg.SenderConnection);
+
+                        PlayerManager.WaveGoodbye(id);
+                    }
+
+                    break;
+            }
+        }
+
+        public void SendStatesToPlayers()
+        {
+            var packet = new StateListPacket();
+
+            packet.States.Add(Network.ServerPlayerID, new PlayerState
+            {
+                PlayerID = Network.ServerPlayerID,
+                Position = FirstPersonInteraction.FirstPersonCamera.transform.position,
+                EulerAngles = FirstPersonInteraction.FirstPersonCamera.transform.eulerAngles
+            });
+
+            foreach (var item in Players)
+            {
+                packet.States.Add(item.Value.ID, new PlayerState
+                {
+                    PlayerID = item.Value.ID,
+                    Position = item.Value.Position,
+                    EulerAngles = item.Value.EulerAngles
+                });
+            }
+
+            Broadcast(packet, NetDeliveryMethod.ReliableSequenced);
+        }
+
+        public void UpdatePlayerState(PlayerStatePacket packet)
+        {
+            if (Players.TryGetValue(packet.PlayerID, out var player))
+            {
+                player.Position = packet.Position;
+                player.EulerAngles = packet.EulerAngles;
+            }
+        }
+
+        public void Send(Packet packet, NetDeliveryMethod delivery = NetDeliveryMethod.ReliableOrdered) => Broadcast(packet, delivery);
+
+        public void Broadcast(Packet packet, NetDeliveryMethod delivery, params int[] excludeIds)
         {
             Network.ProcessPacket(packet, 0);
 
-            if (!(packet is PlayerStatePacket))
-                MyDebug.Log($"Server broadcast: {packet.GetType().Name}" + (packet is SignalPacket signal ? $" ({signal.Data.ToString()})" : ""));
+            var msg = packet.GetMessage(Server);
 
-            Broadcast(packet.Serialize(), excludeIds);
+            //foreach (var item in Players)
+            //{
+            //    if (!excludeIds.Contains(item.Key))
+            //    {
+            //        var res = item.Value.Connection.SendMessage(msg, delivery, 0);
+            //    }
+            //}
+            Server.SendToAll(msg, delivery);
+
+            PacketLog.LogSend(packet);
         }
 
-        public void Broadcast(byte[] data, params int[] excludeIds)
+        public void SendWorld(int playerId)
         {
-            foreach (var item in Players.Where(o => !excludeIds.Contains(o.ID)))
+            var player = Players[playerId];
+
+            IGConsole.Log("Sending world to player " + playerId);
+
+            byte[] world = World.Serialize();
+
+            var msg = new WorldDataPacket
             {
-                try
-                {
-                    item.Client.Client.Send(data);
-                }
-                catch { }
-            }
-        }
+                Data = world
+            }.GetMessage(Server);
 
-        public Player GetPlayer(int id) => Players.SingleOrDefault(o => o.ID == id);
-
-        public void LoadWorld()
-        {
-            foreach (var item in GameObject.FindObjectsOfType<ObjectInfo>())
-            {
-                if (item.GetComponent<NetObject>() == null)
-                    item.gameObject.AddComponent<NetObject>().NetID = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-            }
-        }
-
-        public void SendWorld(Player player)
-        {
-            IGConsole.Log("Sending world to player");
-
-            List<SavedObjectV2> topLevelObjects = SaveManager.GetTopLevelObjects();
-
-            BinaryFormatter bin = new BinaryFormatter();
-
-            using (MemoryStream mem = new MemoryStream())
-            {
-                bin.Serialize(mem, topLevelObjects);
-
-                mem.Position = 0;
-
-                //TODO Add a Semaphore in order to prevent sending the world to multiple players at once
-                Transfer.Send(mem, player);
-            }
-        }
-
-        private void StartCircuitUpdateClock()
-        {
-            new Thread(() =>
-            {
-                while (true)
-                {
-                    Thread.Sleep(CircuitUpdateTime);
-                    
-                    //Broadcast(new SignalPacket(MulTUNG.Packeting.Packets.Utils.SignalData.CircuitUpdate));
-                }
-            }).Start();
-        }
-
-        private void StartPlayerClock()
-        {
-            new Thread(() =>
-            {
-                while (true)
-                {
-                    Thread.Sleep(1000);
-
-                    foreach (var item in Players)
-                    {
-                        if (Time.time - item.LastUpdateTime > Constants.MaximumPlayerStateTime)
-                        {
-                            //IGConsole.Log($"Player {item.ID} hasn't updated in a while!");
-                        }
-                    }
-                }
-            }).Start();
-        }
-
-        private void BeginAcceptTcpClient()
-        {
-            Listener.BeginAcceptTcpClient(AcceptTcpClient, null);
-
-            void AcceptTcpClient(IAsyncResult ar)
-            {
-                var client = Listener.EndAcceptTcpClient(ar);
-
-                BeginAcceptTcpClient();
-
-                Log.WriteLine($"New player with ID {PlayerIdCounter} connected.");
-
-                var player = new Player(client, PlayerIdCounter++);
-                player.Send(new PlayerWelcomePacket { YourID = player.ID, SenderID = -1 });
-                
-                Players.Add(player);
-            }
+            player.Connection.SendMessage(msg, NetDeliveryMethod.ReliableOrdered, 0);
         }
     }
 }

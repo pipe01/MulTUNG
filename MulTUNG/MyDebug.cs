@@ -12,7 +12,7 @@ namespace MulTUNG
 
         private static string Side => Network.IsClient ? "CLIENT" : "SERVER";
 
-        public static void Log(string line)
+        public static void Log(object line)
         {
             Debug.WriteLine($"[{Side}] [{Time}] {line}");
         }

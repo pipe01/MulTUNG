@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -6,7 +7,56 @@ using UnityEngine;
 
 namespace MulTUNG.Packeting.Packets
 {
-    public class PacketReader : IDisposable
+    public sealed class MessagePacketReader : IReader
+    {
+        private static BinaryFormatter BinFormatter = new BinaryFormatter();
+
+        private NetIncomingMessage Message;
+
+        public MessagePacketReader(NetIncomingMessage msg)
+        {
+            this.Message = msg;
+        }
+
+        public T ReadBasePacket<T>() where T : Packet, new()
+        {
+            Message.Position = 0;
+
+            ReadPacketType();
+
+            return new T
+            {
+                Time = ReadFloat(),
+                SenderID = ReadInt32()
+            };
+        }
+
+        public T ReadBinaryObject<T>()
+        {
+            using (MemoryStream mem = new MemoryStream(Message.PeekBytes(Message.LengthBytes - Message.PositionInBytes)))
+            {
+                return (T)BinFormatter.Deserialize(mem);
+            }
+        }
+
+        public bool ReadBool() => Message.ReadBoolean();
+
+        public byte[] ReadByteArray() => Message.ReadBytes(Message.ReadInt32());
+
+        public float ReadFloat() => Message.ReadFloat();
+
+        public int ReadInt32() => Message.ReadInt32();
+
+        public long ReadInt64() => Message.ReadInt64();
+
+        public PacketType ReadPacketType() => (PacketType)Message.ReadByte();
+
+        public string ReadString() => Message.ReadString();
+
+        public Vector3 ReadVector3() => Message.ReadVector3();
+    }
+
+    public sealed class PacketReader : IReader, IDisposable
     {
         private static BinaryFormatter BinFormatter = new BinaryFormatter();
         
@@ -75,5 +125,19 @@ namespace MulTUNG.Packeting.Packets
         {
             return (T)BinFormatter.Deserialize(Data);
         }
+    }
+
+    public interface IReader
+    {
+        T ReadBasePacket<T>() where T : Packet, new();
+        PacketType ReadPacketType();
+        int ReadInt32();
+        long ReadInt64();
+        float ReadFloat();
+        bool ReadBool();
+        Vector3 ReadVector3();
+        string ReadString();
+        byte[] ReadByteArray();
+        T ReadBinaryObject<T>();
     }
 }

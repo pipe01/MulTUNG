@@ -9,11 +9,11 @@ namespace MulTUNG.Packeting.Packets
 {
     public static class PacketDeserializer
     {
-        private static IDictionary<PacketType, Func<byte[], Packet>> Handlers = new Dictionary<PacketType, Func<byte[], Packet>>
+        private static IDictionary<PacketType, Func<IReader, Packet>> Handlers = new Dictionary<PacketType, Func<IReader, Packet>>
         {
-            [PacketType.TransferData]       = TransferDataPacket.Deserialize,
             [PacketType.Signal]             = SignalPacket.Deserialize,
             [PacketType.PlayerState]        = PlayerStatePacket.Deserialize,
+            [PacketType.StateList]          = StateListPacket.Deserialize,
             [PacketType.PlayerWelcome]      = PlayerWelcomePacket.Deserialize,
             [PacketType.PlayerDisconnect]   = PlayerDisconnectPacket.Deserialize,
             [PacketType.PlaceBoard]         = PlaceBoardPacket.Deserialize,
@@ -23,25 +23,17 @@ namespace MulTUNG.Packeting.Packets
             [PacketType.PlaceWire]          = PlaceWirePacket.Deserialize,
             [PacketType.DeleteWire]         = DeleteWirePacket.Deserialize,
             [PacketType.RotateComponent]    = RotateComponentPacket.Deserialize,
+            [PacketType.WorldData]          = WorldDataPacket.Deserialize,
         };
 
-        public static Packet DeserializePacket(byte[] data, out int length)
+        public static Packet DeserializePacket(IReader reader)
         {
-            byte[] packetSizeBytes = new byte[sizeof(int)];
-            Array.Copy(data, 0, packetSizeBytes, 0, sizeof(int));
+            var packetType = reader.ReadPacketType();
 
-            length = BitConverter.ToInt32(packetSizeBytes, 0) + sizeof(int);
-
-            Func<byte[], Packet> handler;
-            byte packetTypeByte = data[sizeof(int)];
-
-            if (packetTypeByte == 0 || !Handlers.TryGetValue((PacketType)packetTypeByte, out handler))
-            {
-                length = -1;
+            if (!Handlers.TryGetValue(packetType, out Func<IReader, Packet> handler))
                 return null;
-            }
 
-            return handler(data);
+            return handler(reader);
         }
     }
 }

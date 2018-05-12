@@ -1,4 +1,5 @@
-﻿using MulTUNG.Packeting.Packets;
+﻿using Lidgren.Network;
+using MulTUNG.Packeting.Packets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,6 @@ namespace MulTUNG
 {
     public interface ISender
     {
-        void Send(Packet packet);
+        void Send(Packet packet, NetDeliveryMethod delivery = NetDeliveryMethod.ReliableOrdered);
     }
 }

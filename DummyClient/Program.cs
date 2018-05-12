@@ -3,6 +3,7 @@
 using Harmony;
 using MulTUNG;
 using MulTUNG.Packeting.Packets;
+using Server;
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -53,9 +54,7 @@ namespace DummyClient
                 });
             });
 
-            Thread.Sleep(1000);
-
-            while (NetworkClient.Instance.Connected)
+            while (true)
             {
                 var key = Console.ReadKey(true);
 
@@ -71,6 +70,15 @@ namespace DummyClient
                     ParseCommand(line);
 
                     Log.FlushQueue();
+                }
+                else if (key.Key == ConsoleKey.P)
+                {
+                    Console.WriteLine(new string('-', 15));
+                    foreach (var item in PlayerManager.Players)
+                    {
+                        Console.WriteLine($"{item.LastState.PlayerID}\t{item.LastState.Position}");
+                    }
+                    Console.WriteLine(new string('-', 15) + "\n");
                 }
             }
         }

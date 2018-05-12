@@ -6,6 +6,7 @@
         Signal,
         PlayerWelcome,
         PlayerState,
+        StateList,
         PlayerDisconnect,
         PlaceBoard,
         DeleteBoard,
@@ -14,6 +15,6 @@
         PlaceWire,
         DeleteWire,
         RotateComponent,
-        TransferData,
+        WorldData
     }
 }

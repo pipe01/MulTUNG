@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 
 namespace MulTUNG.Packeting.Packets
 {
@@ -6,14 +7,15 @@ namespace MulTUNG.Packeting.Packets
     public abstract class Packet
     {
         public virtual bool ShouldBroadcast => false;
+        public virtual bool ReliableBroadcast => true;
 
         public byte[] Serialize()
         {
             return new PacketBuilder()
-                .WritePacketType(Type)
-                .WriteFloat(Time)
-                .WriteInt32(SenderID)
-                .Write(SerializeInner())
+                .Write(Type)
+                .Write(Time)
+                .Write(SenderID)
+                .WriteRaw(SerializeInner())
                 .Done();
         }
 
@@ -23,5 +25,12 @@ namespace MulTUNG.Packeting.Packets
 
         public float Time { get; set; }
         public int SenderID { get; set; }
+
+        public NetOutgoingMessage GetMessage(NetPeer peer)
+        {
+            var msg = peer.CreateMessage();
+            msg.Write(this.Serialize());
+            return msg;
+        }
     }
 }
