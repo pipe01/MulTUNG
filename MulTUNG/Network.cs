@@ -115,6 +115,8 @@ namespace MulTUNG
         
         public static void StartPositionUpdateThread(int updateInterval)
         {
+            IGConsole.Log("Start timer");
+
             //The timer will start after 500ms have elapsed
             Timer timer = null;
             timer = new Timer(_ =>

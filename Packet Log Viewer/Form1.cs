@@ -72,5 +72,17 @@ namespace Packet_Log_Viewer
 
             pgPacket.SelectedObject = entry.Packet;
         }
+
+        private void lvPackets_DoubleClick(object sender, EventArgs e)
+        {
+            if (lvPackets.SelectedIndices.Count == 0)
+                return;
+
+            var entry = ShownEntries[lvPackets.SelectedIndices[0]];
+
+            byte[] data = entry.Packet.Serialize();
+
+            new frmHexViewer(data).Show();
+        }
     }
 }

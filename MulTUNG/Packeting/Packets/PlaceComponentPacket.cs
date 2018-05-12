@@ -46,10 +46,10 @@ namespace MulTUNG.Packeting.Packets
         {
             return new PacketBuilder()
                 .Write(NetID)
-                .WriteBinaryObject(SavedObject)
                 .Write(ParentBoardID)
                 .Write(LocalPosition)
                 .Write(EulerAngles)
+                .WriteBinaryObject(SavedObject)
                 .Done();
         }
 
@@ -57,10 +57,10 @@ namespace MulTUNG.Packeting.Packets
         {
             var packet = reader.ReadBasePacket<PlaceComponentPacket>();
             packet.NetID = reader.ReadInt32();
-            packet.SavedObject = reader.ReadBinaryObject<SavedObjectV2>();
             packet.ParentBoardID = reader.ReadInt32();
             packet.LocalPosition = reader.ReadVector3();
             packet.EulerAngles = reader.ReadVector3();
+            packet.SavedObject = reader.ReadBinaryObject<SavedObjectV2>();
 
             return packet;
         }

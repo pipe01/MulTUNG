@@ -70,8 +70,6 @@ namespace MulTUNG
                     Client.Recycle(msg);
                 }
             });
-
-            Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
         }
 
         public void Connect(string host) => Connect(new IPEndPoint(IPAddress.Parse(host), Constants.Port));
