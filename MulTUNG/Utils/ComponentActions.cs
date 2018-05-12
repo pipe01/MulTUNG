@@ -1,5 +1,6 @@
 ﻿using MulTUNG.Packeting.Packets;
 using PiTung;
+using PiTung.Console;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace MulTUNG.Utils
     public static class ComponentActions
     {
         public static List<int> CurrentlyActing { get; } = new List<int>();
+        public static List<Button> PushedDownButtons { get; } = new List<Button>();
 
         public static void DoAction(UserInputPacket packet)
         {
@@ -22,10 +24,10 @@ namespace MulTUNG.Utils
             switch (packet.Receiver)
             {
                 case UserInputPacket.UserInputReceiver.Button:
-                    DoButton(obj.GetComponent<Button>(), packet.State);
+                    DoButton(obj.GetComponentInChildren<Button>(), packet.State);
                     break;
                 case UserInputPacket.UserInputReceiver.Switch:
-                    DoSwitch(obj.GetComponent<Switch>(), packet.State);
+                    DoSwitch(obj.GetComponentInChildren<Switch>(), packet.State);
                     break;
             }
 
@@ -35,9 +37,15 @@ namespace MulTUNG.Utils
         private static void DoButton(Button button, bool state)
         {
             if (state)
+            {
                 ModUtilities.ExecuteMethod(button, "ButtonDown");
+                PushedDownButtons.Add(button);
+            }
             else
+            {
                 ModUtilities.ExecuteMethod(button, "ButtonUp");
+                PushedDownButtons.Remove(button);
+            }
         }
 
         private static void DoSwitch(Switch @switch, bool state)

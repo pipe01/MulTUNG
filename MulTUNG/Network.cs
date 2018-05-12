@@ -97,7 +97,7 @@ namespace MulTUNG
 
                     break;
                 case UserInputPacket input:
-                    ComponentActions.DoAction(input);
+                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoAction(o as UserInputPacket), input);
 
                     break;
             }
@@ -119,8 +119,6 @@ namespace MulTUNG
         
         public static void StartPositionUpdateThread(int updateInterval)
         {
-            IGConsole.Log("Start timer");
-
             //The timer will start after 500ms have elapsed
             Timer timer = null;
             timer = new Timer(_ =>
