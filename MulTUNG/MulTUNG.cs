@@ -1,16 +1,13 @@
-﻿using MulTUNG.Packeting.Packets;
-using MulTUNG.Utils;
-using PiTung;
+﻿using PiTung;
 using PiTung.Console;
 using PiTung.Mod_utilities;
 using Server;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
+using System.Reflection;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -28,7 +25,31 @@ namespace MulTUNG
         public const string ForbiddenSaveName = "you shouldn't be seeing this";
 
         public static SynchronizationContext SynchronizationContext;
-        
+
+        //static MulTUNG()
+        //{
+        //    AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+        //}
+
+        //private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        //{
+        //    Console.WriteLine("::: " + args.Name);
+
+        //    var dic = new Dictionary<string, byte[]>
+        //    {
+        //        ["Lidgren.Network"] = Properties.Resources.Lidgren_Network
+        //    };
+
+        //    var name = new AssemblyName(args.Name).Name;
+
+        //    if (dic.TryGetValue(name, out var b))
+        //    {
+        //        return Assembly.Load(b);
+        //    }
+
+        //    return null;
+        //}
+
         public override void BeforePatch()
         {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -50,13 +71,7 @@ namespace MulTUNG
             if (ModUtilities.DummyComponent.gameObject.GetComponent<NetUtilitiesComponent>() == null)
                 ModUtilities.DummyComponent.gameObject.AddComponent<NetUtilitiesComponent>();
         }
-
-        public override void OnGUI()
-        {
-            if (!ModUtilities.IsOnMainMenu)
-                ModUtilities.Graphics.DrawText(Time.time.ToString("0.00"), new Vector2(3, 3), Color.white, true);
-        }
-
+        
         public override void OnApplicationQuit()
         {
             NetworkClient.Instance.Disconnect();

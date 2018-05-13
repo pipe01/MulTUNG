@@ -16,6 +16,7 @@
         DeleteWire,
         RotateComponent,
         WorldData,
-        UserInput
+        UserInput,
+        ComponentData,
     }
 }

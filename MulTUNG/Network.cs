@@ -100,6 +100,9 @@ namespace MulTUNG
                     MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoAction(o as UserInputPacket), input);
 
                     break;
+                case ComponentDataPacket compdata:
+                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoData(o as ComponentDataPacket), compdata);
+                    break;
             }
         }
 

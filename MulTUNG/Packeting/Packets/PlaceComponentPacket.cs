@@ -25,11 +25,29 @@ namespace MulTUNG.Packeting.Packets
             {
                 netObj = component.AddComponent<NetObject>();
                 netObj.NetID = Random.Range(int.MinValue, int.MaxValue);
+                
+                if (component.GetComponent<ObjectInfo>()?.ComponentType == ComponentType.Mount)
+                {
+                    IGConsole.Log("MOUNT");
+                    var board = component.GetComponentInChildren<CircuitBoard>();
+                    IGConsole.Log("--" + board);
+                    board.gameObject.AddComponent<NetObject>().NetID = Random.Range(int.MinValue, int.MaxValue);
+                }
             }
 
             var objInfo = component.GetComponent<ObjectInfo>();
 
-            int parentId = component.transform.parent?.gameObject.GetComponent<NetObject>()?.NetID ?? 0;
+            int parentId;
+
+            //IGConsole.Log(component.transform.parent?.GetComponent<NetObject>()?.ToString() ?? "NULL");
+            //if (component.transform.parent?.parent?.GetComponent<Mount>() != null)
+            //{
+            //    parentId = component.transform.parent.parent.GetComponent<NetObject>().NetID;
+            //}
+            //else
+            //{
+                parentId = component.transform.parent?.GetComponent<NetObject>()?.NetID ?? 0;
+            //}
 
             return new PlaceComponentPacket
             {

@@ -4,6 +4,8 @@ using MulTUNG.Utils;
 using PiTung;
 using PiTung.Console;
 using SavedObjects;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace MulTUNG
@@ -269,6 +271,90 @@ namespace MulTUNG
             };
 
             Network.SendPacket(packet);
+        }
+    }
+
+    [Target(typeof(NoisemakerMenu))]
+    internal static class NoisemakerMenuPatch
+    {
+        [PatchMethod(PatchType.Postfix)]
+        public static void Done()
+        {
+            var noisemaker = NoisemakerMenu.NoisemakerBeingEdited;
+            var netObj = noisemaker.transform.parent.GetComponent<NetObject>();
+            
+            if (netObj == null)
+                return;
+
+            Network.SendPacket(new ComponentDataPacket
+            {
+                NetID = netObj.NetID,
+                ComponentType = ComponentType.Noisemaker,
+                Data = new List<object>
+                {
+                    noisemaker.ToneFrequency
+                }
+            });
+        }
+    }
+
+    [Target(typeof(EditDisplayColorMenu))]
+    internal static class EditDisplayColorMenuPatch
+    {
+        [PatchMethod(PatchType.Postfix)]
+        public static void DoneMenu(EditDisplayColorMenu __instance)
+        {
+            var display = __instance.DisplayBeingEdited;
+            var netObj = display.transform.parent.GetComponent<NetObject>();
+
+            if (netObj == null)
+                return;
+
+            Network.SendPacket(new ComponentDataPacket
+            {
+                NetID = netObj.NetID,
+                ComponentType = ComponentType.Display,
+                Data = new List<object>
+                {
+                    display.DisplayColor
+                }
+            });
+        }
+    }
+
+    [Target(typeof(TextEditMenu))]
+    internal static class TextEditMenuPatch
+    {
+        public static Label LabelBeingEdited;
+
+        [PatchMethod]
+        public static void Done(EditDisplayColorMenu __instance)
+        {
+            var netObj = LabelBeingEdited.GetComponent<NetObject>();
+
+            if (netObj == null)
+                return;
+            
+            Network.SendPacket(new ComponentDataPacket
+            {
+                NetID = netObj.NetID,
+                ComponentType = ComponentType.Label,
+                Data = new List<object>
+                {
+                    LabelBeingEdited.text.text,
+                    LabelBeingEdited.text.fontSize
+                }
+            });
+        }
+    }
+
+    [Target(typeof(Label))]
+    internal static class LabelPatch
+    {
+        [PatchMethod]
+        public static void Interact(Label __instance)
+        {
+            TextEditMenuPatch.LabelBeingEdited = __instance;
         }
     }
 }

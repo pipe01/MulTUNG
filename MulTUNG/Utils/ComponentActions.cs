@@ -53,5 +53,34 @@ namespace MulTUNG.Utils
             @switch.On = state;
             @switch.UpdateLever();
         }
+
+        public static void DoData(ComponentDataPacket packet)
+        {
+            var netObj = NetObject.GetByNetId(packet.NetID);
+
+            if (netObj == null)
+                return;
+
+            switch (packet.ComponentType)
+            {
+                case ComponentType.Noisemaker:
+                    var noisemaker = netObj.GetComponentInChildren<Noisemaker>();
+                    noisemaker.ToneFrequency = (float)packet.Data[0];
+
+                    break;
+                case ComponentType.Display:
+                    var display = netObj.GetComponentInChildren<Display>();
+                    display.DisplayColor = (DisplayColor)packet.Data[0];
+                    display.ForceVisualRefresh();
+
+                    break;
+                case ComponentType.Label:
+                    var label = netObj.GetComponent<Label>();
+                    label.text.text = (string)packet.Data[0];
+                    label.text.fontSize = (float)packet.Data[1];
+
+                    break;
+            }
+        }
     }
 }

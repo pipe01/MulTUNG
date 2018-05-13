@@ -76,16 +76,18 @@ namespace MulTUNG.Utils
                     SavedObjectUtilities.LoadSavedObject(item);
                 }
 
-                //Add a NetObject component to all of them
+                SaveManager.RecalculateAllClustersEverywhereWithDelay();
+                
+                //Add a NetObject component to all components
                 World.AddNetObjects();
 
                 //Go through each NetObject and assign them an ID taken from the net IDs queue
                 foreach (var item in GameObject.FindObjectsOfType<NetObject>())
                 {
+                    MyDebug.Log("Load: " + item);
                     item.NetID = netIds[item.transform.position];
                 }
 
-                SaveManager.RecalculateAllClustersEverywhereWithDelay();
             }, world.NetIDs);
         }
         

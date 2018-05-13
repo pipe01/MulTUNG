@@ -58,6 +58,9 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="TextMeshPro-1.0.55.2017.1.0b12">
+      <HintPath>..\..\..\..\..\Downloads\The Ultimate Nerd Game\The Ultimate Nerd Game_Data\Managed\TextMeshPro-1.0.55.2017.1.0b12.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="UnityEngine.CoreModule">
@@ -81,6 +84,7 @@
     <Compile Include="Client\NetworkClient.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Packeting\NetState.cs" />
+    <Compile Include="Packeting\Packets\ComponentDataPacket.cs" />
     <Compile Include="Packeting\Packets\SignalPacket.cs" />
     <Compile Include="Packeting\Packets\DeleteBoardPacket.cs" />
     <Compile Include="Packeting\Packets\DeleteComponentPacket.cs" />
@@ -132,6 +136,9 @@
     <None Include="Resources\Image_2D_0003_0010.png2" />
     <None Include="Resources\patrick.mtl" />
     <None Include="Resources\patrick.obj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Lidgren.Network.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

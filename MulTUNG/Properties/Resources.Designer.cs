@@ -93,6 +93,16 @@ namespace MulTUNG.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] Lidgren_Network {
+            get {
+                object obj = ResourceManager.GetObject("Lidgren_Network", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] patrick {
             get {
                 object obj = ResourceManager.GetObject("patrick", resourceCulture);
