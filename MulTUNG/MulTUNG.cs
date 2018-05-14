@@ -1,4 +1,5 @@
-﻿using PiTung;
+﻿using MulTUNG.Headless;
+using PiTung;
 using PiTung.Console;
 using PiTung.Mod_utilities;
 using Server;
@@ -7,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -52,6 +52,11 @@ namespace MulTUNG
 
         public override void BeforePatch()
         {
+            if (Headlesser.IsHeadless)
+            {
+                HeadlessServer.Instance.Start();
+            }
+
 #pragma warning disable CS0618 // Type or member is obsolete
             IGConsole.RegisterCommand<Command_connect>(this);
             IGConsole.RegisterCommand<Command_disconnect>(this);
@@ -62,10 +67,14 @@ namespace MulTUNG
             string path = Application.persistentDataPath + "/saves/" + ForbiddenSaveName;
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
-
+            
             SynchronizationContext = SynchronizationContext.Current;
         }
 
+        public override void AfterPatch()
+        {
+        }
+        
         public override void Update()
         {
             if (ModUtilities.DummyComponent.gameObject.GetComponent<NetUtilitiesComponent>() == null)
@@ -144,7 +153,7 @@ namespace MulTUNG
 
                     if (ipStr != null && IPAddress.TryParse(ipStr.Trim(), out var ip))
                     {
-                        IGConsole.Log("Your public IP address is " + ip);
+                        Log.WriteLine("Your public IP address is " + ip);
                     }
                 });
             }

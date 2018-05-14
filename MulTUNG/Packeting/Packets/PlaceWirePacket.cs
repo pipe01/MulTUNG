@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using UnityEngine;
 
 namespace MulTUNG.Packeting.Packets
 {
@@ -22,9 +19,9 @@ namespace MulTUNG.Packeting.Packets
             
             var netObj = wireBeingPlaced.AddComponent<NetObject>();
             netObj.NetID = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-
-            var netObj1 = wire.Point1?.parent?.parent?.gameObject?.GetComponent<NetObject>();
-            var netObj2 = wire.Point2?.parent?.parent?.gameObject?.GetComponent<NetObject>();
+            
+            var netObj1 = GetNetObjectFromPoint(wire.Point1);
+            var netObj2 = GetNetObjectFromPoint(wire.Point2);
 
             if (netObj1 == null || netObj2 == null)
                 return null;
@@ -43,6 +40,14 @@ namespace MulTUNG.Packeting.Packets
                 Point2Id = ioIndex2,
                 NetID = netObj.NetID
             };
+        }
+
+        private static NetObject GetNetObjectFromPoint(Transform point)
+        {
+            if (point.parent?.GetComponent<ObjectInfo>() != null)
+                return point.parent.GetComponent<NetObject>();
+
+            return point.parent?.parent?.gameObject?.GetComponent<NetObject>();
         }
 
         protected override byte[] SerializeInner()

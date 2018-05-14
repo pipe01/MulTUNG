@@ -1,11 +1,9 @@
 ﻿using MulTUNG.Packeting.Packets;
-using PiTung.Console;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using UnityEngine;
 
 namespace MulTUNG.Utils

@@ -1,7 +1,5 @@
 ﻿using PiTung.Console;
 using SavedObjects;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 namespace MulTUNG.Packeting.Packets

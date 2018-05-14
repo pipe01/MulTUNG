@@ -18,5 +18,6 @@
         WorldData,
         UserInput,
         ComponentData,
+        CircuitState
     }
 }

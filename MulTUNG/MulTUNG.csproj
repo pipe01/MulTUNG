@@ -75,6 +75,8 @@
   <ItemGroup>
     <Compile Include="Client\BlockingQueue.cs" />
     <Compile Include="Client\RemotePlayer.cs" />
+    <Compile Include="Headless\Headlesser.cs" />
+    <Compile Include="Headless\HeadlessServer.cs" />
     <Compile Include="ISender.cs" />
     <Compile Include="MulTUNG.cs" />
     <Compile Include="MyDebug.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="Client\NetworkClient.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Packeting\NetState.cs" />
+    <Compile Include="Packeting\Packets\CircuitStatePacket.cs" />
     <Compile Include="Packeting\Packets\ComponentDataPacket.cs" />
     <Compile Include="Packeting\Packets\SignalPacket.cs" />
     <Compile Include="Packeting\Packets\DeleteBoardPacket.cs" />
@@ -118,6 +121,7 @@
     <Compile Include="Server\NetworkServer.cs" />
     <Compile Include="Server\Player.cs" />
     <Compile Include="Utils\ComponentActions.cs" />
+    <Compile Include="Utils\Compressor.cs" />
     <Compile Include="Utils\World.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\OBJLoader.cs" />

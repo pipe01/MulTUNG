@@ -6,7 +6,6 @@ DO NOT USE PARTS OF, OR THE ENTIRE SCRIPT, AND CLAIM AS YOUR OWN WORK
 
 using System;
 using UnityEngine;
-using System.Collections;
 using System.IO;
 
 public class TextureLoader : MonoBehaviour

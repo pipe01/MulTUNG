@@ -1,8 +1,5 @@
 ﻿using MulTUNG.Packeting.Packets;
-using PiTung;
-using PiTung.Console;
 using References;
-using System.Linq;
 using UnityEngine;
 
 namespace MulTUNG
@@ -32,7 +29,7 @@ namespace MulTUNG
 
         public override void Do()
         {
-            GameObject parentBoard = NetObject.GetByNetId(Packet.ParentBoardID);
+            NetObject parentBoard = NetObject.GetByNetId(Packet.ParentBoardID);
             
             GameObject gameObject = Object.Instantiate(Prefabs.CircuitBoard, Packet.Position, Quaternion.Euler(Packet.EulerAngles), parentBoard?.transform);
 
@@ -89,7 +86,7 @@ namespace MulTUNG
 
         public override void Do()
         {
-            var obj = NetObject.GetByNetId(Packet.ComponentNetID);
+            var obj = NetObject.GetByNetId(Packet.ComponentNetID).gameObject;
 
             CircuitInput[] componentsInChildren = obj.GetComponentsInChildren<CircuitInput>();
             CircuitOutput[] componentsInChildren2 = obj.GetComponentsInChildren<CircuitOutput>();
@@ -114,8 +111,8 @@ namespace MulTUNG
 
         public override void Do()
         {
-            var netObj1 = NetObject.GetByNetId(Packet.NetObj1Id)?.GetComponent<NetObject>();
-            var netObj2 = NetObject.GetByNetId(Packet.NetObj2Id)?.GetComponent<NetObject>();
+            var netObj1 = NetObject.GetByNetId(Packet.NetObj1Id);
+            var netObj2 = NetObject.GetByNetId(Packet.NetObj2Id);
 
             if (netObj1 == null || netObj2 == null)
                 return;
@@ -163,7 +160,7 @@ namespace MulTUNG
 
         public override void Do()
         {
-            var wire = NetObject.GetByNetId(Packet.WireNetID);
+            var wire = NetObject.GetByNetId(Packet.WireNetID)?.gameObject;
 
             if (wire == null)
                 return;
@@ -182,7 +179,7 @@ namespace MulTUNG
 
         public override void Do()
         {
-            var RotateThis = NetObject.GetByNetId(Packet.ComponentID);
+            var RotateThis = NetObject.GetByNetId(Packet.ComponentID)?.gameObject;
 
             if (RotateThis != null)
             {

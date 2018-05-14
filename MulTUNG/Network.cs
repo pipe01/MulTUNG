@@ -1,18 +1,9 @@
-﻿using MulTUNG;
-using MulTUNG.Packeting.Packets;
+﻿using MulTUNG.Packeting.Packets;
 using MulTUNG.Packeting.Packets.Utils;
 using MulTUNG.Utils;
 using PiTung;
-using PiTung.Console;
 using Server;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using UnityEngine;
 
 namespace MulTUNG
 {
@@ -138,9 +129,6 @@ namespace MulTUNG
                 {
                     NetworkServer.Instance.SendStatesToPlayers();
                 }
-                
-                //if (Counter++ % 120 == 0)
-                //    IGConsole.Log("Update pos");
             }, null, 500, updateInterval);
         }
 

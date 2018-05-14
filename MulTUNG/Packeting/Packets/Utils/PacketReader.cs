@@ -54,6 +54,13 @@ namespace MulTUNG.Packeting.Packets
         public string ReadString() => Message.ReadString();
 
         public Vector3 ReadVector3() => Message.ReadVector3();
+
+        public byte[] ReadRaw(int length)
+        {
+            int maxLength = Message.LengthBytes - Message.PositionInBytes;
+
+            return Message.PeekBytes(Math.Min(maxLength, length));
+        }
     }
 
     public sealed class PacketReader : IReader, IDisposable
@@ -73,6 +80,7 @@ namespace MulTUNG.Packeting.Packets
             this.Data = new MemoryStream(data, offset, length);
         }
         
+
         public void Dispose()
         {
             this.Data.Dispose();
@@ -125,6 +133,8 @@ namespace MulTUNG.Packeting.Packets
         {
             return (T)BinFormatter.Deserialize(Data);
         }
+
+        public byte[] ReadRaw(int length) => Read(length);
     }
 
     public interface IReader
@@ -139,5 +149,6 @@ namespace MulTUNG.Packeting.Packets
         string ReadString();
         byte[] ReadByteArray();
         T ReadBinaryObject<T>();
+        byte[] ReadRaw(int length);
     }
 }

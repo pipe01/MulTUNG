@@ -1,14 +1,15 @@
-﻿using PiTung.Console;
-using System;
-using System.Collections.Generic;
+﻿using MulTUNG;
+using PiTung.Console;
 
 namespace Server
 {
     public static class Log
     {
-        public static void WriteLine(string line)
+        private static string Side => Network.IsClient ? "CLIENT" : "SERVER";
+
+        public static void WriteLine(object msg)
         {
-            IGConsole.Log("[SERVER] " + line);
+            IGConsole.Log($"[{Side}] {msg}");
         }
     }
 }

@@ -3,16 +3,11 @@ using MulTUNG;
 using MulTUNG.Packeting.Packets;
 using MulTUNG.Server;
 using MulTUNG.Utils;
-using PiTung.Console;
-using SavedObjects;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
-using UnityEngine;
 using Network = MulTUNG.Network;
 
 namespace Server
@@ -90,6 +85,9 @@ namespace Server
                 case NetIncomingMessageType.Data:
                     var packet = PacketDeserializer.DeserializePacket(new MessagePacketReader(msg));
 
+                    if (packet.SenderID == Network.ServerPlayerID)
+                        break;
+
                     PacketLog.LogReceive(packet);
 
                     if (packet.ShouldBroadcast)
@@ -103,7 +101,6 @@ namespace Server
 
                     if (status == NetConnectionStatus.Connected)
                     {
-                        IGConsole.Log("Connected: " + msg.SenderEndPoint);
 
                         int id = PlayerIdCounter++;
 
@@ -113,9 +110,10 @@ namespace Server
                         }.GetMessage(Server), NetDeliveryMethod.ReliableOrdered, 0);
 
                         var player = new Player(id, msg.SenderConnection);
+                        
+                        Log.WriteLine("Connected player " + player.ID);
 
-                        IGConsole.Log("ID " + player.ID);
-
+                        PlayerManager.NewPlayer(player.ID);
                         Players.Add(id, player);
                     }
                     else if (status == NetConnectionStatus.Disconnected)
@@ -164,19 +162,12 @@ namespace Server
 
         public void Send(Packet packet, NetDeliveryMethod delivery = NetDeliveryMethod.ReliableOrdered) => Broadcast(packet, delivery);
 
-        public void Broadcast(Packet packet, NetDeliveryMethod delivery, params int[] excludeIds)
+        public void Broadcast(Packet packet, NetDeliveryMethod delivery)
         {
             Network.ProcessPacket(packet, 0);
 
             var msg = packet.GetMessage(Server);
-
-            //foreach (var item in Players)
-            //{
-            //    if (!excludeIds.Contains(item.Key))
-            //    {
-            //        var res = item.Value.Connection.SendMessage(msg, delivery, 0);
-            //    }
-            //}
+            
             Server.SendToAll(msg, delivery);
 
             PacketLog.LogSend(packet);
@@ -186,7 +177,7 @@ namespace Server
         {
             var player = Players[playerId];
 
-            IGConsole.Log("Sending world to player " + playerId);
+            Log.WriteLine("Sending world to player " + playerId);
 
             byte[] world = World.Serialize();
 

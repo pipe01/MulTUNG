@@ -43,7 +43,7 @@ namespace MulTUNG.Utils
             {
                 bin.Serialize(mem, world);
                 
-                return mem.ToArray();
+                return Compressor.Compress(mem.ToArray());
             }
         }
         
@@ -60,7 +60,7 @@ namespace MulTUNG.Utils
             SavedWorld world;
 
             //Deserialize the data into a SavedWorld
-            using (MemoryStream mem = new MemoryStream(data))
+            using (MemoryStream mem = new MemoryStream(Compressor.Decompress(data)))
             {
                 world = (SavedWorld)new BinaryFormatter().Deserialize(mem);
             }
@@ -84,8 +84,14 @@ namespace MulTUNG.Utils
                 //Go through each NetObject and assign them an ID taken from the net IDs queue
                 foreach (var item in GameObject.FindObjectsOfType<NetObject>())
                 {
-                    MyDebug.Log("Load: " + item);
-                    item.NetID = netIds[item.transform.position];
+                    if (netIds.TryGetValue(item.transform.position, out var id))
+                    {
+                        item.NetID = id;
+                    }
+                    else
+                    {
+                        MyDebug.Log("ERROR: Missing object ID for " + item.gameObject);
+                    }
                 }
 
             }, world.NetIDs);

@@ -1,14 +1,13 @@
-﻿using PiTung.Console;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace MulTUNG.Packeting.Packets
 {
     public static class PacketDeserializer
     {
+        private static IDictionary<PacketType, Func<byte[], Packet>> RawHandlers = new Dictionary<PacketType, Func<byte[], Packet>>();
+
         private static IDictionary<PacketType, Func<IReader, Packet>> Handlers = new Dictionary<PacketType, Func<IReader, Packet>>();
 
         static PacketDeserializer()
@@ -19,12 +18,11 @@ namespace MulTUNG.Packeting.Packets
             foreach (PacketType item in Enum.GetValues(typeof(PacketType)))
             {
                 var cls = ass.GetType(@namespace + item.ToString() + "Packet");
+                var method = cls?.GetMethod("Deserialize", BindingFlags.Public | BindingFlags.Static);
 
-                if (cls == null)
+                if (cls == null || method == null || method.GetParameters()[0].ParameterType != typeof(IReader))
                     continue;
-
-                var method = cls.GetMethod("Deserialize", BindingFlags.Public | BindingFlags.Static);
-
+                
                 Handlers.Add(item, (Func<IReader, Packet>)Delegate.CreateDelegate(typeof(Func<IReader, Packet>), method));
             }
         }
@@ -33,10 +31,18 @@ namespace MulTUNG.Packeting.Packets
         {
             var packetType = reader.ReadPacketType();
 
-            if (!Handlers.TryGetValue(packetType, out Func<IReader, Packet> handler))
-                return null;
+            if (Handlers.TryGetValue(packetType, out var handler))
+            {
+                return handler(reader);
+            }
+            else if (RawHandlers.TryGetValue(packetType, out var rawHandler))
+            {
+                byte[] data = reader.ReadRaw(int.MaxValue);
 
-            return handler(reader);
+                return rawHandler(data);
+            }
+
+            return null;
         }
     }
 }

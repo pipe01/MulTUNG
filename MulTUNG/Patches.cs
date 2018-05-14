@@ -2,10 +2,7 @@
 using MulTUNG.Packeting.Packets;
 using MulTUNG.Utils;
 using PiTung;
-using PiTung.Console;
-using SavedObjects;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 namespace MulTUNG
@@ -355,6 +352,24 @@ namespace MulTUNG
         public static void Interact(Label __instance)
         {
             TextEditMenuPatch.LabelBeingEdited = __instance;
+        }
+    }
+
+    [Target(typeof(PauseMenu))]
+    internal static class PauseMenuPatch
+    {
+        [PatchMethod]
+        public static bool QuitToMainMenu()
+        {
+            if (Network.IsClient)
+            {
+                NetworkClient.Instance.Disconnect();
+                Time.timeScale = 1;
+
+                return false;
+            }
+
+            return true;
         }
     }
 }

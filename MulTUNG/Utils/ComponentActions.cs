@@ -1,12 +1,6 @@
 ﻿using MulTUNG.Packeting.Packets;
 using PiTung;
-using PiTung.Console;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using UnityEngine;
 
 namespace MulTUNG.Utils
 {
@@ -81,6 +75,24 @@ namespace MulTUNG.Utils
 
                     break;
             }
+        }
+
+        public static void UpdateStates(CircuitStatePacket packet)
+        {
+            BehaviorManager.AllowedToUpdate = false;
+
+            foreach (var state in packet.States)
+            {
+                var netObj = NetObject.GetByNetId(state.Key.Key);
+
+                if (netObj == null)
+                    continue;
+
+                var io = netObj.IO[state.Key.Value].GetComponent<CircuitOutput>();
+                io.On = state.Value;
+            }
+
+            BehaviorManager.AllowedToUpdate = true;
         }
     }
 }

@@ -1,10 +1,8 @@
 ﻿using MulTUNG.Client;
 using MulTUNG.Packeting.Packets;
 using PiTung.Console;
-using PiTung.Mod_utilities;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using UnityEngine;
 
 namespace MulTUNG
@@ -61,7 +59,9 @@ namespace MulTUNG
             if (!PlayersInner.ContainsKey(state.PlayerID))
             {
                 //Create it
-                NewPlayer(state.PlayerID);
+                //NewPlayer(state.PlayerID);
+
+                return;
             }
 
             var player = PlayersInner[state.PlayerID];

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-
-namespace MulTUNG.Packeting.Packets
+﻿namespace MulTUNG.Packeting.Packets
 {
     public class WorldDataPacket : Packet
     {

@@ -5,14 +5,10 @@ DO NOT USE PARTS OF, OR THE ENTIRE SCRIPT, AND CLAIM AS YOUR OWN WORK
 
 using System;
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Text;
-using PiTung.Console;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif

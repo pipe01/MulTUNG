@@ -1,9 +1,4 @@
 ﻿using MulTUNG.Packeting.Packets;
-using PiTung.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace MulTUNG.Client
@@ -19,27 +14,26 @@ namespace MulTUNG.Client
                            NextRotation = Quaternion.identity;
 
         private float TimeBetweenStates = 0.01f;
-        private float LastStateTime = 0;
+        private float ElapsedTime = 0;
 
         public PlayerState LastState;
 
         void FixedUpdate()
         {
-            float t = (Time.time - LastStateTime) / TimeBetweenStates;
+            float t = ElapsedTime / TimeBetweenStates;
             
             transform.position = Vector3.Lerp(LastPosition, NextPosition, t);
             transform.rotation = Quaternion.Lerp(LastRotation, NextRotation, t);
+
+            ElapsedTime += Time.fixedDeltaTime;
         }
 
         public void UpdateState(PlayerState state)
         {
-            //if (state.Time < LastStateTime)
-            //    return;
-
             LastState = state;
 
-            TimeBetweenStates = Time.time - LastStateTime;
-            LastStateTime = Time.time;
+            TimeBetweenStates = ElapsedTime;
+            ElapsedTime = 0;
 
             LastPosition = transform.position;
             NextPosition = state.Position - new Vector3(0, 1.68f / 2, 0);

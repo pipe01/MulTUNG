@@ -1,7 +1,4 @@
-﻿using MulTUNG.Packeting;
-using MulTUNG.Packeting.Packets;
-using PiTung;
-using PiTung.Console;
+﻿using MulTUNG.Packeting.Packets;
 using System;
 using System.Net;
 using System.Threading;
@@ -10,10 +7,6 @@ using UnityEngine.SceneManagement;
 using Lidgren.Network;
 using MulTUNG.Utils;
 using MulTUNG.Packeting.Packets.Utils;
-using System.IO;
-using SavedObjects;
-using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
 using Server;
 
 namespace MulTUNG
@@ -24,9 +17,7 @@ namespace MulTUNG
         
         public int PlayerID { get; private set; } = -2;
         public bool Connected => Client?.ConnectionStatus == NetConnectionStatus.Connected;
-
-        public bool ReceivingWorld { get; private set; }
-
+        
         private NetClient Client;
 
         public NetworkClient()
@@ -47,6 +38,7 @@ namespace MulTUNG
             ThreadPool.QueueUserWorkItem(_ =>
             {
                 NetIncomingMessage msg;
+                
                 while (Client.Status == NetPeerStatus.Running)
                 {
                     msg = Client.WaitMessage(int.MaxValue);
@@ -58,13 +50,16 @@ namespace MulTUNG
                     {
                         case NetIncomingMessageType.Data:
                             var packet = PacketDeserializer.DeserializePacket(new MessagePacketReader(msg));
-                            
+
+                            if (packet.SenderID == this.PlayerID)
+                                break;
+
                             PacketLog.LogReceive(packet);
 
                             Network.ProcessPacket(packet, this.PlayerID);
                             break;
                         case NetIncomingMessageType.StatusChanged:
-                            IGConsole.Log("Status: " + Client.ConnectionStatus);
+                            Log.WriteLine("Status: " + Client.ConnectionStatus);
                             break;
                     }
                     Client.Recycle(msg);
@@ -101,8 +96,9 @@ namespace MulTUNG
             if (this.PlayerID == -2)
                 this.PlayerID = id;
 
-            IGConsole.Log("Your ID: " + id);
+            Log.WriteLine("Your ID: " + id);
 
+            PlayerManager.NewPlayer(Network.ServerPlayerID);
             Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
 
             Send(new SignalPacket(SignalData.RequestWorld));
