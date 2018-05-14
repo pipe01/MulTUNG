@@ -172,6 +172,7 @@ namespace MulTUNG
             var scene = SceneManager.GetActiveScene();
 
             Console.WriteLine("-----BEGIN NET OBJECT DUMP-----");
+            Console.WriteLine("Alive NetObjects: " + NetObject.Alive.Count);
 
             foreach (var obj in scene.GetRootGameObjects())
             {

@@ -4,6 +4,7 @@ using MulTUNG.Utils;
 using PiTung;
 using Server;
 using System.Threading;
+using UnityEngine;
 
 namespace MulTUNG
 {
@@ -94,6 +95,10 @@ namespace MulTUNG
                 case ComponentDataPacket compdata:
                     MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoData(o as ComponentDataPacket), compdata);
                     break;
+                case CircuitStatePacket circuit:
+                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.UpdateStates(o as CircuitStatePacket), circuit);
+
+                    break;
             }
         }
 
@@ -149,6 +154,9 @@ namespace MulTUNG
 
         public static void SendPacket(Packet packet)
         {
+            packet.SenderID = PlayerID;
+            packet.Time = Time.time;
+
             if (IsClient)
             {
                 NetworkClient.Instance.Send(packet);

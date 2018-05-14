@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MulTUNG.Utils;
+using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -12,6 +13,8 @@ namespace MulTUNG.Packeting.Packets
 
         private MemoryStream Data = new MemoryStream();
 
+        public Stream RawStream => Data;
+
         public PacketBuilder()
         {
             var data = new byte[sizeof(int)];
@@ -24,14 +27,7 @@ namespace MulTUNG.Packeting.Packets
             
             return data;
         }
-
-        private PacketBuilder Write(byte data)
-        {
-            Data.Write(new byte[] { data }, 0, 1);
-
-            return this;
-        }
-
+        
         public PacketBuilder WriteRaw(byte[] data)
         {
             Data.Write(data, 0, data.Length);
@@ -40,6 +36,8 @@ namespace MulTUNG.Packeting.Packets
         }
 
         public PacketBuilder Write(PacketType d) => Write((byte)d);
+
+        public PacketBuilder Write(byte data) => WriteRaw(new[] { data });
 
         public PacketBuilder Write(int d) => WriteRaw(BitConverter.GetBytes(d));
 

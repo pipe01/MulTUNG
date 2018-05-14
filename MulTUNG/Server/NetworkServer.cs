@@ -29,11 +29,9 @@ namespace Server
         }
 
         public bool Running => Server?.Status == NetPeerStatus.Running;
-
-        public IPEndPoint LocalEndPoint => null;//Listener?.LocalEndpoint as IPEndPoint;
-
+        
         private TimeSpan CircuitUpdateTime;
-        private int PlayerIdCounter = 123;
+        private int PlayerIdCounter = 1;
 
         private NetServer Server;
         private IDictionary<int, Player> Players = new Dictionary<int, Player>();
@@ -126,7 +124,7 @@ namespace Server
                     break;
             }
         }
-
+        
         public void SendStatesToPlayers()
         {
             var packet = new StateListPacket();

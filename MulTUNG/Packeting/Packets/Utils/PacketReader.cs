@@ -45,6 +45,8 @@ namespace MulTUNG.Packeting.Packets
 
         public float ReadFloat() => Message.ReadFloat();
 
+        public byte ReadByte() => Message.ReadByte();
+
         public int ReadInt32() => Message.ReadInt32();
 
         public long ReadInt64() => Message.ReadInt64();
@@ -109,6 +111,8 @@ namespace MulTUNG.Packeting.Packets
 
         public PacketType ReadPacketType() => (PacketType)Read(1)[0];
 
+        public byte ReadByte() => Read(1)[0];
+
         public int ReadInt32() => BitConverter.ToInt32(Read(sizeof(int)), 0);
 
         public long ReadInt64() => BitConverter.ToInt64(Read(sizeof(long)), 0);
@@ -141,6 +145,7 @@ namespace MulTUNG.Packeting.Packets
     {
         T ReadBasePacket<T>() where T : Packet, new();
         PacketType ReadPacketType();
+        byte ReadByte();
         int ReadInt32();
         long ReadInt64();
         float ReadFloat();

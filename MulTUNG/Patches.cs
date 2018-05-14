@@ -2,6 +2,7 @@
 using MulTUNG.Packeting.Packets;
 using MulTUNG.Utils;
 using PiTung;
+using PiTung.Console;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -158,7 +159,22 @@ namespace MulTUNG
         [PatchMethod]
         public static bool OnCircuitLogicUpdate()
         {
-            return true;//!Network.IsClient;
+            if (ComponentActions.HasCalledCircuitUpdate)
+            {
+                ComponentActions.HasCalledCircuitUpdate = false;
+                return true;
+            }
+
+            return !Network.IsClient;
+        }
+
+        [PatchMethod("OnCircuitLogicUpdate", PatchType.Postfix)]
+        public static void OnCircuitLogicUpdatePostfix()
+        {
+            if (Network.IsServer)
+            {
+                Network.SendPacket(CircuitStatePacket.Build());
+            }
         }
     }
 

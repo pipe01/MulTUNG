@@ -1,6 +1,9 @@
 ﻿using MulTUNG.Packeting.Packets;
 using PiTung;
+using PiTung.Console;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace MulTUNG.Utils
 {
@@ -8,6 +11,9 @@ namespace MulTUNG.Utils
     {
         public static List<int> CurrentlyActing { get; } = new List<int>();
         public static List<Button> PushedDownButtons { get; } = new List<Button>();
+        public static bool HasCalledCircuitUpdate { get; set; }
+
+        private static Action<float> CircuitUpdate;
 
         public static void DoAction(UserInputPacket packet)
         {
@@ -79,20 +85,29 @@ namespace MulTUNG.Utils
 
         public static void UpdateStates(CircuitStatePacket packet)
         {
-            BehaviorManager.AllowedToUpdate = false;
-
             foreach (var state in packet.States)
             {
                 var netObj = NetObject.GetByNetId(state.Key.Key);
-
+                
                 if (netObj == null)
                     continue;
-
-                var io = netObj.IO[state.Key.Value].GetComponent<CircuitOutput>();
+                
+                var io = netObj.GetComponentsInChildren<CircuitOutput>()[state.Key.Value];
                 io.On = state.Value;
             }
+            
+            if (CircuitUpdate == null)
+                GetCircuitUpdate();
+            
+            HasCalledCircuitUpdate = true;
+            CircuitUpdate(0);
+        }
 
-            BehaviorManager.AllowedToUpdate = true;
+        private static void GetCircuitUpdate()
+        {
+            var method = typeof(BehaviorManager).GetMethod("OnCircuitLogicUpdate", BindingFlags.NonPublic | BindingFlags.Static);
+
+            CircuitUpdate = (Action<float>)Delegate.CreateDelegate(typeof(Action<float>), method);
         }
     }
 }

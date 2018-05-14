@@ -56,7 +56,7 @@ namespace MulTUNG.Utils
             {
                 GameObject.Destroy(objectInfo.gameObject);
             }
-
+            
             SavedWorld world;
 
             //Deserialize the data into a SavedWorld
