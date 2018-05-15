@@ -16,6 +16,9 @@ namespace MulTUNG
             get => _netID;
             set
             {
+                if (Alive.ContainsKey(value))
+                    return;
+
                 Alive.Remove(_netID);
                 _netID = value;
                 Alive.Add(_netID, this);
@@ -26,6 +29,12 @@ namespace MulTUNG
 
         void Awake()
         {
+            if (Alive.Values.Contains(this))
+            {
+                Destroy(this);
+                return;
+            }
+
             Alive.Add(NetID, this);
 
             //Incoming LINQ shenanigans

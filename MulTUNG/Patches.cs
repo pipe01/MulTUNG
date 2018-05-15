@@ -18,25 +18,13 @@ namespace MulTUNG
         {
             if (StuffPlacer.OkayToPlace)
             {
+                IGConsole.Log(BoardPlacer.BoardBeingPlaced.GetComponent<NetObject>());
+
                 var boardComp = BoardPlacer.BoardBeingPlaced.GetComponent<CircuitBoard>();
-                int id = Random.Range(int.MinValue, int.MaxValue);
-
-                if (boardComp.GetComponent<NetObject>() == null)
-                    boardComp.gameObject.AddComponent<NetObject>().NetID = id;
-
                 var parent = BoardPlacer.ReferenceObject.transform.parent;
 
-                var packet = new PlaceBoardPacket
-                {
-                    AuthorID = NetworkClient.Instance.PlayerID,
-                    BoardID = id,
-                    ParentBoardID = parent?.GetComponent<NetObject>()?.NetID ?? 0,
-                    Width = boardComp.x,
-                    Height = boardComp.z,
-                    Position = boardComp.transform.position,
-                    EulerAngles = boardComp.transform.eulerAngles
-                };
-                
+                var packet = PlaceBoardPacket.BuildFromBoard(boardComp, parent);
+
                 Network.SendPacket(packet);
             }
         }

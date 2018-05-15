@@ -154,7 +154,6 @@ namespace MulTUNG
 
         public static void SendPacket(Packet packet)
         {
-            packet.SenderID = PlayerID;
             packet.Time = Time.time;
 
             if (IsClient)

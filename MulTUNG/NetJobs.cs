@@ -1,5 +1,10 @@
 ﻿using MulTUNG.Packeting.Packets;
+using MulTUNG.Utils;
+using PiTung.Console;
 using References;
+using SavedObjects;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 namespace MulTUNG
@@ -23,6 +28,8 @@ namespace MulTUNG
 
     public class PlaceBoardJob : PacketNetJob<PlaceBoardPacket>
     {
+        private static BinaryFormatter BinFormatter = new BinaryFormatter();
+
         public PlaceBoardJob(PlaceBoardPacket packet) : base(packet)
         {
         }
@@ -30,18 +37,39 @@ namespace MulTUNG
         public override void Do()
         {
             NetObject parentBoard = NetObject.GetByNetId(Packet.ParentBoardID);
+            SavedCircuitBoard savedBoard;
             
-            GameObject gameObject = Object.Instantiate(Prefabs.CircuitBoard, Packet.Position, Quaternion.Euler(Packet.EulerAngles), parentBoard?.transform);
+            using (var mem = new MemoryStream(Packet.SavedBoard))
+            {
+                savedBoard = (SavedCircuitBoard)BinFormatter.Deserialize(mem);
+            }
 
-            gameObject.AddComponent<ObjectInfo>().ComponentType = ComponentType.CircuitBoard;
-            gameObject.AddComponent<NetObject>().NetID = Packet.BoardID;
+            var boardObj = SavedObjectUtilities.LoadSavedObject(savedBoard, parentBoard?.transform);
+            boardObj.AddComponent<NetObject>().NetID = Packet.BoardID;
+            boardObj.transform.position = Packet.Position;
+            boardObj.transform.eulerAngles = Packet.EulerAngles;
 
-            CircuitBoard component = gameObject.GetComponent<CircuitBoard>();
-            component.x = Packet.Width;
-            component.z = Packet.Height;
-            component.CreateCuboid();
+            World.AddNetObjects();
 
-            MegaMeshManager.AddComponentsIn(gameObject);
+            foreach (var item in boardObj.GetComponentsInChildren<NetObject>())
+            {
+                if (Packet.IdByPosition.TryGetValue(item.transform.localPosition, out int id))
+                    item.NetID = id;
+            }
+
+            SaveManager.RecalculateAllClustersEverywhereWithDelay();
+
+            //GameObject gameObject = Object.Instantiate(Prefabs.CircuitBoard, Packet.Position, Quaternion.Euler(Packet.EulerAngles), parentBoard?.transform);
+
+            //gameObject.AddComponent<ObjectInfo>().ComponentType = ComponentType.CircuitBoard;
+            //gameObject.AddComponent<NetObject>().NetID = Packet.BoardID;
+
+            //CircuitBoard component = gameObject.GetComponent<CircuitBoard>();
+            //component.x = Packet.Width;
+            //component.z = Packet.Height;
+            //component.CreateCuboid();
+
+            //MegaMeshManager.AddComponentsIn(gameObject);
         }
     }
 
@@ -57,9 +85,27 @@ namespace MulTUNG
         public void Do()
         {
             var board = NetObject.GetByNetId(BoardID);
+            IGConsole.Log("Delete board " + board);
             
-            if (board != null)
-                StuffDeleter.DeleteThing(board.gameObject);
+            if (board == null)
+            {
+                return;
+            }
+
+            CircuitInput[] componentsInChildren = board.GetComponentsInChildren<CircuitInput>();
+            CircuitOutput[] componentsInChildren2 = board.GetComponentsInChildren<CircuitOutput>();
+
+            foreach (CircuitInput input in componentsInChildren)
+            {
+                StuffDeleter.DestroyInput(input);
+            }
+
+            foreach (CircuitOutput output in componentsInChildren2)
+            {
+                StuffDeleter.DestroyOutput(output);
+            }
+
+            GameObject.Destroy(board.gameObject);
         }
     }
 

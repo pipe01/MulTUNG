@@ -84,6 +84,8 @@ namespace MulTUNG
         
         public void Send(Packet packet, NetDeliveryMethod delivery = NetDeliveryMethod.ReliableOrdered)
         {
+            packet.SenderID = this.PlayerID;
+
             PacketLog.LogSend(packet);
             Client.SendMessage(packet.GetMessage(Client), delivery);
         }

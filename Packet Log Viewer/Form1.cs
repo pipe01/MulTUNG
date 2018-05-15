@@ -21,16 +21,26 @@ namespace Packet_Log_Viewer
 
         private PacketLog Log;
         private List<PacketLogEntry> ShownEntries = new List<PacketLogEntry>();
+        private bool Loading = false;
+        private List<Type> HiddenPacketTypes = new List<Type>();
 
-        void LoadLog(PacketLog log)
+        private IList<Type> PacketTypes =
+            typeof(Packet).Assembly.GetTypes()
+                .Where(o => o.BaseType == typeof(Packet))
+                .OrderBy(o => o.Name)
+                .ToList();
+
+        void LoadLog(PacketLog log = null)
         {
+            log = log ?? this.Log;
+
             lvPackets.Items.Clear();
             ShownEntries.Clear();
 
             lvPackets.BeginUpdate();
             foreach (var entry in log.Entries)
             {
-                if ((chkHidePackets.Checked && (entry.Packet is StateListPacket || entry.Packet is PlayerStatePacket))
+                if (HiddenPacketTypes.Contains(entry.Packet.GetType())
                     || (entry.In && !chkIn.Checked)
                     || (entry.Out && !chkOut.Checked))
                 {
@@ -48,19 +58,35 @@ namespace Packet_Log_Viewer
             lvPackets.EndUpdate();
         }
 
+        private void LoadCheckedPacketTypes()
+        {
+            if (lvPacketTypes.Items.Count != PacketTypes.Count)
+                return;
+
+            HiddenPacketTypes.Clear();
+
+            for (int i = 0; i < PacketTypes.Count; i++)
+            {
+                var lvItem = lvPacketTypes.Items[i];
+
+                if (!lvItem.Checked)
+                    HiddenPacketTypes.Add(PacketTypes[i]);
+            }
+        }
+
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 Log = PacketLog.Load(openFileDialog1.FileName);
 
-                LoadLog(Log);
+                LoadLog();
             }
         }
 
         private void chkHidePackets_CheckedChanged(object sender, EventArgs e)
         {
-            LoadLog(Log);
+            LoadLog();
         }
 
         private void lvPackets_SelectedIndexChanged(object sender, EventArgs e)
@@ -87,6 +113,24 @@ namespace Packet_Log_Viewer
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            Loading = true;
+            lvPacketTypes.BeginUpdate();
+
+            foreach (var type in PacketTypes)
+            {
+                var item = lvPacketTypes.Items.Add(type.Name.Replace("Packet", ""));
+
+                item.Checked = 
+                    type != typeof(PlayerStatePacket)
+                    && type != typeof(StateListPacket)
+                    && type != typeof(CircuitStatePacket);
+            }
+
+            LoadCheckedPacketTypes();
+
+            lvPacketTypes.EndUpdate();
+            Loading = false;
+
             var args = Environment.GetCommandLineArgs();
 
             if (args.Length > 1)
@@ -103,6 +147,15 @@ namespace Packet_Log_Viewer
 
                 LoadLog(Log);
             }
+        }
+
+        private void lvPacketTypes_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            if (Loading)
+                return;
+
+            LoadCheckedPacketTypes();
+            LoadLog();
         }
     }
 }

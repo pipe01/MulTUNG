@@ -91,8 +91,13 @@ namespace MulTUNG.Utils
                 
                 if (netObj == null)
                     continue;
-                
-                var io = netObj.GetComponentsInChildren<CircuitOutput>()[state.Key.Value];
+
+                var ios = netObj.GetComponentsInChildren<CircuitOutput>();
+
+                if (ios.Length <= state.Key.Value)
+                    continue;
+
+                var io = ios[state.Key.Value];
                 io.On = state.Value;
             }
             

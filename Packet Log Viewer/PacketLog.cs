@@ -19,7 +19,7 @@ namespace Packet_Log_Viewer
             var bin = new BinaryFormatter();
             List<PacketLogEntry> entries = new List<PacketLogEntry>();
 
-            using (var fileStream = File.OpenRead(file))
+            using (var fileStream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 while (true)
                 {
