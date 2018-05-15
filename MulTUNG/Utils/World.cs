@@ -26,13 +26,6 @@ namespace MulTUNG.Utils
             //Get the top level objects
             world.TopLevelObjects = SaveManager.GetTopLevelObjects();
             
-            //Add the components' IDs to the dictionary
-            world.NetIDs = new Dictionary<Tuple<SerializableVector3, SerializableVector3>, int>();
-            foreach (var item in GameObject.FindObjectsOfType<NetObject>())
-            {
-                world.NetIDs.Add(new Tuple<SerializableVector3, SerializableVector3>(item.transform.position, item.transform.eulerAngles), item.NetID);
-            }
-            
             BinaryFormatter bin = new BinaryFormatter();
 
             //Serialize the SavedWorld
@@ -63,13 +56,13 @@ namespace MulTUNG.Utils
             }
             
             //Run on Unity thread
-            MulTUNG.SynchronizationContext.Send(o =>
+            MulTUNG.SynchronizationContext.Send(_ =>
             {
-                var netIds = (Dictionary<Tuple<SerializableVector3, SerializableVector3>, int>)o;
-
                 //Load all the objects from the save
                 foreach (var item in world.TopLevelObjects)
                 {
+                    MyDebug.Log(string.Join(", ", item.Children.Select(o => o.GetType().Name).ToArray()));
+
                     SavedObjectUtilities.LoadSavedObject(item);
                 }
 
@@ -78,27 +71,13 @@ namespace MulTUNG.Utils
                 //Add a NetObject component to all components
                 World.AddNetObjects();
 
-                //Go through each NetObject and assign them an ID taken from the net IDs queue
-                foreach (var item in GameObject.FindObjectsOfType<NetObject>())
-                {
-                    if (netIds.TryGetValue(new Tuple<SerializableVector3, SerializableVector3>(item.transform.position, item.transform.eulerAngles), out var id))
-                    {
-                        item.NetID = id;
-                    }
-                    else
-                    {
-                        MyDebug.Log("ERROR: Missing object ID for " + item.gameObject);
-                    }
-                }
-
-            }, world.NetIDs);
+            }, null);
         }
         
         [Serializable]
         private class SavedWorld
         {
             public List<SavedObjectV2> TopLevelObjects;
-            public Dictionary<Tuple<SerializableVector3, SerializableVector3>, int> NetIDs;
         }
     }
 }

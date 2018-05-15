@@ -1,11 +1,14 @@
 ﻿using MulTUNG.Packeting.Packets;
 using MulTUNG.Utils;
+using SavedObjects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -97,6 +100,14 @@ namespace Packet_Log_Viewer
             var entry = ShownEntries[lvPackets.SelectedIndices[0]];
 
             pgPacket.SelectedObject = entry.Packet;
+
+            //if (entry.Packet is WorldDataPacket world)
+            //{
+            //    using (MemoryStream mem = new MemoryStream(Compressor.Decompress(world.Data)))
+            //    {
+            //        var l = new BinaryFormatter().Deserialize(mem);
+            //    }
+            //}
         }
 
         private void lvPackets_DoubleClick(object sender, EventArgs e)

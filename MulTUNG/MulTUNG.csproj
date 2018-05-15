@@ -117,6 +117,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SavedNetObject.cs" />
     <Compile Include="Server\Log.cs" />
     <Compile Include="Server\NetworkServer.cs" />
     <Compile Include="Server\Player.cs" />

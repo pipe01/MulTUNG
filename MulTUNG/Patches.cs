@@ -3,7 +3,10 @@ using MulTUNG.Packeting.Packets;
 using MulTUNG.Utils;
 using PiTung;
 using PiTung.Console;
+using SavedObjects;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace MulTUNG
@@ -374,6 +377,54 @@ namespace MulTUNG
             }
 
             return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(SavedObjectUtilities), "CreateSavedObjectFrom", new[] { typeof(ObjectInfo) })]
+    internal static class SavedObjectUtilitiesCreateSavedObjectFromPatch
+    {
+        static void Postfix(ObjectInfo worldsave, ref SavedObjectV2 __result)
+        {
+            var netObj = worldsave.GetComponent<NetObject>();
+
+            if (netObj != null)
+            {
+                if (__result.Children == null)
+                    __result.Children = new SavedObjectV2[0];
+
+                SavedObjectV2[] newChildren = new SavedObjectV2[__result.Children.Length + 1];
+                Array.Copy(__result.Children, 0, newChildren, 1, __result.Children.Length);
+
+                IGConsole.Log(netObj.NetID);
+                newChildren[0] = new SavedNetObject(netObj.NetID);
+
+                __result.Children = newChildren;
+            }
+        }
+    }
+
+    [Target(typeof(SavedObjectUtilities))]
+    internal static class SavedObjectUtilitiesPatch
+    {
+        [PatchMethod]
+        public static bool LoadSavedObject(SavedObjectV2 save)
+        {
+            return !(save is SavedNetObject);
+        }
+
+        [PatchMethod("LoadSavedObject", PatchType.Postfix)]
+        public static void LoadSavedObject(SavedObjectV2 save, ref GameObject __result)
+        {
+            foreach (var item in save.Children ?? new SavedObjectV2[0])
+            {
+                MyDebug.Log(item.GetType().Name);
+            }
+
+            if (save.Children?.FirstOrDefault() is SavedNetObject net)
+            {
+                IGConsole.Log("Net object! " + net.NetID);
+                __result.AddComponent<NetObject>().NetID = net.NetID;
+            }
         }
     }
 }

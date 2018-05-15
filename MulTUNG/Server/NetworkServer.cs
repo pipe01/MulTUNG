@@ -179,10 +179,13 @@ namespace Server
 
             byte[] world = World.Serialize();
 
-            var msg = new WorldDataPacket
+            var packet = new WorldDataPacket
             {
                 Data = world
-            }.GetMessage(Server);
+            };
+            var msg = packet.GetMessage(Server);
+
+            PacketLog.LogSend(packet);
 
             player.Connection.SendMessage(msg, NetDeliveryMethod.ReliableOrdered, 0);
         }
