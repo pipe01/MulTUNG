@@ -53,23 +53,11 @@ namespace MulTUNG
 
             foreach (var item in boardObj.GetComponentsInChildren<NetObject>())
             {
-                if (Packet.IdByPosition.TryGetValue(item.transform.localPosition, out int id))
+                if (Packet.IdByPosition.TryGetValue(new Tuple<Vector3, Vector3>(item.transform.position, item.transform.eulerAngles), out int id))
                     item.NetID = id;
             }
 
             SaveManager.RecalculateAllClustersEverywhereWithDelay();
-
-            //GameObject gameObject = Object.Instantiate(Prefabs.CircuitBoard, Packet.Position, Quaternion.Euler(Packet.EulerAngles), parentBoard?.transform);
-
-            //gameObject.AddComponent<ObjectInfo>().ComponentType = ComponentType.CircuitBoard;
-            //gameObject.AddComponent<NetObject>().NetID = Packet.BoardID;
-
-            //CircuitBoard component = gameObject.GetComponent<CircuitBoard>();
-            //component.x = Packet.Width;
-            //component.z = Packet.Height;
-            //component.CreateCuboid();
-
-            //MegaMeshManager.AddComponentsIn(gameObject);
         }
     }
 

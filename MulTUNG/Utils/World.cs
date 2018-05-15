@@ -25,17 +25,14 @@ namespace MulTUNG.Utils
 
             //Get the top level objects
             world.TopLevelObjects = SaveManager.GetTopLevelObjects();
-
-            //Create a new queue that will store all of the objects' net IDs in order
-            Queue<KeyValuePair<Vector3, int>> netIds = new Queue<KeyValuePair<Vector3, int>>();
-
+            
+            //Add the components' IDs to the dictionary
+            world.NetIDs = new Dictionary<Tuple<SerializableVector3, SerializableVector3>, int>();
             foreach (var item in GameObject.FindObjectsOfType<NetObject>())
             {
-                netIds.Enqueue(new KeyValuePair<Vector3, int>(item.transform.position, item.NetID));
+                world.NetIDs.Add(new Tuple<SerializableVector3, SerializableVector3>(item.transform.position, item.transform.eulerAngles), item.NetID);
             }
-
-            world.NetIDs = netIds.ToDictionary(o => (SerializableVector3)o.Key, o => o.Value);
-
+            
             BinaryFormatter bin = new BinaryFormatter();
 
             //Serialize the SavedWorld
@@ -68,7 +65,7 @@ namespace MulTUNG.Utils
             //Run on Unity thread
             MulTUNG.SynchronizationContext.Send(o =>
             {
-                var netIds = (Dictionary<SerializableVector3, int>)o;
+                var netIds = (Dictionary<Tuple<SerializableVector3, SerializableVector3>, int>)o;
 
                 //Load all the objects from the save
                 foreach (var item in world.TopLevelObjects)
@@ -84,7 +81,7 @@ namespace MulTUNG.Utils
                 //Go through each NetObject and assign them an ID taken from the net IDs queue
                 foreach (var item in GameObject.FindObjectsOfType<NetObject>())
                 {
-                    if (netIds.TryGetValue(item.transform.position, out var id))
+                    if (netIds.TryGetValue(new Tuple<SerializableVector3, SerializableVector3>(item.transform.position, item.transform.eulerAngles), out var id))
                     {
                         item.NetID = id;
                     }
@@ -101,7 +98,7 @@ namespace MulTUNG.Utils
         private class SavedWorld
         {
             public List<SavedObjectV2> TopLevelObjects;
-            public Dictionary<SerializableVector3, int> NetIDs;
+            public Dictionary<Tuple<SerializableVector3, SerializableVector3>, int> NetIDs;
         }
     }
 }

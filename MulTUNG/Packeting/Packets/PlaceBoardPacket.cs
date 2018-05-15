@@ -17,12 +17,10 @@ namespace MulTUNG.Packeting.Packets
         public int BoardID { get; set; }
         public int ParentBoardID { get; set; }
         public int AuthorID { get; set; }
-        //public int Width { get; set; }
-        //public int Height { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 EulerAngles { get; set; }
         public byte[] SavedBoard { get; set; } = new byte[0];
-        public Dictionary<Vector3, int> IdByPosition { get; set; } = new Dictionary<Vector3, int>();
+        public Dictionary<Tuple<Vector3, Vector3>, int> IdByPosition { get; set; } = new Dictionary<Tuple<Vector3, Vector3>, int>();
         
         protected override byte[] SerializeInner()
         {
@@ -30,8 +28,6 @@ namespace MulTUNG.Packeting.Packets
                 .Write(BoardID)
                 .Write(ParentBoardID)
                 .Write(AuthorID)
-                //.Write(Width)
-                //.Write(Height)
                 .Write(Position)
                 .Write(EulerAngles)
                 .Write(Compressor.Compress(SavedBoard))
@@ -39,7 +35,8 @@ namespace MulTUNG.Packeting.Packets
 
             foreach (var item in IdByPosition)
             {
-                builder.Write(item.Key);
+                builder.Write(item.Key.Item1);
+                builder.Write(item.Key.Item2);
                 builder.Write(item.Value);
             }
             
@@ -52,8 +49,6 @@ namespace MulTUNG.Packeting.Packets
             packet.BoardID = reader.ReadInt32();
             packet.ParentBoardID = reader.ReadInt32();
             packet.AuthorID = reader.ReadInt32();
-            //packet.Width = reader.ReadInt32();
-            //packet.Height = reader.ReadInt32();
             packet.Position = reader.ReadVector3();
             packet.EulerAngles = reader.ReadVector3();
             packet.SavedBoard = Compressor.Decompress(reader.ReadByteArray());
@@ -61,7 +56,7 @@ namespace MulTUNG.Packeting.Packets
             int count = reader.ReadInt32();
             for (int i = 0; i < count; i++)
             {
-                packet.IdByPosition.Add(reader.ReadVector3(), reader.ReadInt32());
+                packet.IdByPosition.Add(new Tuple<Vector3, Vector3>(reader.ReadVector3(), reader.ReadVector3()), reader.ReadInt32());
             }
 
             return packet;
@@ -82,8 +77,6 @@ namespace MulTUNG.Packeting.Packets
                 AuthorID = NetworkClient.Instance.PlayerID,
                 BoardID = netObj.NetID,
                 ParentBoardID = parent?.GetComponent<NetObject>()?.NetID ?? 0,
-                //Width = board.x,
-                //Height = board.z,
                 Position = board.transform.position,
                 EulerAngles = board.transform.eulerAngles
             };
@@ -98,7 +91,7 @@ namespace MulTUNG.Packeting.Packets
 
             foreach (var item in board.GetComponentsInChildren<NetObject>())
             {
-                packet.IdByPosition.Add(item.transform.localPosition, item.NetID);
+                packet.IdByPosition.Add(new Tuple<Vector3, Vector3>(item.transform.position, item.transform.eulerAngles), item.NetID);
             }
 
             return packet;

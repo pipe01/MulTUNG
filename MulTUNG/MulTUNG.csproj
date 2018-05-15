@@ -122,6 +122,7 @@
     <Compile Include="Server\Player.cs" />
     <Compile Include="Utils\ComponentActions.cs" />
     <Compile Include="Utils\Compressor.cs" />
+    <Compile Include="Utils\Tuple.cs" />
     <Compile Include="Utils\World.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\OBJLoader.cs" />
