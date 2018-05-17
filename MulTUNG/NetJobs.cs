@@ -73,12 +73,12 @@ namespace MulTUNG
         public void Do()
         {
             var board = NetObject.GetByNetId(BoardID);
-            IGConsole.Log("Delete board " + board);
-            
+
             if (board == null)
-            {
                 return;
-            }
+
+            BoardFunctions.DestroyAllWiresConnectedToBoardButNotPartOfIt(board.gameObject);
+            MegaMeshManager.RemoveComponentsImmediatelyIn(board.gameObject);
 
             CircuitInput[] componentsInChildren = board.GetComponentsInChildren<CircuitInput>();
             CircuitOutput[] componentsInChildren2 = board.GetComponentsInChildren<CircuitOutput>();
@@ -150,7 +150,7 @@ namespace MulTUNG
 
             if (netObj1 == null || netObj2 == null)
                 return;
-
+            
             var io1 = netObj1.IO[Packet.Point1Id];
             var io2 = netObj2.IO[Packet.Point2Id];
 
@@ -198,9 +198,7 @@ namespace MulTUNG
 
             if (wire == null)
                 return;
-
-            GameObject.Destroy(wire.GetComponent<NetObject>());
-
+            
             StuffDeleter.DestroyWire(wire);
         }
     }

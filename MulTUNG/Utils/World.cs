@@ -15,7 +15,7 @@ namespace MulTUNG.Utils
             foreach (var item in GameObject.FindObjectsOfType<ObjectInfo>())
             {
                 if (item.GetComponent<NetObject>() == null)
-                    item.gameObject.AddComponent<NetObject>().NetID = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+                    item.gameObject.AddComponent<NetObject>().NetID = NetObject.GetNewID();
             }
         }
 

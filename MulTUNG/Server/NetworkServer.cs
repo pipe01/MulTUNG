@@ -1,6 +1,7 @@
 ﻿using Lidgren.Network;
 using MulTUNG;
 using MulTUNG.Packeting.Packets;
+using MulTUNG.Packeting.Packets.Utils;
 using MulTUNG.Server;
 using MulTUNG.Utils;
 using System;
@@ -173,6 +174,14 @@ namespace Server
 
         public void SendWorld(int playerId)
         {
+            //foreach (var item in Players)
+            //{
+            //    if (item.Key == playerId)
+            //        continue;
+
+            //    item.Value.Connection.SendMessage(new SignalPacket(SignalData.Pause).GetMessage(Server), NetDeliveryMethod.ReliableOrdered, 0);
+            //}
+
             var player = Players[playerId];
 
             Log.WriteLine("Sending world to player " + playerId);
@@ -188,6 +197,8 @@ namespace Server
             PacketLog.LogSend(packet);
 
             player.Connection.SendMessage(msg, NetDeliveryMethod.ReliableOrdered, 0);
+
+            //Network.ResumeGame();
         }
     }
 }

@@ -18,7 +18,7 @@ namespace MulTUNG.Packeting.Packets
             var wireBeingPlaced = wire.gameObject;
             
             var netObj = wireBeingPlaced.AddComponent<NetObject>();
-            netObj.NetID = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+            netObj.NetID = NetObject.GetNewID();
             
             var netObj1 = GetNetObjectFromPoint(wire.Point1);
             var netObj2 = GetNetObjectFromPoint(wire.Point2);

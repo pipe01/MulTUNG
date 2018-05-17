@@ -79,8 +79,25 @@ namespace MulTUNG
         {
             if (ModUtilities.DummyComponent.gameObject.GetComponent<NetUtilitiesComponent>() == null)
                 ModUtilities.DummyComponent.gameObject.AddComponent<NetUtilitiesComponent>();
+
+            if (Input.GetKeyDown(KeyCode.P))
+                Network.PauseGame();
+            if (Input.GetKeyDown(KeyCode.R))
+                Network.ResumeGame();
         }
-        
+
+        public override void OnGUI()
+        {
+            if (Network.IsPaused)
+            {
+                Rect size = new Rect(0, 0, 200, 70);
+                size.x = Screen.width / 2 - size.width / 2;
+                size.y = Screen.height / 2 - size.height / 2;
+
+                GUI.Box(size, "A player is downloading the world...");
+            }
+        }
+
         public override void OnApplicationQuit()
         {
             NetworkClient.Instance.Disconnect();

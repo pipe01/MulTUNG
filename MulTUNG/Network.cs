@@ -14,6 +14,8 @@ namespace MulTUNG
         public static bool IsClient => NetworkClient.Instance?.Connected ?? false;
         public static bool IsServer => NetworkServer.Instance?.Running ?? false;
 
+        public static bool IsPaused { get; private set; }
+
         public static int PlayerID => IsClient ? NetworkClient.Instance.PlayerID : ServerPlayerID;
         
         public const int ServerPlayerID = 0;
@@ -113,6 +115,16 @@ namespace MulTUNG
                         NetworkServer.Instance.SendWorld(signal.SenderID);
 
                     break;
+                case SignalData.Pause:
+                    IsPaused = true;
+                    Time.timeScale = 0;
+
+                    break;
+                case SignalData.Resume:
+                    IsPaused = false;
+                    Time.timeScale = 1;
+
+                    break;
             }
         }
         
@@ -150,6 +162,18 @@ namespace MulTUNG
                 Network.SendPacket(packet);
             else
                 Network.ProcessPacket(packet, 0);
+        }
+
+        public static void PauseGame()
+        {
+            if (IsServer)
+                Network.SendPacket(new SignalPacket(SignalData.Pause));
+        }
+
+        public static void ResumeGame()
+        {
+            if (IsServer)
+                Network.SendPacket(new SignalPacket(SignalData.Resume));
         }
 
         public static void SendPacket(Packet packet)

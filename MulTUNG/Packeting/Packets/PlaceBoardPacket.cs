@@ -69,7 +69,7 @@ namespace MulTUNG.Packeting.Packets
             if (netObj == null)
             {
                 netObj = board.gameObject.AddComponent<NetObject>();
-                netObj.NetID = Random.Range(int.MinValue, int.MaxValue);
+                netObj.NetID = NetObject.GetNewID();
             }
 
             var packet = new PlaceBoardPacket
@@ -88,12 +88,7 @@ namespace MulTUNG.Packeting.Packets
 
                 packet.SavedBoard = mem.ToArray();
             }
-
-            foreach (var item in board.GetComponentsInChildren<NetObject>())
-            {
-                packet.IdByPosition.Add(new Tuple<Vector3, Vector3>(item.transform.position, item.transform.eulerAngles), item.NetID);
-            }
-
+            
             return packet;
         }
     }

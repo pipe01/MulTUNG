@@ -4,7 +4,7 @@
     {
         CircuitUpdate,
         RequestWorld,
-        Ping,
-        Pong,
+        Pause,
+        Resume
     }
 }

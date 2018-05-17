@@ -21,7 +21,11 @@ namespace MulTUNG
         {
             if (StuffPlacer.OkayToPlace)
             {
-                IGConsole.Log(BoardPlacer.BoardBeingPlaced.GetComponent<NetObject>());
+                foreach (var item in BoardPlacer.BoardBeingPlaced.GetComponentsInChildren<ObjectInfo>())
+                {
+                    var netObj = item.GetComponent<NetObject>() ?? item.gameObject.AddComponent<NetObject>();
+                    netObj.NetID = NetObject.GetNewID();
+                }
 
                 var boardComp = BoardPlacer.BoardBeingPlaced.GetComponent<CircuitBoard>();
                 var parent = BoardPlacer.ReferenceObject.transform.parent;
@@ -42,6 +46,16 @@ namespace MulTUNG
                 if (net != null)
                 {
                     Network.SendPacket(new DeleteBoardPacket { BoardID = net.NetID });
+                }
+            }
+            else if (BoardFunctionsPatch.IsCloning)
+            {
+                IGConsole.Log("Cloning board");
+                BoardFunctionsPatch.IsCloning = false;
+
+                foreach (var item in NewBoard.GetComponentsInChildren<NetObject>())
+                {
+                    GameObject.Destroy(item);
                 }
             }
         }
@@ -109,6 +123,11 @@ namespace MulTUNG
             
             if (DestroyThis.tag == "CircuitBoard")
             {
+                if (DestroyThis.transform.childCount > 0 && ((DestroyThis.transform.childCount != 1 || !DestroyThis.transform.GetChild(0).gameObject == StuffPlacer.GetThingBeingPlaced)))
+                {
+                    return;
+                }
+
                 if (!(NetUtilitiesComponent.Instance.CurrentJob is DeleteBoardJob))
                 {
                     Network.SendPacket(new DeleteBoardPacket
@@ -394,8 +413,7 @@ namespace MulTUNG
 
                 SavedObjectV2[] newChildren = new SavedObjectV2[__result.Children.Length + 1];
                 Array.Copy(__result.Children, 0, newChildren, 1, __result.Children.Length);
-
-                IGConsole.Log(netObj.NetID);
+                
                 newChildren[0] = new SavedNetObject(netObj.NetID);
 
                 __result.Children = newChildren;
@@ -415,16 +433,29 @@ namespace MulTUNG
         [PatchMethod("LoadSavedObject", PatchType.Postfix)]
         public static void LoadSavedObject(SavedObjectV2 save, ref GameObject __result)
         {
-            foreach (var item in save.Children ?? new SavedObjectV2[0])
-            {
-                MyDebug.Log(item.GetType().Name);
-            }
-
             if (save.Children?.FirstOrDefault() is SavedNetObject net)
             {
-                IGConsole.Log("Net object! " + net.NetID);
-                __result.AddComponent<NetObject>().NetID = net.NetID;
+                var netObj = __result.GetComponent<NetObject>() ?? __result.AddComponent<NetObject>();
+                netObj.NetID = net.NetID;
             }
+        }
+    }
+
+    [Target(typeof(BoardFunctions))]
+    internal static class BoardFunctionsPatch
+    {
+        public static bool IsCloning = false;
+
+        [PatchMethod]
+        public static void CloneBoard()
+        {
+            IsCloning = true;
+        }
+
+        [PatchMethod("CloneBoard", PatchType.Postfix)]
+        public static void CloneBoardPostfix()
+        {
+            IsCloning = false;
         }
     }
 }

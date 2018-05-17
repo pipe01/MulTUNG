@@ -19,26 +19,23 @@ namespace MulTUNG
                 if (Alive.ContainsKey(value))
                     return;
 
-                Alive.Remove(_netID);
+                if (Alive.ContainsKey(_netID))
+                    Alive.Remove(_netID);
+
                 _netID = value;
+
                 Alive.Add(_netID, this);
             }
         }
 
-        public IList<GameObject> IO { get; private set; } = new GameObject[0];
+        public IList<GameObject> IO => GetComponentsInChildren<CircuitInput>().Select(o => o.gameObject).Concat(GetComponentsInChildren<CircuitOutput>().Select(o => o.gameObject)).ToList();
 
         void Awake()
         {
             if (Alive.Values.Contains(this))
             {
                 Destroy(this);
-                return;
             }
-
-            Alive.Add(NetID, this);
-
-            //Incoming LINQ shenanigans
-            this.IO = new ReadOnlyCollection<GameObject>(GetComponentsInChildren<CircuitInput>().Select(o => o.gameObject).Concat(GetComponentsInChildren<CircuitOutput>().Select(o => o.gameObject)).ToList());
         }
 
         void OnDestroy()
@@ -53,5 +50,7 @@ namespace MulTUNG
 
             return null;
         }
+
+        public static int GetNewID() => Random.Range(int.MinValue, int.MaxValue);
     }
 }
