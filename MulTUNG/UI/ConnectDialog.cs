@@ -1,4 +1,5 @@
-﻿using PiTung.Mod_utilities;
+﻿using PiTung.Console;
+using PiTung.Mod_utilities;
 using System;
 using System.IO;
 using System.Linq;
@@ -22,9 +23,9 @@ namespace MulTUNG.UI
         {
             WindowRect.x = Screen.width / 2 - WindowRect.width / 2;
             WindowRect.y = Screen.height / 2 - WindowRect.height / 2;
-
+            
             Host = Configuration.Get("Host", "127.0.0.1");
-            Port = Configuration.Get("Port", Constants.Port).ToString();
+            Port = Configuration.Get<long>("Port", Constants.Port).ToString();
             Username = Configuration.Get("Username", "");
         }
 
@@ -77,7 +78,7 @@ namespace MulTUNG.UI
                         int port = int.Parse(Port);
                         Configuration.Set("Port", port);
 
-                        NetworkClient.Instance.Connect(new IPEndPoint(address, port));
+                        MulTUNG.Connect(new IPEndPoint(address, port));
 
                         Visible = false;
                     }

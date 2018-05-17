@@ -92,7 +92,7 @@ namespace MulTUNG
 
         public override void OnGUI()
         {
-            if (RunMainMenu.Instance.MainMenuCanvas.enabled)
+            if (RunMainMenu.Instance?.MainMenuCanvas?.enabled ?? false)
             {
                 if (GUI.Button(new Rect(Screen.width - 3 - 80, 3, 80, 35), "Connect"))
                 {
@@ -116,6 +116,28 @@ namespace MulTUNG
         {
             NetworkClient.Instance.Disconnect();
         }
+
+        public static void Connect(IPEndPoint endpoint)
+        {
+            if (!ModUtilities.IsOnMainMenu)
+            {
+                return;
+            }
+
+            SaveManager.SaveName = ForbiddenSaveName;
+            SceneManager.LoadScene("gameplay");
+            EverythingHider.HideEverything();
+
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                while (ModUtilities.IsOnMainMenu)
+                    Thread.Sleep(500);
+
+                Thread.Sleep(1000);
+
+                NetworkClient.Instance.Connect(endpoint);
+            });
+        }
     }
 
     public class Command_disconnect : Command
@@ -138,24 +160,7 @@ namespace MulTUNG
 
         public override bool Execute(IEnumerable<string> arguments)
         {
-            if (!ModUtilities.IsOnMainMenu)
-            {
-                return true;
-            }
-            
-            SaveManager.SaveName = MulTUNG.ForbiddenSaveName;
-            SceneManager.LoadScene("gameplay");
-            EverythingHider.HideEverything();
-            
-            ThreadPool.QueueUserWorkItem(_ =>
-            {
-                while (ModUtilities.IsOnMainMenu)
-                    Thread.Sleep(500);
-
-                Thread.Sleep(1000);
-
-                NetworkClient.Instance.Connect(arguments.FirstOrDefault() ?? "127.0.0.1");
-            });
+            MulTUNG.Connect(new IPEndPoint(IPAddress.Parse(arguments.FirstOrDefault() ?? "127.0.0.1"), Constants.Port));
 
             return true;
         }
