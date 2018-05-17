@@ -40,7 +40,8 @@ namespace MulTUNG
 
         void OnDestroy()
         {
-            Alive.Remove(NetID);
+            if (Alive.ContainsKey(NetID))
+                Alive.Remove(NetID);
         }
 
         public static NetObject GetByNetId(int id)
