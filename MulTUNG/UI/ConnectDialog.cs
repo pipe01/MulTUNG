@@ -12,9 +12,9 @@ namespace MulTUNG.UI
     {
         private Rect WindowRect = new Rect(0, 0, 200, 130);
         
-        public string Host { get; private set; } = "127.0.0.1";
-        public string Port { get; private set; } = Constants.Port.ToString();
-        public string Username { get; private set; } = "";
+        public string Host { get; private set; }
+        public string Port { get; private set; }
+        public string Username { get; private set; }
 
         public bool Visible { get; set; } = true;
 
@@ -23,6 +23,8 @@ namespace MulTUNG.UI
             WindowRect.x = Screen.width / 2 - WindowRect.width / 2;
             WindowRect.y = Screen.height / 2 - WindowRect.height / 2;
 
+            Host = Configuration.Get("Host", "127.0.0.1");
+            Port = Configuration.Get("Port", Constants.Port).ToString();
             Username = Configuration.Get("Username", "");
         }
 
@@ -70,7 +72,10 @@ namespace MulTUNG.UI
 
                     if (IPAddress.TryParse(Host, out var address))
                     {
+                        Configuration.Set("Host", Host);
+
                         int port = int.Parse(Port);
+                        Configuration.Set("Port", port);
 
                         NetworkClient.Instance.Connect(new IPEndPoint(address, port));
 
