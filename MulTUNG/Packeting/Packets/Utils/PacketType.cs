@@ -18,6 +18,7 @@
         WorldData,
         UserInput,
         ComponentData,
-        CircuitState
+        CircuitState,
+        PlayerData
     }
 }

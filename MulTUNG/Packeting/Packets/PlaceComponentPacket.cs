@@ -67,7 +67,5 @@ namespace MulTUNG.Packeting.Packets
 
             return packet;
         }
-
-        public override string ToString() => $"{ParentBoardID}.{NetID}";
     }
 }

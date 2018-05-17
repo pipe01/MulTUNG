@@ -92,6 +92,7 @@
     <Compile Include="Packeting\NetState.cs" />
     <Compile Include="Packeting\Packets\CircuitStatePacket.cs" />
     <Compile Include="Packeting\Packets\ComponentDataPacket.cs" />
+    <Compile Include="Packeting\Packets\PlayerDataPacket.cs" />
     <Compile Include="Packeting\Packets\SignalPacket.cs" />
     <Compile Include="Packeting\Packets\DeleteBoardPacket.cs" />
     <Compile Include="Packeting\Packets\DeleteComponentPacket.cs" />
@@ -149,6 +150,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Lidgren.Network.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UI\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

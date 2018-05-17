@@ -101,6 +101,11 @@ namespace MulTUNG
                     MulTUNG.SynchronizationContext.Post(o => ComponentActions.UpdateStates(o as CircuitStatePacket), circuit);
 
                     break;
+                case PlayerDataPacket player:
+                    if (IsServer)
+                        NetworkServer.Instance.ReceivedPlayerData(player);
+
+                    break;
             }
         }
 

@@ -111,8 +111,7 @@ namespace Server
                         var player = new Player(id, msg.SenderConnection);
                         
                         Log.WriteLine("Connected player " + player.ID);
-
-                        PlayerManager.NewPlayer(player.ID);
+                        
                         Players.Add(id, player);
                     }
                     else if (status == NetConnectionStatus.Disconnected)
@@ -126,6 +125,16 @@ namespace Server
             }
         }
         
+        public void ReceivedPlayerData(PlayerDataPacket packet)
+        {
+            if (Players.TryGetValue(packet.SenderID, out var player))
+            {
+                player.Username = packet.Username;
+
+                PlayerManager.NewPlayer(player.ID);
+            }
+        }
+
         public void SendStatesToPlayers()
         {
             var packet = new StateListPacket();
