@@ -75,6 +75,7 @@
       <HintPath>..\..\TUNG Console\PiTung Bootstrap\lib\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client\BlockingQueue.cs" />
@@ -126,6 +127,8 @@
     <Compile Include="Server\Log.cs" />
     <Compile Include="Server\NetworkServer.cs" />
     <Compile Include="Server\Player.cs" />
+    <Compile Include="UI\ConnectDialog.cs" />
+    <Compile Include="UI\IDialog.cs" />
     <Compile Include="Utils\ComponentActions.cs" />
     <Compile Include="Utils\Compressor.cs" />
     <Compile Include="Utils\Tuple.cs" />
@@ -151,9 +154,7 @@
   <ItemGroup>
     <None Include="Resources\Lidgren.Network.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UI\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy "$(TargetPath)" "C:\Users\Pipe\Downloads\The Ultimate Nerd Game\mods\$(TargetFileName)"</PostBuildEvent>

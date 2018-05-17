@@ -1,4 +1,5 @@
 ﻿using MulTUNG.Headless;
+using MulTUNG.UI;
 using PiTung;
 using PiTung.Console;
 using PiTung.Mod_utilities;
@@ -25,6 +26,8 @@ namespace MulTUNG
         public const string ForbiddenSaveName = "you shouldn't be seeing this";
 
         public static SynchronizationContext SynchronizationContext;
+
+        private IDialog ConnectDialog;
 
         //static MulTUNG()
         //{
@@ -73,8 +76,9 @@ namespace MulTUNG
 
         public override void AfterPatch()
         {
+            ConnectDialog = new ConnectDialog { Visible = false };
         }
-        
+
         public override void Update()
         {
             if (ModUtilities.DummyComponent.gameObject.GetComponent<NetUtilitiesComponent>() == null)
@@ -88,6 +92,16 @@ namespace MulTUNG
 
         public override void OnGUI()
         {
+            if (RunMainMenu.Instance.MainMenuCanvas.enabled)
+            {
+                if (GUI.Button(new Rect(Screen.width - 3 - 80, 3, 80, 35), "Connect"))
+                {
+                    ConnectDialog.Visible = !ConnectDialog.Visible;
+                }
+
+                ConnectDialog.Draw();
+            }
+
             if (Network.IsPaused)
             {
                 Rect size = new Rect(0, 0, 200, 70);
