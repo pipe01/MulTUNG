@@ -1,6 +1,6 @@
 ﻿namespace MulTUNG
 {
-    public static class PatchesData
+    public static class PatchesCommon
     {
         public static bool IsTryingToMoveBoard;
         public static Label LabelBeingEdited;

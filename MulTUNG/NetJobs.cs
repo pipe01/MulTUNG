@@ -43,11 +43,13 @@ namespace MulTUNG
             {
                 savedBoard = (SavedCircuitBoard)BinFormatter.Deserialize(mem);
             }
-
+            
             var boardObj = SavedObjectUtilities.LoadSavedObject(savedBoard, parentBoard?.transform);
-            boardObj.AddComponent<NetObject>().NetID = Packet.BoardID;
             boardObj.transform.position = Packet.Position;
             boardObj.transform.eulerAngles = Packet.EulerAngles;
+            
+            BoardFunctions.RecalculateClustersOfBoard(boardObj);
+            SnappingPeg.TryToSnapIn(boardObj);
         }
     }
 

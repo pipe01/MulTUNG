@@ -7,6 +7,7 @@ using SavedObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace MulTUNG
@@ -14,7 +15,6 @@ namespace MulTUNG
     [Target(typeof(BoardPlacer))]
     internal static class BoardPlacerPatch
     {
-
         [PatchMethod]
         public static void PlaceBoard()
         {
@@ -38,7 +38,7 @@ namespace MulTUNG
         [PatchMethod]
         public static void NewBoardBeingPlaced(GameObject NewBoard)
         {
-            if (PatchesData.IsTryingToMoveBoard)
+            if (PatchesCommon.IsTryingToMoveBoard)
             {
                 var net = NewBoard.GetComponent<NetObject>();
 
@@ -47,9 +47,9 @@ namespace MulTUNG
                     Network.SendPacket(new DeleteBoardPacket { BoardID = net.NetID });
                 }
             }
-            else if (PatchesData.IsCloning)
+            else if (PatchesCommon.IsCloning)
             {
-                PatchesData.IsCloning = false;
+                PatchesCommon.IsCloning = false;
 
                 foreach (var item in NewBoard.GetComponentsInChildren<NetObject>())
                 {
@@ -67,14 +67,14 @@ namespace MulTUNG
         {
             if (BoardMenu.Instance.SelectedThing == 2)
             {
-                PatchesData.IsTryingToMoveBoard = true;
+                PatchesCommon.IsTryingToMoveBoard = true;
             }
         }
 
         [PatchMethod("ExecuteSelectedAction", PatchType.Postfix)]
         public static void ExecuteSelectedActionPostfix()
         {
-            PatchesData.IsTryingToMoveBoard = false;
+            PatchesCommon.IsTryingToMoveBoard = false;
         }
     }
 
@@ -105,13 +105,13 @@ namespace MulTUNG
         [PatchMethod]
         public static void RunGameplayDeleting()
         {
-            PatchesData.IsGameplayDeleting = true;
+            PatchesCommon.IsGameplayDeleting = true;
         }
 
         [PatchMethod("RunGameplayDeleting", PatchType.Postfix)]
         public static void RunGameplayDeletingPostfix()
         {
-            PatchesData.IsGameplayDeleting = false;
+            PatchesCommon.IsGameplayDeleting = false;
         }
 
         [PatchMethod]
@@ -161,7 +161,7 @@ namespace MulTUNG
     {
         static void Prefix(GameObject wire)
         {
-            if (!PatchesData.IsGameplayDeleting)
+            if (!PatchesCommon.IsGameplayDeleting)
                 return;
 
             var netObj = wire.GetComponent<NetObject>();
@@ -364,7 +364,7 @@ namespace MulTUNG
         [PatchMethod]
         public static void Done()
         {
-            var netObj = PatchesData.LabelBeingEdited.GetComponent<NetObject>();
+            var netObj = PatchesCommon.LabelBeingEdited.GetComponent<NetObject>();
 
             if (netObj == null)
                 return;
@@ -375,8 +375,8 @@ namespace MulTUNG
                 ComponentType = ComponentType.Label,
                 Data = new List<object>
                 {
-                    PatchesData.LabelBeingEdited.text.text,
-                    PatchesData.LabelBeingEdited.text.fontSize
+                    PatchesCommon.LabelBeingEdited.text.text,
+                    PatchesCommon.LabelBeingEdited.text.fontSize
                 }
             });
         }
@@ -388,7 +388,7 @@ namespace MulTUNG
         [PatchMethod]
         public static void Interact(Label __instance)
         {
-            PatchesData.LabelBeingEdited = __instance;
+            PatchesCommon.LabelBeingEdited = __instance;
         }
     }
 
@@ -444,7 +444,9 @@ namespace MulTUNG
         [PatchMethod("LoadSavedObject", PatchType.Postfix)]
         public static void LoadSavedObject(SavedObjectV2 save, ref GameObject __result)
         {
-            if (save.Children?.FirstOrDefault() is SavedNetObject net)
+            var net = save.Children?.SingleOrDefault(o => o is SavedNetObject) as SavedNetObject;
+
+            if (net != null)
             {
                 var netObj = __result.GetComponent<NetObject>() ?? __result.AddComponent<NetObject>();
                 netObj.NetID = net.NetID;
@@ -458,13 +460,37 @@ namespace MulTUNG
         [PatchMethod]
         public static void CloneBoard()
         {
-            PatchesData.IsCloning = true;
+            PatchesCommon.IsCloning = true;
         }
 
         [PatchMethod("CloneBoard", PatchType.Postfix)]
         public static void CloneBoardPostfix()
         {
-            PatchesData.IsCloning = false;
+            PatchesCommon.IsCloning = false;
+        }
+    }
+
+    [Target(typeof(StackBoardMenu))]
+    internal static class StackBoardMenuPatch
+    {
+        [PatchMethod]
+        public static void Place(StackBoardMenu __instance)
+        {
+            if (!ModUtilities.GetFieldValue<bool>(__instance, "CurrentPlacementIsValid"))
+                return;
+
+            var allBoards = ModUtilities.GetFieldValue<List<GameObject>>(__instance, "AllSubBoardsInvolvedWithStacking");
+            var parentBoard = ModUtilities.GetFieldValue<GameObject>(__instance, "BoardBeingStacked");
+            var firstBoard = allBoards.First(o => o != parentBoard);
+
+            foreach (var item in firstBoard.GetComponentsInChildren<ObjectInfo>())
+            {
+                var netObj = item.GetComponent<NetObject>() ?? item.gameObject.AddComponent<NetObject>();
+                netObj.NetID = NetObject.GetNewID();
+            }
+
+            var packet = PlaceBoardPacket.BuildFromBoard(firstBoard.GetComponent<CircuitBoard>(), parentBoard.transform);
+            Network.SendPacket(packet);
         }
     }
 }

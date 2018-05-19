@@ -138,6 +138,43 @@ namespace MulTUNG
                 NetworkClient.Instance.Connect(endpoint);
             });
         }
+
+        public static void DumpNetobjs()
+        {
+            var scene = SceneManager.GetActiveScene();
+
+            Console.WriteLine($"-----BEGIN NET OBJECT DUMP----- [{(Network.IsClient ? "Client" : "Server")}]");
+            Console.WriteLine("Alive NetObjects: " + NetObject.Alive.Count);
+
+            foreach (var obj in scene.GetRootGameObjects())
+            {
+                Recurse(obj);
+            }
+
+            Console.WriteLine("------END NET OBJECT DUMP------");
+            
+            void Recurse(GameObject parent, int level = 0)
+            {
+                string indentation = new string(' ', level * 4);
+
+                var objInfo = parent.GetComponent<ObjectInfo>();
+
+                if (objInfo != null)
+                {
+                    var netObj = parent.GetComponent<NetObject>();
+
+                    if (netObj != null)
+                    {
+                        Console.WriteLine($"{indentation}{objInfo.ComponentType} ID: {netObj.NetID}");
+                    }
+                }
+
+                foreach (Transform item in parent.transform)
+                {
+                    Recurse(item.gameObject, level + 1);
+                }
+            }
+        }
     }
 
     public class Command_disconnect : Command
@@ -205,41 +242,9 @@ namespace MulTUNG
 
         public override bool Execute(IEnumerable<string> arguments)
         {
-            var scene = SceneManager.GetActiveScene();
-
-            Console.WriteLine("-----BEGIN NET OBJECT DUMP-----");
-            Console.WriteLine("Alive NetObjects: " + NetObject.Alive.Count);
-
-            foreach (var obj in scene.GetRootGameObjects())
-            {
-                Recurse(obj);
-            }
-
-            Console.WriteLine("------END NET OBJECT DUMP------");
+            MulTUNG.DumpNetobjs();
 
             return true;
-
-            void Recurse(GameObject parent, int level = 0)
-            {
-                string indentation = new string(' ', level * 4);
-
-                var objInfo = parent.GetComponent<ObjectInfo>();
-
-                if (objInfo != null)
-                {
-                    var netObj = parent.GetComponent<NetObject>();
-
-                    if (netObj != null)
-                    {
-                        Console.WriteLine($"{indentation}{objInfo.ComponentType} ID: {netObj.NetID}");
-                    }
-                }
-
-                foreach (Transform item in parent.transform)
-                {
-                    Recurse(item.gameObject, level + 1);
-                }
-            }
         }
     }
 }
