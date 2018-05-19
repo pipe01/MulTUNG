@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -28,30 +29,6 @@ namespace MulTUNG
         public static SynchronizationContext SynchronizationContext;
 
         private IDialog ConnectDialog;
-
-        //static MulTUNG()
-        //{
-        //    AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-        //}
-
-        //private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        //{
-        //    Console.WriteLine("::: " + args.Name);
-
-        //    var dic = new Dictionary<string, byte[]>
-        //    {
-        //        ["Lidgren.Network"] = Properties.Resources.Lidgren_Network
-        //    };
-
-        //    var name = new AssemblyName(args.Name).Name;
-
-        //    if (dic.TryGetValue(name, out var b))
-        //    {
-        //        return Assembly.Load(b);
-        //    }
-
-        //    return null;
-        //}
 
         public override void BeforePatch()
         {
