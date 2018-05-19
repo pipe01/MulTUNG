@@ -68,7 +68,7 @@ namespace MulTUNG.UI
                 {
                     Configuration.Set("Username", Username);
 
-                    if (IPAddress.TryParse(Host, out var address))
+                    if (!string.IsNullOrEmpty(Username) && IPAddress.TryParse(Host, out var address))
                     {
                         Configuration.Set("Host", Host);
 
