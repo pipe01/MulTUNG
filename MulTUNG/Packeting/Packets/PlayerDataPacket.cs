@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace MulTUNG.Packeting.Packets
+﻿namespace MulTUNG.Packeting.Packets
 {
     public class PlayerDataPacket : Packet
     {
