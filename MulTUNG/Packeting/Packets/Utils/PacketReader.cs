@@ -53,8 +53,8 @@ namespace MulTUNG.Packeting.Packets
 
         public PacketType ReadPacketType() => (PacketType)Message.ReadByte();
 
-        public string ReadString() => Message.ReadString();
-
+        public string ReadString() => Encoding.UTF8.GetString(ReadByteArray());
+        
         public Vector3 ReadVector3() => Message.ReadVector3();
 
         public byte[] ReadRaw(int length)

@@ -7,6 +7,7 @@ namespace MulTUNG.Packeting.Packets
     {
         public float Time;
         public int PlayerID;
+        public string Username;
         public Vector3 Position, EulerAngles;
     }
 
@@ -27,6 +28,7 @@ namespace MulTUNG.Packeting.Packets
                 builder.Write(item.Value.PlayerID);
                 builder.Write(item.Value.Position);
                 builder.Write(item.Value.EulerAngles);
+                builder.Write(item.Value.Username);
             }
 
             return builder.Done();
@@ -45,6 +47,7 @@ namespace MulTUNG.Packeting.Packets
                     PlayerID = reader.ReadInt32(),
                     Position = reader.ReadVector3(),
                     EulerAngles = reader.ReadVector3(),
+                    Username = reader.ReadString(),
                     Time = packet.Time
                 };
 

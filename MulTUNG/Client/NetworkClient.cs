@@ -16,6 +16,7 @@ namespace MulTUNG
         public static NetworkClient Instance { get; private set; } = new NetworkClient();
         
         public int PlayerID { get; private set; } = -2;
+        public string Username { get; private set; }
         public bool Connected => Client?.ConnectionStatus == NetConnectionStatus.Connected;
         
         private NetClient Client;
@@ -97,10 +98,18 @@ namespace MulTUNG
 
             Log.WriteLine("Your ID: " + id);
 
-            PlayerManager.NewPlayer(Network.ServerPlayerID);
+            PlayerManager.NewPlayer(Network.ServerPlayerID, "Server");
             Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
 
             Send(new SignalPacket(SignalData.RequestWorld));
+        }
+
+        public void SetUsername(string username)
+        {
+            if (this.Username != null)
+                return;
+
+            this.Username = username;
         }
     }
 }

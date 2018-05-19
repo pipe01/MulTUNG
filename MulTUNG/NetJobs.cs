@@ -48,16 +48,6 @@ namespace MulTUNG
             boardObj.AddComponent<NetObject>().NetID = Packet.BoardID;
             boardObj.transform.position = Packet.Position;
             boardObj.transform.eulerAngles = Packet.EulerAngles;
-
-            World.AddNetObjects();
-
-            foreach (var item in boardObj.GetComponentsInChildren<NetObject>())
-            {
-                if (Packet.IdByPosition.TryGetValue(new Tuple<Vector3, Vector3>(item.transform.position, item.transform.eulerAngles), out int id))
-                    item.NetID = id;
-            }
-
-            SaveManager.RecalculateAllClustersEverywhereWithDelay();
         }
     }
 

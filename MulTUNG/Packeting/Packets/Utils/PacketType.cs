@@ -19,6 +19,6 @@
         UserInput,
         ComponentData,
         CircuitState,
-        PlayerData
+        PlayerData,
     }
 }

@@ -14,7 +14,6 @@ namespace MulTUNG
     [Target(typeof(BoardPlacer))]
     internal static class BoardPlacerPatch
     {
-        public static bool IsTryingToMoveBoard = false;
 
         [PatchMethod]
         public static void PlaceBoard()
@@ -39,7 +38,7 @@ namespace MulTUNG
         [PatchMethod]
         public static void NewBoardBeingPlaced(GameObject NewBoard)
         {
-            if (IsTryingToMoveBoard)
+            if (PatchesData.IsTryingToMoveBoard)
             {
                 var net = NewBoard.GetComponent<NetObject>();
 
@@ -48,10 +47,9 @@ namespace MulTUNG
                     Network.SendPacket(new DeleteBoardPacket { BoardID = net.NetID });
                 }
             }
-            else if (BoardFunctionsPatch.IsCloning)
+            else if (PatchesData.IsCloning)
             {
-                IGConsole.Log("Cloning board");
-                BoardFunctionsPatch.IsCloning = false;
+                PatchesData.IsCloning = false;
 
                 foreach (var item in NewBoard.GetComponentsInChildren<NetObject>())
                 {
@@ -69,14 +67,14 @@ namespace MulTUNG
         {
             if (BoardMenu.Instance.SelectedThing == 2)
             {
-                BoardPlacerPatch.IsTryingToMoveBoard = true;
+                PatchesData.IsTryingToMoveBoard = true;
             }
         }
 
         [PatchMethod("ExecuteSelectedAction", PatchType.Postfix)]
         public static void ExecuteSelectedActionPostfix()
         {
-            BoardPlacerPatch.IsTryingToMoveBoard = false;
+            PatchesData.IsTryingToMoveBoard = false;
         }
     }
 
@@ -104,6 +102,18 @@ namespace MulTUNG
     [Target(typeof(StuffDeleter))]
     internal static class StuffDeleterPatch
     {
+        [PatchMethod]
+        public static void RunGameplayDeleting()
+        {
+            PatchesData.IsGameplayDeleting = true;
+        }
+
+        [PatchMethod("RunGameplayDeleting", PatchType.Postfix)]
+        public static void RunGameplayDeletingPostfix()
+        {
+            PatchesData.IsGameplayDeleting = false;
+        }
+
         [PatchMethod]
         public static void DeleteThing(GameObject DestroyThis, ref bool __state)
         {
@@ -151,6 +161,9 @@ namespace MulTUNG
     {
         static void Prefix(GameObject wire)
         {
+            if (!PatchesData.IsGameplayDeleting)
+                return;
+
             var netObj = wire.GetComponent<NetObject>();
 
             if (netObj != null)
@@ -348,12 +361,10 @@ namespace MulTUNG
     [Target(typeof(TextEditMenu))]
     internal static class TextEditMenuPatch
     {
-        public static Label LabelBeingEdited;
-
         [PatchMethod]
-        public static void Done(EditDisplayColorMenu __instance)
+        public static void Done()
         {
-            var netObj = LabelBeingEdited.GetComponent<NetObject>();
+            var netObj = PatchesData.LabelBeingEdited.GetComponent<NetObject>();
 
             if (netObj == null)
                 return;
@@ -364,8 +375,8 @@ namespace MulTUNG
                 ComponentType = ComponentType.Label,
                 Data = new List<object>
                 {
-                    LabelBeingEdited.text.text,
-                    LabelBeingEdited.text.fontSize
+                    PatchesData.LabelBeingEdited.text.text,
+                    PatchesData.LabelBeingEdited.text.fontSize
                 }
             });
         }
@@ -377,7 +388,7 @@ namespace MulTUNG
         [PatchMethod]
         public static void Interact(Label __instance)
         {
-            TextEditMenuPatch.LabelBeingEdited = __instance;
+            PatchesData.LabelBeingEdited = __instance;
         }
     }
 
@@ -444,18 +455,16 @@ namespace MulTUNG
     [Target(typeof(BoardFunctions))]
     internal static class BoardFunctionsPatch
     {
-        public static bool IsCloning = false;
-
         [PatchMethod]
         public static void CloneBoard()
         {
-            IsCloning = true;
+            PatchesData.IsCloning = true;
         }
 
         [PatchMethod("CloneBoard", PatchType.Postfix)]
         public static void CloneBoardPostfix()
         {
-            IsCloning = false;
+            PatchesData.IsCloning = false;
         }
     }
 }

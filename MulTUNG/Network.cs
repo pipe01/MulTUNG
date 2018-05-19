@@ -28,6 +28,10 @@ namespace MulTUNG
             if (packet is PlayerWelcomePacket wel)
             {
                 NetworkClient.Instance.SetID(wel.YourID);
+                SendPacket(new PlayerDataPacket
+                {
+                    Username = NetworkClient.Instance.Username
+                });
                 return;
             }
             

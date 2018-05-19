@@ -5,7 +5,10 @@ namespace MulTUNG.Client
 {
     public class RemotePlayer : MonoBehaviour
     {
+        public string Username { get; set; }
         public float LastUpdateTime { get; set; }
+
+        private static GUIStyle DefaultUsernameStyle = new GUIStyle();
 
         private Vector3 LastPosition = Vector3.zero,
                         NextPosition = Vector3.zero;
@@ -15,6 +18,9 @@ namespace MulTUNG.Client
 
         private float TimeBetweenStates = 0;
         private float LastStateTime = 0;
+        private GUIStyle UsernameStyle = new GUIStyle(DefaultUsernameStyle);
+
+        private const float MaxUsernameDistance = 10;
 
         void FixedUpdate()
         {
@@ -23,7 +29,7 @@ namespace MulTUNG.Client
             transform.position = Vector3.Lerp(LastPosition, NextPosition, t);
             transform.rotation = Quaternion.Lerp(LastRotation, NextRotation, t);
         }
-
+        
         public void UpdateState(PlayerState state)
         {
             TimeBetweenStates = Time.time - LastStateTime;

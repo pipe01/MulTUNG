@@ -4,6 +4,8 @@ using MulTUNG.Packeting.Packets;
 using MulTUNG.Packeting.Packets.Utils;
 using MulTUNG.Server;
 using MulTUNG.Utils;
+using PiTung.Console;
+using PiTung.Mod_utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +35,7 @@ namespace Server
         
         private TimeSpan CircuitUpdateTime;
         private int PlayerIdCounter = 1;
-
+        private int MaxUsernameLength;
         private NetServer Server;
         private IDictionary<int, Player> Players = new Dictionary<int, Player>();
 
@@ -41,6 +43,7 @@ namespace Server
         {
             Instance = this;
             CircuitUpdateRate = 100;
+            MaxUsernameLength = (int)Configuration.Get<long>("MaxUsernameLength", 15);
         }
 
         public void Start()
@@ -129,9 +132,10 @@ namespace Server
         {
             if (Players.TryGetValue(packet.SenderID, out var player))
             {
-                player.Username = packet.Username;
+                IGConsole.Log($"Player {packet.Username} connected");
+                player.Username = packet.Username.Substring(0, Math.Min(packet.Username.Length, 123));
 
-                PlayerManager.NewPlayer(player.ID);
+                PlayerManager.NewPlayer(player.ID, packet.Username);
             }
         }
 
@@ -143,7 +147,8 @@ namespace Server
             {
                 PlayerID = Network.ServerPlayerID,
                 Position = FirstPersonInteraction.FirstPersonCamera.transform.position,
-                EulerAngles = FirstPersonInteraction.FirstPersonCamera.transform.eulerAngles
+                EulerAngles = FirstPersonInteraction.FirstPersonCamera.transform.eulerAngles,
+                Username = "Server" //TODO Add username to server player
             });
 
             foreach (var item in Players)
@@ -152,7 +157,8 @@ namespace Server
                 {
                     PlayerID = item.Value.ID,
                     Position = item.Value.Position,
-                    EulerAngles = item.Value.EulerAngles
+                    EulerAngles = item.Value.EulerAngles,
+                    Username = item.Value.Username
                 });
             }
 

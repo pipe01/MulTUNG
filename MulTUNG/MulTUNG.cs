@@ -92,7 +92,7 @@ namespace MulTUNG
 
         public override void OnGUI()
         {
-            if (RunMainMenu.Instance?.MainMenuCanvas?.enabled ?? false)
+            if (ModUtilities.IsOnMainMenu && (RunMainMenu.Instance?.MainMenuCanvas?.enabled ?? false))
             {
                 if (GUI.Button(new Rect(Screen.width - 3 - 80, 3, 80, 35), "Connect"))
                 {

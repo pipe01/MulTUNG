@@ -26,7 +26,7 @@ namespace MulTUNG
 
         public static RemotePlayer[] Players => PlayersInner.Values.ToArray();
 
-        public static void NewPlayer(int id)
+        public static void NewPlayer(int id, string username)
         {
             //If the player already exists, don't do anything
             if (!PlayersInner.ContainsKey(id))
@@ -36,6 +36,7 @@ namespace MulTUNG
 
                 //Add a RemotePlayer component
                 var remotePlayer = obj.AddComponent<RemotePlayer>();
+                remotePlayer.Username = username;
 
                 //Add it to the players registry
                 PlayersInner.Add(id, remotePlayer);

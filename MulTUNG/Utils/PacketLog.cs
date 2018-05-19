@@ -27,7 +27,7 @@ namespace MulTUNG.Utils
                     File.Move(LogPath, LogPath + ".old");
                 }
 
-                LogFile = File.OpenWrite(LogPath);
+                LogFile = File.Open(LogPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
             }
         }
 

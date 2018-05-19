@@ -78,6 +78,7 @@ namespace MulTUNG.UI
                         int port = int.Parse(Port);
                         Configuration.Set("Port", port);
 
+                        NetworkClient.Instance.SetUsername(Username);
                         MulTUNG.Connect(new IPEndPoint(address, port));
 
                         Visible = false;
