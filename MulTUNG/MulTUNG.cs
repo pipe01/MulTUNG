@@ -83,11 +83,6 @@ namespace MulTUNG
         {
             if (ModUtilities.DummyComponent.gameObject.GetComponent<NetUtilitiesComponent>() == null)
                 ModUtilities.DummyComponent.gameObject.AddComponent<NetUtilitiesComponent>();
-
-            if (Input.GetKeyDown(KeyCode.P))
-                Network.PauseGame();
-            if (Input.GetKeyDown(KeyCode.R))
-                Network.ResumeGame();
         }
 
         public override void OnGUI()
