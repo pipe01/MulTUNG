@@ -51,7 +51,7 @@ namespace MulTUNG.Packeting.Packets
                 .Write(d.y)
                 .Write(d.z);
 
-        public PacketBuilder Write(string d) => Write(Encoding.UTF8.GetBytes(d));
+        public PacketBuilder Write(string d) => Write(Encoding.UTF8.GetBytes(d ?? ""));
 
         public PacketBuilder Write(byte[] d)
         {
