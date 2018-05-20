@@ -91,6 +91,7 @@
     <Compile Include="Client\NetworkClient.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Packeting\NetState.cs" />
+    <Compile Include="Packeting\Packets\ChatMessagePacket.cs" />
     <Compile Include="Packeting\Packets\CircuitStatePacket.cs" />
     <Compile Include="Packeting\Packets\ComponentDataPacket.cs" />
     <Compile Include="Packeting\Packets\PlayerDataPacket.cs" />

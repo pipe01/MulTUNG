@@ -2,6 +2,7 @@
 using MulTUNG.Packeting.Packets.Utils;
 using MulTUNG.Utils;
 using PiTung;
+using PiTung.Console;
 using Server;
 using System.Threading;
 using UnityEngine;
@@ -17,7 +18,8 @@ namespace MulTUNG
         public static bool IsPaused { get; private set; }
 
         public static int PlayerID => IsClient ? NetworkClient.Instance.PlayerID : ServerPlayerID;
-        
+        public static string Username => IsClient ? NetworkClient.Instance.Username : "Server";
+
         public const int ServerPlayerID = 0;
         
         public static void ProcessPacket(Packet packet, int playerId)
@@ -108,6 +110,10 @@ namespace MulTUNG
                 case PlayerDataPacket player:
                     if (IsServer)
                         NetworkServer.Instance.ReceivedPlayerData(player);
+
+                    break;
+                case ChatMessagePacket chat:
+                    IGConsole.Log($"<b>{chat.Username}</b>: {chat.Text}");
 
                     break;
             }

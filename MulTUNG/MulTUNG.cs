@@ -1,4 +1,5 @@
 ﻿using MulTUNG.Headless;
+using MulTUNG.Packeting.Packets;
 using MulTUNG.UI;
 using PiTung;
 using PiTung.Console;
@@ -35,13 +36,12 @@ namespace MulTUNG
             {
                 HeadlessServer.Instance.Start();
             }
-
-#pragma warning disable CS0618 // Type or member is obsolete
-            IGConsole.RegisterCommand<Command_connect>(this);
-            IGConsole.RegisterCommand<Command_disconnect>(this);
-            IGConsole.RegisterCommand<Command_host>(this);
-            IGConsole.RegisterCommand<Command_netobjs>(this);
-#pragma warning restore CS0618 // Type or member is obsolete
+            
+            IGConsole.RegisterCommand<Command_connect>();
+            IGConsole.RegisterCommand<Command_disconnect>();
+            IGConsole.RegisterCommand<Command_host>();
+            IGConsole.RegisterCommand<Command_netobjs>();
+            IGConsole.RegisterCommand<Command_chat>();
 
             string path = Application.persistentDataPath + "/saves/" + ForbiddenSaveName;
             if (Directory.Exists(path))
@@ -214,6 +214,28 @@ namespace MulTUNG
         public override bool Execute(IEnumerable<string> arguments)
         {
             MulTUNG.DumpNetobjs();
+
+            return true;
+        }
+    }
+
+    public class Command_chat : Command
+    {
+        public override string Name => "chat";
+        public override string Usage => $"{Name} <message>";
+
+        public override bool Execute(IEnumerable<string> arguments)
+        {
+            if (!arguments.Any())
+                return false;
+
+            string msg = string.Join(" ", arguments.ToArray());
+            Network.SendPacket(new ChatMessagePacket
+            {
+                Username = Network.Username,
+                Text = msg
+            });
+            IGConsole.Log($"<b>{Network.Username}</b>: {msg}");
 
             return true;
         }
