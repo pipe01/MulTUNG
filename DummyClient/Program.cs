@@ -12,13 +12,25 @@ using UnityEngine;
 
 namespace DummyClient
 {
+    class MySyncContext : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback d, object state)
+        {
+        }
+
+        public override void Send(SendOrPostCallback d, object state)
+        {
+        }
+    }
+
     class Program
     {
         static void Main(string[] args) => new Program().Run();
 
         public static Stopwatch TimeStopwatch = Stopwatch.StartNew();
 
-        HarmonyInstance Harmony = HarmonyInstance.Create("dummyclient");
+        private Vector3 Position, Rotation;
+        private HarmonyInstance Harmony = HarmonyInstance.Create("dummyclient");
 
         public static void TestMethod()
         {
@@ -27,10 +39,16 @@ namespace DummyClient
 
         public void Run()
         {
-            HarmonyInstance.DEBUG = true;
-            
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+            MulTUNG.MulTUNG.SynchronizationContext = new MySyncContext();
+
+            System.Windows.Forms.Application.EnableVisualStyles();
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+            ThreadPool.QueueUserWorkItem(_ => System.Windows.Forms.Application.Run(new frmSendPacket()));
             
+            AppDomain.CurrentDomain.UnhandledException += MyExceptionHandler;
+
             Console.Write("Host (127.0.0.1): ");
             string host = Console.ReadLine();
 
@@ -74,6 +92,11 @@ namespace DummyClient
             }
         }
 
+        private void MyExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+        {
+            Console.WriteLine((e.ExceptionObject as Exception).Message);
+        }
+
         private void ParseCommand(string cmd)
         {
             switch (cmd.Split(' ')[0])
@@ -90,8 +113,22 @@ namespace DummyClient
                     NetworkClient.Instance.Send(new PlayerStatePacket
                     {
                         PlayerID = NetworkClient.Instance.PlayerID,
-                        Position = new Vector3(x, y, z),
-                        EulerAngles = Vector3.zero
+                        Position = this.Position = new Vector3(x, y, z),
+                        EulerAngles = this.Rotation
+                    });
+
+                    break;
+                case "rotate":
+                    string[] splita = cmd.Split(' ');
+                    float xa = float.Parse(splita[1]);
+                    float ya = float.Parse(splita[2]);
+                    float za = float.Parse(splita[3]);
+
+                    NetworkClient.Instance.Send(new PlayerStatePacket
+                    {
+                        PlayerID = NetworkClient.Instance.PlayerID,
+                        Position = this.Position,
+                        EulerAngles = this.Rotation = new Vector3(xa, ya, za)
                     });
 
                     break;

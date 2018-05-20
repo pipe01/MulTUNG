@@ -45,24 +45,34 @@ namespace MulTUNG
 
         public static void UpdateStates(StateListPacket states)
         {
+            foreach (var item in PlayersInner.Where(o => !states.States.ContainsKey(o.Key)))
+            {
+                PlayersInner.Remove(item.Key);
+            }
+
             foreach (var item in states.States)
             {
                 if (item.Key == Network.PlayerID)
                     continue;
-                
-                UpdatePlayer(item.Value);
+
+                UpdatePlayer(item.Value, true);
             }
         }
 
-        public static void UpdatePlayer(PlayerState state)
+        public static void UpdatePlayer(PlayerState state, bool create = false)
         {
             //If the player doesn't exist
             if (!PlayersInner.ContainsKey(state.PlayerID))
             {
-                //Create it
-                //NewPlayer(state.PlayerID);
-
-                return;
+                if (create)
+                {
+                    //Create it
+                    NewPlayer(state.PlayerID, state.Username);
+                }
+                else
+                {
+                    return;
+                }
             }
 
             var player = PlayersInner[state.PlayerID];

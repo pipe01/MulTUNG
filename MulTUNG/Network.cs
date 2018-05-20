@@ -91,18 +91,18 @@ namespace MulTUNG
 
                     break;
                 case WorldDataPacket world:
-                    World.Deserialize(world.Data);
-
+                    MulTUNG.SynchronizationContext.Post(o => World.Deserialize(((WorldDataPacket)o).Data), world);
+                    
                     break;
                 case UserInputPacket input:
-                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoAction(o as UserInputPacket), input);
+                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoAction((UserInputPacket)o), input);
 
                     break;
                 case ComponentDataPacket compdata:
-                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoData(o as ComponentDataPacket), compdata);
+                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoData((ComponentDataPacket)o), compdata);
                     break;
                 case CircuitStatePacket circuit:
-                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.UpdateStates(o as CircuitStatePacket), circuit);
+                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.UpdateStates((CircuitStatePacket)o), circuit);
 
                     break;
                 case PlayerDataPacket player:

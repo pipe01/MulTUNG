@@ -119,6 +119,7 @@ namespace Server
                     {
                         int id = Players.Keys.SingleOrDefault(o => Players[o].Connection == msg.SenderConnection);
 
+                        Players.Remove(id);
                         PlayerManager.WaveGoodbye(id);
                     }
 
