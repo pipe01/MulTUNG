@@ -61,15 +61,10 @@ namespace MulTUNG.Utils
                 //Load all the objects from the save
                 foreach (var item in world.TopLevelObjects)
                 {
-                    MyDebug.Log(string.Join(", ", item.Children.Select(o => o.GetType().Name).ToArray()));
-
                     SavedObjectUtilities.LoadSavedObject(item);
                 }
 
                 SaveManager.RecalculateAllClustersEverywhereWithDelay();
-                
-                //Add a NetObject component to all components
-                World.AddNetObjects();
 
             }, null);
         }
