@@ -71,15 +71,6 @@ namespace DummyClient
 
                     Log.FlushQueue();
                 }
-                else if (key.Key == ConsoleKey.P)
-                {
-                    Console.WriteLine(new string('-', 15));
-                    foreach (var item in PlayerManager.Players)
-                    {
-                        Console.WriteLine($"{item.LastState.PlayerID}\t{item.LastState.Position}");
-                    }
-                    Console.WriteLine(new string('-', 15) + "\n");
-                }
             }
         }
 
