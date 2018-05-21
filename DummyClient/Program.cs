@@ -39,13 +39,12 @@ namespace DummyClient
 
         public void Run()
         {
+            System.Windows.Forms.Application.EnableVisualStyles();
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
 
             MulTUNG.MulTUNG.SynchronizationContext = new MySyncContext();
-
-            System.Windows.Forms.Application.EnableVisualStyles();
-            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-            ThreadPool.QueueUserWorkItem(_ => System.Windows.Forms.Application.Run(new frmSendPacket()));
             
             AppDomain.CurrentDomain.UnhandledException += MyExceptionHandler;
 
@@ -59,6 +58,7 @@ namespace DummyClient
 
             new NetUtilitiesComponent();
 
+            NetworkClient.Instance.SetUsername("Dummy" + new System.Random().Next(0, 100));
             NetworkClient.Instance.Connect(host);
 
             ThreadPool.QueueUserWorkItem(_ =>
@@ -90,6 +90,11 @@ namespace DummyClient
                     Log.FlushQueue();
                 }
             }
+        }
+
+        private void OpenSendForm()
+        {
+            ThreadPool.QueueUserWorkItem(_ => new frmSendPacket().ShowDialog());
         }
 
         private void MyExceptionHandler(object sender, UnhandledExceptionEventArgs e)
@@ -130,6 +135,10 @@ namespace DummyClient
                         Position = this.Position,
                         EulerAngles = this.Rotation = new Vector3(xa, ya, za)
                     });
+
+                    break;
+                case "send":
+                    OpenSendForm();
 
                     break;
             }

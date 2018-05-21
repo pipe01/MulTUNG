@@ -28,8 +28,11 @@ namespace MulTUNG
 
         public static void NewPlayer(int id, string username)
         {
-            //If the player already exists, don't do anything
-            if (!PlayersInner.ContainsKey(id))
+            if (PlayersInner.TryGetValue(id, out var player))
+            {
+                player.Username = username;
+            }
+            else
             {
                 //Instantiate a new player from the prefab
                 var obj = MakePlayerModel();

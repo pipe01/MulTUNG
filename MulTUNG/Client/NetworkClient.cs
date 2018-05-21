@@ -97,7 +97,7 @@ namespace MulTUNG
 
             Log.WriteLine("Your ID: " + id);
 
-            PlayerManager.NewPlayer(Network.ServerPlayerID, "Server");
+            PlayerManager.NewPlayer(Network.ServerPlayerID, Network.ServerUsername);
             Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
 
             Send(new SignalPacket(SignalData.RequestWorld));

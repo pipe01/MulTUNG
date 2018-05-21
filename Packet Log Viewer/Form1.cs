@@ -33,7 +33,7 @@ namespace Packet_Log_Viewer
                 .OrderBy(o => o.Name)
                 .ToList();
 
-        void LoadLog(PacketLog log = null)
+        private void LoadLog(PacketLog log = null)
         {
             log = log ?? this.Log;
 
@@ -77,11 +77,11 @@ namespace Packet_Log_Viewer
             }
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
+        private async void toolStripButton1_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                Log = PacketLog.Load(openFileDialog1.FileName);
+                Log = await LoadLogFromFile(openFileDialog1.FileName);
 
                 LoadLog();
             }
@@ -122,7 +122,7 @@ namespace Packet_Log_Viewer
             new frmHexViewer(data).Show();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private async void Form1_Load(object sender, EventArgs e)
         {
             Loading = true;
             lvPacketTypes.BeginUpdate();
@@ -148,7 +148,7 @@ namespace Packet_Log_Viewer
             {
                 try
                 {
-                    Log = PacketLog.Load(args[1]);
+                    Log = await LoadLogFromFile(args[1]);
                 }
                 catch (Exception ex)
                 {
@@ -167,6 +167,28 @@ namespace Packet_Log_Viewer
 
             LoadCheckedPacketTypes();
             LoadLog();
+        }
+
+        private async Task<PacketLog> LoadLogFromFile(string path)
+        {
+            this.Cursor = Cursors.WaitCursor;
+            SetEnabled(this, false);
+
+            var log = await PacketLog.Load(path);
+            
+            this.Cursor = Cursors.Default;
+            SetEnabled(this, true);
+
+            return log;
+
+            void SetEnabled(Control parent, bool enabled)
+            {
+                foreach (Control item in parent.Controls)
+                {
+                    item.Enabled = enabled;
+                    SetEnabled(item, enabled);
+                }
+            }
         }
     }
 }

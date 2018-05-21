@@ -42,6 +42,7 @@ namespace MulTUNG
             IGConsole.RegisterCommand<Command_host>();
             IGConsole.RegisterCommand<Command_netobjs>();
             IGConsole.RegisterCommand<Command_chat>();
+            IGConsole.RegisterCommand<Command_players>();
 
             string path = Application.persistentDataPath + "/saves/" + ForbiddenSaveName;
             if (Directory.Exists(path))
@@ -237,6 +238,19 @@ namespace MulTUNG
             });
             IGConsole.Log($"<b>{Network.Username}</b>: {msg}");
 
+            return true;
+        }
+    }
+
+    public class Command_players : Command
+    {
+        public override string Name => "players";
+        public override string Usage => Name;
+
+        public override bool Execute(IEnumerable<string> arguments)
+        {
+            IGConsole.Log($"<color=lime>Online players</color> (<b>{PlayerManager.Players.Length}</b>): {string.Join(", ", PlayerManager.Players.Select(o => o.Username).ToArray())}");
+            
             return true;
         }
     }

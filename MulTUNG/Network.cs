@@ -18,7 +18,9 @@ namespace MulTUNG
         public static bool IsPaused { get; private set; }
 
         public static int PlayerID => IsClient ? NetworkClient.Instance.PlayerID : ServerPlayerID;
-        public static string Username => IsClient ? NetworkClient.Instance.Username : "Server";
+        public static string Username => IsClient ? NetworkClient.Instance.Username : ServerUsername;
+
+        public static string ServerUsername { get; set; } = "Server";
 
         public const int ServerPlayerID = 0;
         
@@ -29,11 +31,14 @@ namespace MulTUNG
 
             if (packet is PlayerWelcomePacket wel)
             {
+                ServerUsername = wel.ServerUsername;
                 NetworkClient.Instance.SetID(wel.YourID);
+
                 SendPacket(new PlayerDataPacket
                 {
                     Username = NetworkClient.Instance.Username
                 });
+
                 return;
             }
             

@@ -29,6 +29,8 @@ namespace Server
             }
         }
 
+        public string Username => Network.ServerUsername;
+
         public bool Running => Server?.Status == NetPeerStatus.Running;
         
         private TimeSpan CircuitUpdateTime;
@@ -101,7 +103,6 @@ namespace Server
 
                     if (status == NetConnectionStatus.Connected)
                     {
-
                         int id = PlayerIdCounter++;
 
                         msg.SenderConnection.SendMessage(new PlayerWelcomePacket
@@ -117,10 +118,11 @@ namespace Server
                     }
                     else if (status == NetConnectionStatus.Disconnected)
                     {
-                        int id = Players.Keys.SingleOrDefault(o => Players[o].Connection == msg.SenderConnection);
+                        var player = Players.SingleOrDefault(o => o.Value.Connection == msg.SenderConnection);
 
-                        Players.Remove(id);
-                        PlayerManager.WaveGoodbye(id);
+                        IGConsole.Log($"<color=orange>Player {player.Value.Username} disconnected</color>");
+                        Players.Remove(player.Key);
+                        PlayerManager.WaveGoodbye(player.Key);
                     }
 
                     break;
@@ -131,8 +133,8 @@ namespace Server
         {
             if (Players.TryGetValue(packet.SenderID, out var player))
             {
-                IGConsole.Log($"Player {packet.Username} connected");
-                player.Username = packet.Username.Substring(0, Math.Min(packet.Username.Length, 123));
+                player.Username = packet.Username.Substring(0, Math.Min(packet.Username.Length, 15));
+                IGConsole.Log($"<color=orange>Player {packet.Username} connected</color>");
 
                 PlayerManager.NewPlayer(player.ID, packet.Username);
             }
@@ -147,7 +149,7 @@ namespace Server
                 PlayerID = Network.ServerPlayerID,
                 Position = FirstPersonInteraction.FirstPersonCamera.transform.position,
                 EulerAngles = FirstPersonInteraction.FirstPersonCamera.transform.eulerAngles,
-                Username = "Server" //TODO Add username to server player
+                Username = this.Username
             });
 
             foreach (var item in Players)
