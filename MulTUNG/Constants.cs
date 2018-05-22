@@ -6,5 +6,6 @@
         public const int HeadlessPort = 57005;
         public const int PositionUpdateInterval = 1000 / 20;
         public const float MaximumPlayerStateTime = 1;
+        public const int SendFullCircuitEachXUpdates = 500;
     }
 }

@@ -8,6 +8,8 @@ namespace MulTUNG.Patches
     [Target(typeof(BehaviorManager))]
     internal static class BehaviorManagerPatch
     {
+        public static int UpdateCounter = 0;
+
         [PatchMethod]
         public static bool OnCircuitLogicUpdate()
         {
@@ -25,7 +27,9 @@ namespace MulTUNG.Patches
         {
             if (Network.IsServer)
             {
-                Network.SendPacket(CircuitStatePacket.Build());
+                bool full = UpdateCounter++ % Constants.SendFullCircuitEachXUpdates == 0;
+
+                Network.SendPacket(CircuitStatePacket.Build(full));
             }
         }
     }

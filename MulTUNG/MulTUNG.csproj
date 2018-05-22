@@ -121,6 +121,7 @@
     <Compile Include="Patches\BoardMenuPatch.cs" />
     <Compile Include="Patches\BoardPlacerPatch.cs" />
     <Compile Include="Patches\ButtonPatch.cs" />
+    <Compile Include="Patches\CircuitOutputPatch.cs" />
     <Compile Include="Patches\EditDisplayColorMenuPatch.cs" />
     <Compile Include="Patches\LabelPatch.cs" />
     <Compile Include="Patches\NoisemakerMenuPatch.cs" />

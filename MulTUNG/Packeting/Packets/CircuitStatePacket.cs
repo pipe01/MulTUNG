@@ -1,12 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using PiTung.Console;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEngine;
 using StateKey = System.Collections.Generic.KeyValuePair<int, byte>;
 
 namespace MulTUNG.Packeting.Packets
 {
     public class CircuitStatePacket : Packet
     {
-        private static BinaryFormatter BinFormatter = new BinaryFormatter();
+        private static Dictionary<StateKey, bool> CurrentState = new Dictionary<StateKey, bool>();
+        private static Dictionary<StateKey, bool> LastState = new Dictionary<StateKey, bool>();
 
         public override PacketType Type => PacketType.CircuitState;
 
@@ -46,10 +50,40 @@ namespace MulTUNG.Packeting.Packets
             return packet;
         }
 
-        public static CircuitStatePacket Build()
+        public static CircuitStatePacket Build(bool forceFull = false)
         {
-            var states = new Dictionary<StateKey, bool>();
-            
+            Dictionary<StateKey, bool> states;
+
+            if (forceFull)
+            {
+                IGConsole.Log("Full update " + UnityEngine.Time.time);
+                states = CurrentState;
+            }
+            else
+            {
+                states = CurrentState.Where(o =>
+                {
+                    if (LastState.TryGetValue(o.Key, out var last))
+                        return last != o.Value;
+                    return true;
+                }).ToDictionary(o => o.Key, o => o.Value);
+            }
+
+            return new CircuitStatePacket
+            {
+                States = states
+            };
+        }
+
+        private static void CopyState()
+        {
+            LastState = new Dictionary<StateKey, bool>(CurrentState);
+        }
+        
+        private static void LoadWorldState()
+        {
+            CopyState();
+
             foreach (var obj in NetObject.Alive)
             {
                 var objInfo = obj.Value.GetComponent<ObjectInfo>();
@@ -67,15 +101,10 @@ namespace MulTUNG.Packeting.Packets
 
                     if (output == null)
                         continue;
-                    
-                    states.Add(new KeyValuePair<int, byte>(obj.Key, ioCounter++), output.On);
+
+                    CurrentState[new KeyValuePair<int, byte>(obj.Key, ioCounter++)] = output.On;
                 }
             }
-
-            return new CircuitStatePacket
-            {
-                States = states
-            };
         }
     }
 }

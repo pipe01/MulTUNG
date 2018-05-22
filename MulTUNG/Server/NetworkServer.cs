@@ -1,6 +1,7 @@
 ﻿using Lidgren.Network;
 using MulTUNG;
 using MulTUNG.Packeting.Packets;
+using MulTUNG.Patches;
 using MulTUNG.Server;
 using MulTUNG.Utils;
 using PiTung.Console;
@@ -137,6 +138,8 @@ namespace Server
                 IGConsole.Log($"<color=orange>Player {packet.Username} connected</color>");
 
                 PlayerManager.NewPlayer(player.ID, packet.Username);
+
+                BehaviorManagerPatch.UpdateCounter = 0; //Force full circuit update
             }
         }
 
