@@ -26,8 +26,9 @@ namespace Packet_Log_Viewer
         private List<PacketLogEntry> ShownEntries = new List<PacketLogEntry>();
         private bool Loading = false;
         private List<Type> HiddenPacketTypes = new List<Type>();
+        private string LastPath = "";
 
-        private IList<Type> PacketTypes =
+        private readonly IList<Type> PacketTypes =
             typeof(Packet).Assembly.GetTypes()
                 .Where(o => o.BaseType == typeof(Packet))
                 .OrderBy(o => o.Name)
@@ -81,7 +82,7 @@ namespace Packet_Log_Viewer
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                Log = await LoadLogFromFile(openFileDialog1.FileName);
+                Log = await LoadLogFromFile(LastPath = openFileDialog1.FileName);
 
                 LoadLog();
             }
@@ -148,7 +149,7 @@ namespace Packet_Log_Viewer
             {
                 try
                 {
-                    Log = await LoadLogFromFile(args[1]);
+                    Log = await LoadLogFromFile(LastPath = args[1]);
                 }
                 catch (Exception ex)
                 {
@@ -189,6 +190,11 @@ namespace Packet_Log_Viewer
                     SetEnabled(item, enabled);
                 }
             }
+        }
+
+        private async void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            LoadLog(await LoadLogFromFile(LastPath));
         }
     }
 }

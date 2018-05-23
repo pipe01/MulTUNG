@@ -1,6 +1,7 @@
 ﻿using MulTUNG.Packeting.Packets;
 using MulTUNG.Utils;
 using PiTung;
+using PiTung.Console;
 
 namespace MulTUNG.Patches
 {
@@ -29,7 +30,10 @@ namespace MulTUNG.Patches
             {
                 bool full = UpdateCounter++ % Constants.SendFullCircuitEachXUpdates == 0;
 
-                Network.SendPacket(CircuitStatePacket.Build(full));
+                var packet = CircuitStatePacket.Build(full);
+
+                if (packet.Count > 0)
+                    Network.SendPacket(packet);
             }
         }
     }

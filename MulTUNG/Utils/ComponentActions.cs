@@ -1,8 +1,10 @@
 ﻿using MulTUNG.Packeting.Packets;
 using PiTung;
+using PiTung.Console;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using StateKey = System.Collections.Generic.KeyValuePair<int, byte>;
 
 namespace MulTUNG.Utils
 {
@@ -12,7 +14,15 @@ namespace MulTUNG.Utils
         public static List<Button> PushedDownButtons { get; } = new List<Button>();
         public static bool HasCalledCircuitUpdate { get; set; }
 
-        private static Action<float> CircuitUpdate;
+        public static CircuitOutput CurrentlyUpdating = null;
+
+        private static FieldInfo IOConnectionsField;
+        private static Dictionary<CircuitOutput, StateKey> KeysCache = new Dictionary<CircuitOutput, StateKey>();
+
+        static ComponentActions()
+        {
+            IOConnectionsField = typeof(CircuitOutput).GetField("IOConnections", BindingFlags.NonPublic | BindingFlags.Instance);
+        }
 
         public static void DoAction(UserInputPacket packet)
         {
@@ -86,6 +96,8 @@ namespace MulTUNG.Utils
         {
             foreach (var state in packet.States)
             {
+                IGConsole.Log(state.Key + " = " + state.Value);
+
                 var netObj = NetObject.GetByNetId(state.Key.Key);
                 
                 if (netObj == null)
@@ -97,21 +109,47 @@ namespace MulTUNG.Utils
                     continue;
 
                 var io = ios[state.Key.Value];
+
+                CurrentlyUpdating = io;
                 io.On = state.Value;
             }
-            
-            if (CircuitUpdate == null)
-                GetCircuitUpdate();
-            
+
+            CurrentlyUpdating = null;
             HasCalledCircuitUpdate = true;
-            CircuitUpdate(0);
         }
 
-        private static void GetCircuitUpdate()
+        public static bool TryGetKeyFromOutput(CircuitOutput output, out StateKey key)
         {
-            var method = typeof(BehaviorManager).GetMethod("OnCircuitLogicUpdate", BindingFlags.NonPublic | BindingFlags.Static);
+            if (!KeysCache.TryGetValue(output, out StateKey k))
+            {
+                var component = ComponentPlacer.FullComponent(output.transform);
 
-            CircuitUpdate = (Action<float>)Delegate.CreateDelegate(typeof(Action<float>), method);
+                var netObj = component.GetComponent<NetObject>();
+
+                if (netObj == null)
+                {
+                    key = default(StateKey);
+                    return false;
+                }
+
+                byte ioIndex = 0;
+
+                foreach (var item in component.GetComponentsInChildren<CircuitOutput>())
+                {
+                    if (item == output)
+                        break;
+
+                    ioIndex++;
+                }
+
+                key = KeysCache[output] = new KeyValuePair<int, byte>(netObj.NetID, ioIndex);
+            }
+            else
+            {
+                key = k;
+            }
+
+            return true;
         }
     }
 }

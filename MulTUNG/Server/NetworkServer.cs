@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using UnityEngine;
 using Network = MulTUNG.Network;
 
 namespace Server
@@ -72,10 +73,8 @@ namespace Server
             });
 
             World.AddNetObjects();
-            World.Serialize();
-
-            //StartCircuitUpdateClock();
-
+            World.LoadCircuitState();
+            
             Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
 
             Log.WriteLine("Listening on port " + Constants.Port);

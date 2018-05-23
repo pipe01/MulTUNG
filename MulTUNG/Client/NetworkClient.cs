@@ -7,6 +7,7 @@ using Lidgren.Network;
 using MulTUNG.Utils;
 using MulTUNG.Packeting.Packets.Utils;
 using Server;
+using PiTung.Console;
 
 namespace MulTUNG
 {
@@ -60,6 +61,10 @@ namespace MulTUNG
                             break;
                         case NetIncomingMessageType.StatusChanged:
                             Log.WriteLine("Status: " + Client.ConnectionStatus);
+
+                            if (Client.ConnectionStatus == NetConnectionStatus.Disconnected)
+                                Disconnect();
+
                             break;
                     }
                     Client.Recycle(msg);

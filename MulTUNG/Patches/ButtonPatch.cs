@@ -18,12 +18,12 @@ namespace MulTUNG.Patches
         }
 
         [PatchMethod(PatchType.Postfix)]
-        public static void ButtonDown(Button __instance) => DoButton(__instance);
+        public static void ButtonDown(Button __instance) => DoButton(__instance, true);
 
         [PatchMethod(PatchType.Postfix)]
-        public static void ButtonUp(Button __instance) => DoButton(__instance);
+        public static void ButtonUp(Button __instance) => DoButton(__instance, false);
 
-        private static void DoButton(Button __instance)
+        private static void DoButton(Button __instance, bool value)
         {
             var netObj = __instance.transform.parent.GetComponent<NetObject>();
 
@@ -34,7 +34,7 @@ namespace MulTUNG.Patches
             {
                 NetID = netObj.NetID,
                 Receiver = UserInputPacket.UserInputReceiver.Button,
-                State = __instance.output.On
+                State = value
             };
 
             Network.SendPacket(packet);

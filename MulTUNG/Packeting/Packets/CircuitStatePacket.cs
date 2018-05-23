@@ -1,4 +1,6 @@
-﻿using PiTung.Console;
+﻿using MulTUNG.Utils;
+using PiTung.Console;
+using Server;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -10,11 +12,12 @@ namespace MulTUNG.Packeting.Packets
     public class CircuitStatePacket : Packet
     {
         private static Dictionary<StateKey, bool> CurrentState = new Dictionary<StateKey, bool>();
-        private static Dictionary<StateKey, bool> LastState = new Dictionary<StateKey, bool>();
+        private static Dictionary<StateKey, bool> Updated = new Dictionary<StateKey, bool>();
 
         public override PacketType Type => PacketType.CircuitState;
 
         public Dictionary<StateKey, bool> States { get; set; }
+        public int Count => States?.Count ?? -1;
 
         protected override byte[] SerializeInner()
         {
@@ -34,6 +37,7 @@ namespace MulTUNG.Packeting.Packets
         public static CircuitStatePacket Deserialize(IReader reader)
         {
             var packet = reader.ReadBasePacket<CircuitStatePacket>();
+
             int count = reader.ReadInt32();
 
             packet.States = new Dictionary<KeyValuePair<int, byte>, bool>();
@@ -52,21 +56,17 @@ namespace MulTUNG.Packeting.Packets
 
         public static CircuitStatePacket Build(bool forceFull = false)
         {
-            Dictionary<StateKey, bool> states;
+            Dictionary<StateKey, bool> states = null;
 
             if (forceFull)
             {
-                IGConsole.Log("Full update " + UnityEngine.Time.time);
+                Log.WriteLine("FULL");
                 states = CurrentState;
             }
             else
             {
-                states = CurrentState.Where(o =>
-                {
-                    if (LastState.TryGetValue(o.Key, out var last))
-                        return last != o.Value;
-                    return true;
-                }).ToDictionary(o => o.Key, o => o.Value);
+                states = new Dictionary<StateKey, bool>(Updated);
+                Updated.Clear();
             }
 
             return new CircuitStatePacket
@@ -75,35 +75,11 @@ namespace MulTUNG.Packeting.Packets
             };
         }
 
-        private static void CopyState()
+        public static void SetOutputState(CircuitOutput output, bool value)
         {
-            LastState = new Dictionary<StateKey, bool>(CurrentState);
-        }
-        
-        private static void LoadWorldState()
-        {
-            CopyState();
-
-            foreach (var obj in NetObject.Alive)
+            if (ComponentActions.TryGetKeyFromOutput(output, out var key))
             {
-                var objInfo = obj.Value.GetComponent<ObjectInfo>();
-
-                if (objInfo != null && (objInfo.ComponentType == ComponentType.CircuitBoard || objInfo.ComponentType == ComponentType.Mount || objInfo.ComponentType == ComponentType.Wire))
-                {
-                    continue;
-                }
-
-                byte ioCounter = 0;
-
-                foreach (var io in obj.Value.GetComponentsInChildren<CircuitOutput>())
-                {
-                    var output = io.GetComponent<CircuitOutput>();
-
-                    if (output == null)
-                        continue;
-
-                    CurrentState[new KeyValuePair<int, byte>(obj.Key, ioCounter++)] = output.On;
-                }
+                CurrentState[key] = Updated[key] = value;
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using SavedObjects;
+﻿using MulTUNG.Packeting.Packets;
+using SavedObjects;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +19,15 @@ namespace MulTUNG.Utils
                     item.gameObject.AddComponent<NetObject>().NetID = NetObject.GetNewID();
             }
         }
-
+        
+        public static void LoadCircuitState()
+        {
+            foreach (var item in GameObject.FindObjectsOfType<CircuitOutput>())
+            {
+                CircuitStatePacket.SetOutputState(item, item.On);
+            }
+        }
+        
         public static byte[] Serialize()
         {
             var world = new SavedWorld();
