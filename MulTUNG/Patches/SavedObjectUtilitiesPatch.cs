@@ -18,9 +18,7 @@ namespace MulTUNG.Patches
         [PatchMethod("LoadSavedObject", PatchType.Postfix)]
         public static void LoadSavedObject(SavedObjectV2 save, ref GameObject __result)
         {
-            var net = save.Children?.SingleOrDefault(o => o is SavedNetObject) as SavedNetObject;
-
-            if (net != null)
+            if (save.Children?.SingleOrDefault(o => o is SavedNetObject) is SavedNetObject net)
             {
                 var netObj = __result.GetComponent<NetObject>() ?? __result.AddComponent<NetObject>();
                 netObj.NetID = net.NetID;

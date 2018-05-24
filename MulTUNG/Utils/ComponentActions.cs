@@ -96,11 +96,9 @@ namespace MulTUNG.Utils
         {
             foreach (var state in packet.States)
             {
-                IGConsole.Log(state.Key + " = " + state.Value);
-
                 var netObj = NetObject.GetByNetId(state.Key.Key);
                 
-                if (netObj == null)
+                if (netObj == null || !netObj.enabled)
                     continue;
 
                 var ios = netObj.GetComponentsInChildren<CircuitOutput>();

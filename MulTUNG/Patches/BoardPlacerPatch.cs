@@ -18,6 +18,11 @@ namespace MulTUNG.Patches
                     netObj.NetID = NetObject.GetNewID();
                 }
 
+                foreach (var item in BoardPlacer.BoardBeingPlaced.GetComponentsInChildren<NetObject>())
+                {
+                    item.enabled = true;
+                }
+
                 var boardComp = BoardPlacer.BoardBeingPlaced.GetComponent<CircuitBoard>();
                 var parent = BoardPlacer.ReferenceObject.transform.parent;
 
@@ -36,6 +41,11 @@ namespace MulTUNG.Patches
 
                 if (net != null)
                 {
+                    foreach (var item in NewBoard.GetComponentsInChildren<NetObject>())
+                    {
+                        item.enabled = false;
+                    }
+
                     Network.SendPacket(new DeleteBoardPacket { BoardID = net.NetID });
                 }
             }

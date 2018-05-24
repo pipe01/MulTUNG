@@ -60,7 +60,6 @@ namespace MulTUNG.Packeting.Packets
 
             if (forceFull)
             {
-                Log.WriteLine("FULL");
                 states = CurrentState;
             }
             else
@@ -80,6 +79,11 @@ namespace MulTUNG.Packeting.Packets
             if (ComponentActions.TryGetKeyFromOutput(output, out var key))
             {
                 CurrentState[key] = Updated[key] = value;
+            }
+            else
+            {
+                IGConsole.Log("No key for " + ComponentPlacer.FullComponent(output.transform));
+                MulTUNG.DumpNetobjs();
             }
         }
     }

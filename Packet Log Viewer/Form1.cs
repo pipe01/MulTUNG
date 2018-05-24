@@ -102,13 +102,13 @@ namespace Packet_Log_Viewer
 
             pgPacket.SelectedObject = entry.Packet;
 
-            //if (entry.Packet is WorldDataPacket world)
-            //{
-            //    using (MemoryStream mem = new MemoryStream(Compressor.Decompress(world.Data)))
-            //    {
-            //        var l = new BinaryFormatter().Deserialize(mem);
-            //    }
-            //}
+            if (entry.Packet is PlaceBoardPacket board)
+            {
+                using (MemoryStream mem = new MemoryStream(board.SavedBoard))
+                {
+                    var l = new BinaryFormatter().Deserialize(mem);
+                }
+            }
         }
 
         private void lvPackets_DoubleClick(object sender, EventArgs e)
