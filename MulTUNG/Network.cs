@@ -115,6 +115,8 @@ namespace MulTUNG
                 case PlayerDataPacket player:
                     if (IsServer)
                         NetworkServer.Instance.ReceivedPlayerData(player);
+                    else if (IsClient)
+                        PlayerManager.NewPlayer(player.SenderID, player.Username);
 
                     break;
                 case ChatMessagePacket chat:

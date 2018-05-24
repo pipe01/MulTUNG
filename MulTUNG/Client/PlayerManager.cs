@@ -34,13 +34,15 @@ namespace MulTUNG
             }
             else
             {
+                IGConsole.Log($"<color=orange>Player {username} connected</color>");
+
                 //Instantiate a new player from the prefab
                 var obj = MakePlayerModel();
 
                 //Add a RemotePlayer component
                 var remotePlayer = obj.AddComponent<RemotePlayer>();
                 remotePlayer.Username = username;
-
+                
                 //Add it to the players registry
                 PlayersInner.Add(id, remotePlayer);
             }
@@ -58,7 +60,7 @@ namespace MulTUNG
                 if (item.Key == Network.PlayerID)
                     continue;
 
-                UpdatePlayer(item.Value, true);
+                UpdatePlayer(item.Value, false);
             }
         }
 
@@ -92,6 +94,8 @@ namespace MulTUNG
         {
             if (PlayersInner.TryGetValue(playerId, out var player))
             {
+                IGConsole.Log($"<color=orange>Player {player.Username} disconnected</color>");
+
                 GameObject.Destroy(player.gameObject);
 
                 PlayersInner.Remove(playerId);

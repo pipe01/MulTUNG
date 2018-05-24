@@ -3,6 +3,7 @@
     public class PlayerDataPacket : Packet
     {
         public override PacketType Type => PacketType.PlayerData;
+        public override bool ShouldBroadcast => true;
 
         public string Username { get; set; }
 

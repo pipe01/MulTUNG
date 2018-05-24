@@ -121,7 +121,6 @@ namespace Server
                     {
                         var player = Players.SingleOrDefault(o => o.Value.Connection == msg.SenderConnection);
 
-                        IGConsole.Log($"<color=orange>Player {player.Value.Username} disconnected</color>");
                         Players.Remove(player.Key);
                         PlayerManager.WaveGoodbye(player.Key);
                     }
@@ -135,8 +134,8 @@ namespace Server
             if (Players.TryGetValue(packet.SenderID, out var player))
             {
                 player.Username = packet.Username.Substring(0, Math.Min(packet.Username.Length, 15));
-                IGConsole.Log($"<color=orange>Player {packet.Username} connected</color>");
 
+                IGConsole.Log("+" + packet.Username);
                 PlayerManager.NewPlayer(player.ID, packet.Username);
 
                 BehaviorManagerPatch.UpdateCounter = 0; //Force full circuit update
