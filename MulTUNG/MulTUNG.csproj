@@ -78,7 +78,6 @@
     <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\BlockingQueue.cs" />
     <Compile Include="Client\RemotePlayer.cs" />
     <Compile Include="Headless\Headlesser.cs" />
     <Compile Include="Headless\HeadlessServer.cs" />

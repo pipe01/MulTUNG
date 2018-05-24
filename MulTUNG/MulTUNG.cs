@@ -178,12 +178,17 @@ namespace MulTUNG
     public class Command_host : Command
     {
         public override string Name => "host";
-        public override string Usage => Name;
+        public override string Usage => $"{Name} [username]";
 
         public override bool Execute(IEnumerable<string> arguments)
         {
             new NetworkServer().Start();
             
+            if (arguments.Any())
+            {
+                Network.ServerUsername = arguments.First();
+            }
+
             if (Configuration.Get("GetPublicAddress", true))
             {
                 ThreadPool.QueueUserWorkItem(_ =>
