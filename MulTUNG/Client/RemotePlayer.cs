@@ -39,6 +39,9 @@ namespace MulTUNG.Client
             Vector3 worldPos = transform.position + new Vector3(0, 1.5f, 0);
             Vector3 screenPos = FirstPersonInteraction.FirstPersonCamera.WorldToScreenPoint(worldPos);
 
+            if (screenPos.z < 0)
+                return;
+
             float distance = Vector3.Distance(worldPos, FirstPersonInteraction.FirstPersonCamera.transform.position);
             float scale = Mathf.LerpUnclamped(0, UsernameSize, MaxDistance / distance);
             UsernameStyle.fontSize = (int)(UsernameSize * scale);
