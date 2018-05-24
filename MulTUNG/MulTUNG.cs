@@ -21,10 +21,10 @@ namespace MulTUNG
         public override string Name => "MulTUNG";
         public override string PackageName => "me.pipe01.MulTUNG";
         public override string Author => "pipe01";
-        public override Version ModVersion => new Version("1.0.0");
+        public override Version ModVersion => new Version("1.0.1");
         public override string UpdateUrl => "http://pipe0481.heliohost.org/pitung/mods/manifest.ptm";
 
-        public const string ForbiddenSaveName = "you shouldn't be seeing this";
+        public const string ForbiddenSaveName = "_multiplayer";
 
         public static SynchronizationContext SynchronizationContext;
 
@@ -43,6 +43,7 @@ namespace MulTUNG
             IGConsole.RegisterCommand<Command_netobjs>();
             IGConsole.RegisterCommand<Command_chat>();
             IGConsole.RegisterCommand<Command_players>();
+            IGConsole.RegisterCommand<Command_stop>();
 
             string path = Application.persistentDataPath + "/saves/" + ForbiddenSaveName;
             if (Directory.Exists(path))
@@ -86,7 +87,8 @@ namespace MulTUNG
 
         public override void OnApplicationQuit()
         {
-            NetworkClient.Instance.Disconnect();
+            NetworkClient.Instance?.Disconnect();
+            NetworkServer.Instance?.Stop();
         }
 
         public static void Connect(IPEndPoint endpoint)
@@ -236,12 +238,14 @@ namespace MulTUNG
                 return false;
 
             string msg = string.Join(" ", arguments.ToArray());
+
+            IGConsole.Log($"<b>{Network.Username}</b>: {msg}");
+
             Network.SendPacket(new ChatMessagePacket
             {
                 Username = Network.Username,
                 Text = msg
             });
-            IGConsole.Log($"<b>{Network.Username}</b>: {msg}");
 
             return true;
         }
@@ -259,6 +263,25 @@ namespace MulTUNG
 
             IGConsole.Log($"<color=lime>Online players</color> (<b>{players.Count}</b>): {string.Join(", ", players.ToArray())}");
             
+            return true;
+        }
+    }
+
+    public class Command_stop : Command
+    {
+        public override string Name => "stop";
+        public override string Usage => Name;
+
+        public override bool Execute(IEnumerable<string> arguments)
+        {
+            if (Network.IsServer)
+            {
+                NetworkServer.Instance.Stop();
+
+                EverythingHider.HideEverything();
+                SceneManager.LoadScene("main menu");
+            }
+
             return true;
         }
     }

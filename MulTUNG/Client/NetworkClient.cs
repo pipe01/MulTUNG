@@ -8,6 +8,7 @@ using MulTUNG.Utils;
 using MulTUNG.Packeting.Packets.Utils;
 using Server;
 using PiTung.Console;
+using PiTung;
 
 namespace MulTUNG
 {
@@ -20,6 +21,7 @@ namespace MulTUNG
         public bool Connected => Client?.ConnectionStatus == NetConnectionStatus.Connected;
         
         private NetClient Client;
+        private NetConnectionStatus LastStatus;
 
         public NetworkClient()
         {
@@ -34,7 +36,20 @@ namespace MulTUNG
             NetPeerConfiguration config = new NetPeerConfiguration("MulTUNG");
             Client = new NetClient(config);
             Client.Start();
-            Client.Connect(endPoint);
+            var conn = Client.Connect(endPoint);
+
+            ThreadPool.QueueUserWorkItem(o =>
+            {
+                var c = o as NetConnection;
+
+                Thread.Sleep(Constants.WaitForConnection);
+
+                if (c.Status != NetConnectionStatus.Connected)
+                {
+                    IGConsole.Error("Couldn't connect to remote server!");
+                    Disconnect(true);
+                }
+            }, conn);
 
             ThreadPool.QueueUserWorkItem(_ =>
             {
@@ -65,6 +80,7 @@ namespace MulTUNG
                             if (Client.ConnectionStatus == NetConnectionStatus.Disconnected)
                                 Disconnect();
 
+                            LastStatus = Client.ConnectionStatus;
                             break;
                     }
                     Client.Recycle(msg);
@@ -74,17 +90,21 @@ namespace MulTUNG
 
         public void Connect(string host) => Connect(new IPEndPoint(IPAddress.Parse(host), Constants.Port));
 
-        public void Disconnect()
+        public void Disconnect(bool force = false)
         {
+            if (ModUtilities.IsOnMainMenu || (LastStatus != NetConnectionStatus.Connected && !force))
+                return;
+
             if (Client?.ConnectionStatus == NetConnectionStatus.Connected)
             {
                 Client.Disconnect("bye");
-
-                this.PlayerID = -2;
-                
-                EverythingHider.HideEverything();
-                SceneManager.LoadScene("main menu");
             }
+
+            this.PlayerID = -2;
+            PlayerManager.Reset();
+
+            EverythingHider.HideEverything();
+            SceneManager.LoadScene("main menu");
         }
         
         public void Send(Packet packet, NetDeliveryMethod delivery = NetDeliveryMethod.ReliableOrdered)

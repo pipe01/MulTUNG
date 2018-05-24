@@ -18,33 +18,20 @@ namespace Server
     public class NetworkServer : ISender
     {
         public static NetworkServer Instance { get; private set; }
-
-        private int _CircuitUpdateRate;
-        public int CircuitUpdateRate
-        {
-            get => _CircuitUpdateRate;
-            set
-            {
-                _CircuitUpdateRate = value;
-
-                CircuitUpdateTime = TimeSpan.FromMilliseconds(1000f / value);
-            }
-        }
-
+        
         public string Username => Network.ServerUsername;
 
         public bool Running => Server?.Status == NetPeerStatus.Running;
         
-        private TimeSpan CircuitUpdateTime;
+        private readonly int MaxUsernameLength;
+        private readonly IDictionary<int, Player> Players = new Dictionary<int, Player>();
+
         private int PlayerIdCounter = 1;
-        private int MaxUsernameLength;
         private NetServer Server;
-        private IDictionary<int, Player> Players = new Dictionary<int, Player>();
 
         public NetworkServer()
         {
             Instance = this;
-            CircuitUpdateRate = 100;
             MaxUsernameLength = (int)Configuration.Get<long>("MaxUsernameLength", 15);
         }
 
@@ -134,8 +121,7 @@ namespace Server
             if (Players.TryGetValue(packet.SenderID, out var player))
             {
                 player.Username = packet.Username.Substring(0, Math.Min(packet.Username.Length, 15));
-
-                IGConsole.Log("+" + packet.Username);
+                
                 PlayerManager.NewPlayer(player.ID, packet.Username);
 
                 BehaviorManagerPatch.UpdateCounter = 0; //Force full circuit update
@@ -217,6 +203,14 @@ namespace Server
             player.Connection.SendMessage(msg, NetDeliveryMethod.ReliableOrdered, 0);
 
             //Network.ResumeGame();
+        }
+
+        public void Stop()
+        {
+            Server.Shutdown("hasta la vista baby");
+            Server = null;
+
+            PlayerManager.Reset();
         }
     }
 }

@@ -146,5 +146,15 @@ namespace MulTUNG
             PlayerModelPrefab.transform.position = new Vector3(-1000, -1000, -1000);
             PlayerModelPrefab.transform.localScale = new Vector3(.025f, .025f, .025f);
         }
+
+        public static void Reset()
+        {
+            foreach (var item in PlayersInner)
+            {
+                GameObject.Destroy(item.Value.gameObject);
+            }
+
+            PlayersInner.Clear();
+        }
     }
 }
