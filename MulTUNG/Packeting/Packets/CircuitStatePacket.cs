@@ -80,11 +80,6 @@ namespace MulTUNG.Packeting.Packets
             {
                 CurrentState[key] = Updated[key] = value;
             }
-            else
-            {
-                IGConsole.Log("No key for " + ComponentPlacer.FullComponent(output.transform));
-                MulTUNG.DumpNetobjs();
-            }
         }
     }
 }
