@@ -107,7 +107,8 @@ namespace Server
 
                         msg.SenderConnection.SendMessage(new PlayerWelcomePacket
                         {
-                            YourID = id
+                            YourID = id,
+                            ServerUsername = Network.Username
                         }.GetMessage(Server), NetDeliveryMethod.ReliableOrdered, 0);
 
                         var player = new Player(id, msg.SenderConnection);

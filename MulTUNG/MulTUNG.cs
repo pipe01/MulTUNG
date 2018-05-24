@@ -249,7 +249,10 @@ namespace MulTUNG
 
         public override bool Execute(IEnumerable<string> arguments)
         {
-            IGConsole.Log($"<color=lime>Online players</color> (<b>{PlayerManager.Players.Length}</b>): {string.Join(", ", PlayerManager.Players.Select(o => o.Username).ToArray())}");
+            IList<string> players = PlayerManager.Players.Select(o => o.Username).ToList();
+            players.Insert(0, Network.Username);
+
+            IGConsole.Log($"<color=lime>Online players</color> (<b>{players.Count}</b>): {string.Join(", ", players.ToArray())}");
             
             return true;
         }
