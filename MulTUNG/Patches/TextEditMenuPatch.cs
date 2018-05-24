@@ -1,5 +1,6 @@
 ﻿using MulTUNG.Packeting.Packets;
 using PiTung;
+using System;
 using System.Collections.Generic;
 
 namespace MulTUNG.Patches
@@ -11,7 +12,16 @@ namespace MulTUNG.Patches
         [PatchMethod]
         public static void Done()
         {
-            var netObj = PatchesCommon.LabelBeingEdited.GetComponent<NetObject>();
+            NetObject netObj;
+
+            try
+            {
+                netObj = PatchesCommon.LabelBeingEdited.GetComponent<NetObject>();
+            }
+            catch (NullReferenceException)
+            {
+                return;
+            }
 
             if (netObj == null)
                 return;

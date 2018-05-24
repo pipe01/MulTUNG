@@ -128,6 +128,12 @@ namespace MulTUNG
                 StuffDeleter.DestroyOutput(output);
             }
 
+            var label = obj.GetComponent<Label>();
+            if (label != null && PatchesCommon.LabelBeingEdited == label)
+            {
+                TextEditMenu.Instance.Done();
+            }
+
             GameObject.Destroy(obj);
         }
     }
