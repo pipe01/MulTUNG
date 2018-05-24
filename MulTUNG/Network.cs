@@ -107,13 +107,12 @@ namespace MulTUNG
 
                         break;
                     case WorldDataPacket world:
-                        try
+                        MulTUNG.SynchronizationContext.Send(o => World.Deserialize(((WorldDataPacket)o).Data), world);
+
+                        if (MulTUNG.ShowStatusWindow)
                         {
-                            MulTUNG.SynchronizationContext.Post(o => World.Deserialize(((WorldDataPacket)o).Data), world);
-                        }
-                        catch (System.Exception ex)
-                        {
-                            IGConsole.Log(ex);
+                            MulTUNG.ShowStatusWindow = false;
+                            MulTUNG.Status = "";
                         }
 
                         break;

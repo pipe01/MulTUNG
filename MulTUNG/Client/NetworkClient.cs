@@ -169,6 +169,8 @@ namespace MulTUNG
 
         private void InitWorld()
         {
+            MulTUNG.Status = "Loading world...";
+
             PlayerManager.NewPlayer(Network.ServerPlayerID, Network.ServerUsername);
             Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
 

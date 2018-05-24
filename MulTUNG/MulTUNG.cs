@@ -28,6 +28,8 @@ namespace MulTUNG
         public const string ForbiddenSaveName = "_multiplayer";
 
         public static SynchronizationContext SynchronizationContext;
+        public static bool ShowStatusWindow;
+        public static string Status = "";
 
         private IDialog ConnectDialog;
 
@@ -81,6 +83,36 @@ namespace MulTUNG
 
                 GUI.Box(size, "A player is downloading the world...");
             }
+
+            if (ShowStatusWindow)
+            {
+                var rect = new Rect(0, 0, 300, 200);
+                rect.x = Screen.width / 2 - rect.width / 2;
+                rect.y = Screen.height / 2 - rect.height / 2;
+
+                GUI.Window(53451, rect, DrawWindow, "");
+            }
+        }
+
+        private void DrawWindow(int id)
+        {
+            GUILayout.BeginVertical();
+            {
+                GUILayout.FlexibleSpace();
+
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.FlexibleSpace();
+
+                    GUILayout.Label(Status);
+
+                    GUILayout.FlexibleSpace();
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.FlexibleSpace();
+            }
+            GUILayout.EndVertical();
         }
 
         public override void OnApplicationQuit()
@@ -96,16 +128,11 @@ namespace MulTUNG
                 return;
             }
 
+            SetMainMenuCanvases(false);
+            ShowStatusWindow = true;
+            Status = "Connecting to server...";
+
             NetworkClient.Instance.Connect(endpoint);
-
-            ThreadPool.QueueUserWorkItem(_ =>
-            {
-                while (ModUtilities.IsOnMainMenu)
-                    Thread.Sleep(500);
-
-                Thread.Sleep(1000);
-
-            });
         }
 
         public static void DumpNetobjs()
@@ -143,6 +170,17 @@ namespace MulTUNG
                     Recurse(item.gameObject, level + 1);
                 }
             }
+        }
+
+        public static void SetMainMenuCanvases(bool enabled)
+        {
+            RunMainMenu.Instance.AboutCanvas.enabled = enabled;
+            RunMainMenu.Instance.DeleteGameCanvas.enabled = enabled;
+            RunMainMenu.Instance.LoadGameCanvas.enabled = enabled;
+            RunMainMenu.Instance.MainMenuCanvas.enabled = enabled;
+            RunMainMenu.Instance.NewGameCanvas.enabled = enabled;
+            RunMainMenu.Instance.OptionsCanvas.enabled = enabled;
+            RunMainMenu.Instance.RenameGameCanvas.enabled = enabled;
         }
     }
 
