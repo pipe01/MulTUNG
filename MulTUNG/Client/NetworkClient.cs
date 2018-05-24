@@ -19,7 +19,10 @@ namespace MulTUNG
         public int PlayerID { get; private set; } = -2;
         public string Username { get; private set; }
         public bool Connected => Client?.ConnectionStatus == NetConnectionStatus.Connected;
-        
+        public bool IsInGameplay { get; private set; }
+
+        public EventWaitHandle EnterEvent = new ManualResetEvent(false);
+
         private NetClient Client;
         private NetConnectionStatus LastStatus;
 
@@ -41,13 +44,43 @@ namespace MulTUNG
             ThreadPool.QueueUserWorkItem(o =>
             {
                 var c = o as NetConnection;
+                int elapsed = 0;
 
-                Thread.Sleep(Constants.WaitForConnection);
-
-                if (c.Status != NetConnectionStatus.Connected)
+                while (true)
                 {
-                    IGConsole.Error("Couldn't connect to remote server!");
-                    Disconnect(true);
+                    Thread.Sleep(50);
+                    elapsed += 50;
+
+                    if (c.Status != NetConnectionStatus.Connected && elapsed >= Constants.WaitForConnection)
+                    {
+                        IGConsole.Error("Couldn't connect to remote server!");
+                        Disconnect(true);
+
+                        break;
+                    }
+                    else
+                    {
+                        MulTUNG.SynchronizationContext.Send(_ =>
+                        {
+                            SaveManager.SaveName = MulTUNG.ForbiddenSaveName;
+                            World.DeleteSave();
+
+                            SceneManager.LoadScene("gameplay");
+                            EverythingHider.HideEverything();
+                        }, null);
+
+                        while (ModUtilities.IsOnMainMenu)
+                            Thread.Sleep(500);
+
+                        Thread.Sleep(1000);
+
+                        IsInGameplay = true;
+                        EnterEvent.Set();
+
+                        InitWorld();
+
+                        break;
+                    }
                 }
             }, conn);
 
@@ -103,6 +136,9 @@ namespace MulTUNG
             this.PlayerID = -2;
             PlayerManager.Reset();
 
+            EnterEvent.Reset();
+            IsInGameplay = false;
+
             EverythingHider.HideEverything();
             SceneManager.LoadScene("main menu");
         }
@@ -121,11 +157,6 @@ namespace MulTUNG
                 this.PlayerID = id;
 
             Log.WriteLine("Your ID: " + id);
-
-            PlayerManager.NewPlayer(Network.ServerPlayerID, Network.ServerUsername);
-            Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
-
-            Send(new SignalPacket(SignalData.RequestWorld));
         }
 
         public void SetUsername(string username)
@@ -134,6 +165,15 @@ namespace MulTUNG
                 return;
 
             this.Username = username;
+        }
+
+        private void InitWorld()
+        {
+            PlayerManager.NewPlayer(Network.ServerPlayerID, Network.ServerUsername);
+            Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
+
+            Thread.Sleep(500);
+            Send(new SignalPacket(SignalData.RequestWorld));
         }
     }
 }

@@ -61,6 +61,17 @@ namespace MulTUNG.Client
 
         public void UpdateState(PlayerState state)
         {
+            //<IFuckingHateMyLife>
+            try
+            {
+                var t = transform;
+            }
+            catch (NullReferenceException)
+            {
+                return;
+            }
+            //</IFuckingHateMyLife>
+
             TimeBetweenStates = Time.time - LastStateTime;
             LastStateTime = Time.time;
 

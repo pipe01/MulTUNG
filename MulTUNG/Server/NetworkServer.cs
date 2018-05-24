@@ -123,8 +123,6 @@ namespace Server
                 player.Username = packet.Username.Substring(0, Math.Min(packet.Username.Length, 15));
                 
                 PlayerManager.NewPlayer(player.ID, packet.Username);
-
-                BehaviorManagerPatch.UpdateCounter = 0; //Force full circuit update
             }
         }
 
@@ -192,7 +190,7 @@ namespace Server
 
             byte[] world = World.Serialize();
 
-            var packet = new WorldDataPacket
+            Packet packet = new WorldDataPacket
             {
                 Data = world
             };
@@ -201,6 +199,8 @@ namespace Server
             PacketLog.LogSend(packet);
 
             player.Connection.SendMessage(msg, NetDeliveryMethod.ReliableOrdered, 0);
+            
+            player.Connection.SendMessage(CircuitStatePacket.Build(true).GetMessage(Server), NetDeliveryMethod.ReliableOrdered, 0);
 
             //Network.ResumeGame();
         }

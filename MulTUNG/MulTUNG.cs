@@ -1,6 +1,7 @@
 ﻿using MulTUNG.Headless;
 using MulTUNG.Packeting.Packets;
 using MulTUNG.UI;
+using MulTUNG.Utils;
 using PiTung;
 using PiTung.Console;
 using PiTung.Mod_utilities;
@@ -45,10 +46,7 @@ namespace MulTUNG
             IGConsole.RegisterCommand<Command_players>();
             IGConsole.RegisterCommand<Command_stop>();
 
-            string path = Application.persistentDataPath + "/saves/" + ForbiddenSaveName;
-            if (Directory.Exists(path))
-                Directory.Delete(path, true);
-            
+            World.DeleteSave();
             SynchronizationContext = SynchronizationContext.Current;
         }
 
@@ -98,9 +96,7 @@ namespace MulTUNG
                 return;
             }
 
-            SaveManager.SaveName = ForbiddenSaveName;
-            SceneManager.LoadScene("gameplay");
-            EverythingHider.HideEverything();
+            NetworkClient.Instance.Connect(endpoint);
 
             ThreadPool.QueueUserWorkItem(_ =>
             {
@@ -109,7 +105,6 @@ namespace MulTUNG
 
                 Thread.Sleep(1000);
 
-                NetworkClient.Instance.Connect(endpoint);
             });
         }
 

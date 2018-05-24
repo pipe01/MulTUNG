@@ -20,6 +20,13 @@ namespace MulTUNG.Utils
             }
         }
         
+        public static void DeleteSave()
+        {
+            string path = Application.persistentDataPath + "/saves/" + MulTUNG.ForbiddenSaveName;
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
+        }
+
         public static void LoadCircuitState()
         {
             foreach (var item in GameObject.FindObjectsOfType<CircuitOutput>())

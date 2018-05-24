@@ -1,4 +1,5 @@
 ﻿using PiTung;
+using Server;
 using UnityEngine;
 
 namespace MulTUNG.Patches
@@ -16,6 +17,10 @@ namespace MulTUNG.Patches
                 Time.timeScale = 1;
 
                 return false;
+            }
+            else if (Network.IsServer)
+            {
+                NetworkServer.Instance.Stop();
             }
 
             return true;
