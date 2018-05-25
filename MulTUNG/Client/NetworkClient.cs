@@ -50,15 +50,20 @@ namespace MulTUNG
                 {
                     Thread.Sleep(50);
                     elapsed += 50;
-
+                    
                     if (c.Status != NetConnectionStatus.Connected && elapsed >= Constants.WaitForConnection)
                     {
-                        IGConsole.Error("Couldn't connect to remote server!");
-                        Disconnect(true);
+                        MulTUNG.Status = "Couldn't connect to remote server.";
+
+                        Thread.Sleep(2000);
+
+                        MulTUNG.ShowMainMenuCanvases();
+                        MulTUNG.ShowStatusWindow = false;
+                        MulTUNG.Status = "";
 
                         break;
                     }
-                    else
+                    else if (c.Status == NetConnectionStatus.Connected)
                     {
                         MulTUNG.SynchronizationContext.Send(_ =>
                         {
@@ -139,7 +144,7 @@ namespace MulTUNG
             EnterEvent.Reset();
             IsInGameplay = false;
 
-            EverythingHider.HideEverything();
+            //EverythingHider.HideEverything();
             SceneManager.LoadScene("main menu");
         }
         

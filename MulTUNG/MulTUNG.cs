@@ -33,6 +33,8 @@ namespace MulTUNG
 
         private IDialog ConnectDialog;
 
+        private static bool[] CanvasStatuses = new bool[7];
+
         public override void BeforePatch()
         {
             if (Headlesser.IsHeadless)
@@ -128,7 +130,7 @@ namespace MulTUNG
                 return;
             }
 
-            SetMainMenuCanvases(false);
+            HideMainMenuCanvases();
             ShowStatusWindow = true;
             Status = "Connecting to server...";
 
@@ -172,15 +174,34 @@ namespace MulTUNG
             }
         }
 
-        public static void SetMainMenuCanvases(bool enabled)
+        public static void HideMainMenuCanvases()
         {
-            RunMainMenu.Instance.AboutCanvas.enabled = enabled;
-            RunMainMenu.Instance.DeleteGameCanvas.enabled = enabled;
-            RunMainMenu.Instance.LoadGameCanvas.enabled = enabled;
-            RunMainMenu.Instance.MainMenuCanvas.enabled = enabled;
-            RunMainMenu.Instance.NewGameCanvas.enabled = enabled;
-            RunMainMenu.Instance.OptionsCanvas.enabled = enabled;
-            RunMainMenu.Instance.RenameGameCanvas.enabled = enabled;
+            CanvasStatuses[0] = RunMainMenu.Instance.AboutCanvas.enabled;
+            CanvasStatuses[1] = RunMainMenu.Instance.DeleteGameCanvas.enabled;
+            CanvasStatuses[2] = RunMainMenu.Instance.LoadGameCanvas.enabled;
+            CanvasStatuses[3] = RunMainMenu.Instance.MainMenuCanvas.enabled;
+            CanvasStatuses[4] = RunMainMenu.Instance.NewGameCanvas.enabled;
+            CanvasStatuses[5] = RunMainMenu.Instance.OptionsCanvas.enabled;
+            CanvasStatuses[6] = RunMainMenu.Instance.RenameGameCanvas.enabled;
+
+            RunMainMenu.Instance.AboutCanvas.enabled = false;
+            RunMainMenu.Instance.DeleteGameCanvas.enabled = false;
+            RunMainMenu.Instance.LoadGameCanvas.enabled = false;
+            RunMainMenu.Instance.MainMenuCanvas.enabled = false;
+            RunMainMenu.Instance.NewGameCanvas.enabled = false;
+            RunMainMenu.Instance.OptionsCanvas.enabled = false;
+            RunMainMenu.Instance.RenameGameCanvas.enabled = false;
+        }
+
+        public static void ShowMainMenuCanvases()
+        {
+            RunMainMenu.Instance.AboutCanvas.enabled = CanvasStatuses[0];
+            RunMainMenu.Instance.DeleteGameCanvas.enabled = CanvasStatuses[1];
+            RunMainMenu.Instance.LoadGameCanvas.enabled = CanvasStatuses[2];
+            RunMainMenu.Instance.MainMenuCanvas.enabled = CanvasStatuses[3];
+            RunMainMenu.Instance.NewGameCanvas.enabled = CanvasStatuses[4];
+            RunMainMenu.Instance.OptionsCanvas.enabled = CanvasStatuses[5];
+            RunMainMenu.Instance.RenameGameCanvas.enabled = CanvasStatuses[6];
         }
     }
 
