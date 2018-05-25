@@ -151,6 +151,7 @@
     <Compile Include="Server\Player.cs" />
     <Compile Include="UI\ConnectDialog.cs" />
     <Compile Include="UI\IDialog.cs" />
+    <Compile Include="UI\PlayersList.cs" />
     <Compile Include="Utils\ComponentActions.cs" />
     <Compile Include="Utils\Compressor.cs" />
     <Compile Include="Utils\Tuple.cs" />

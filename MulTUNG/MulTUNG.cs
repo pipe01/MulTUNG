@@ -94,6 +94,11 @@ namespace MulTUNG
 
                 GUI.Window(53451, rect, DrawWindow, "");
             }
+
+            if (!ModUtilities.IsOnMainMenu && PauseMenu.Instance.PauseCanvas.enabled && Network.Connected)
+            {
+                PlayersList.Instance.Draw();
+            }
         }
 
         private void DrawWindow(int id)
