@@ -91,7 +91,7 @@ namespace MulTUNG
                 var rect = new Rect(0, 0, 300, 200);
                 rect.x = Screen.width / 2 - rect.width / 2;
                 rect.y = Screen.height / 2 - rect.height / 2;
-
+                
                 GUI.Window(53451, rect, DrawWindow, "");
             }
 

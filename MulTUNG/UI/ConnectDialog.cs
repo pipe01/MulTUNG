@@ -9,21 +9,37 @@ namespace MulTUNG.UI
     public class ConnectDialog : IDialog
     {
         private Rect WindowRect = new Rect(0, 0, 200, 130);
-        
+
         public string Host { get; private set; }
         public string Port { get; private set; }
         public string Username { get; private set; }
 
-        public bool Visible { get; set; } = true;
+        private bool _visible = true;
+        public bool Visible
+        {
+            get => _visible;
+            set
+            {
+                _visible = value;
+
+                if (value)
+                    CenterWindow();
+            }
+        }
 
         public ConnectDialog()
         {
-            WindowRect.x = Screen.width / 2 - WindowRect.width / 2;
-            WindowRect.y = Screen.height / 2 - WindowRect.height / 2;
+            CenterWindow();
             
             Host = Configuration.Get("Host", "127.0.0.1");
             Port = Configuration.Get<long>("Port", Constants.Port).ToString();
             Username = Configuration.Get("Username", "");
+        }
+
+        private void CenterWindow()
+        {
+            WindowRect.x = Screen.width / 2 - WindowRect.width / 2;
+            WindowRect.y = Screen.height / 2 - WindowRect.height / 2;
         }
 
         public void Draw()
@@ -32,6 +48,7 @@ namespace MulTUNG.UI
                 return;
 
             WindowRect = GUI.Window(8745, WindowRect, DrawWindow, "Connect");
+            GUI.Window(8746, WindowRect, _ => { }, "Connect"); //Draw window twice so it's more opaque
         }
 
         private void DrawWindow(int id)
