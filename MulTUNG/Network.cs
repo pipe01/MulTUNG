@@ -1,5 +1,5 @@
-﻿using MulTUNG.Packeting.Packets;
-using MulTUNG.Packeting.Packets.Utils;
+﻿using MulTUNG.Packets;
+using MulTUNG.Packets.Utils;
 using MulTUNG.Utils;
 using PiTung;
 using PiTung.Console;

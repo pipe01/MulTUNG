@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MulTUNG.Packeting.Packets
+namespace MulTUNG.Packets
 {
     public class DeleteWirePacket : Packet
     {

@@ -1,7 +1,7 @@
 ﻿using Lidgren.Network;
 using System;
 
-namespace MulTUNG.Packeting.Packets
+namespace MulTUNG.Packets
 {
     [Serializable]
     public abstract class Packet

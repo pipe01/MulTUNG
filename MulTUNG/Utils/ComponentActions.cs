@@ -1,7 +1,5 @@
-﻿using MulTUNG.Packeting.Packets;
+﻿using MulTUNG.Packets;
 using PiTung;
-using PiTung.Console;
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using StateKey = System.Collections.Generic.KeyValuePair<int, byte>;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MulTUNG.Packeting.Packets
+namespace MulTUNG.Packets
 {
     public class ComponentDataPacket : Packet
     {

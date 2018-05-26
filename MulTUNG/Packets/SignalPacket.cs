@@ -1,7 +1,7 @@
-﻿using MulTUNG.Packeting.Packets.Utils;
+﻿using MulTUNG.Packets.Utils;
 using System;
 
-namespace MulTUNG.Packeting.Packets
+namespace MulTUNG.Packets
 {
     public class SignalPacket : Packet
     {

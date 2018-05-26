@@ -1,5 +1,5 @@
 ﻿using Lidgren.Network;
-using MulTUNG.Packeting.Packets;
+using MulTUNG.Packets;
 
 namespace MulTUNG
 {

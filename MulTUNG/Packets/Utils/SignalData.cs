@@ -1,4 +1,4 @@
-﻿namespace MulTUNG.Packeting.Packets.Utils
+﻿namespace MulTUNG.Packets.Utils
 {
     public enum SignalData
     {

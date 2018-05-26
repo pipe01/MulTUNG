@@ -1,5 +1,5 @@
 ﻿using MulTUNG.Client;
-using MulTUNG.Packeting.Packets;
+using MulTUNG.Packets;
 using PiTung.Console;
 using System.Collections.Generic;
 using System.Linq;

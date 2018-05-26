@@ -1,13 +1,8 @@
 ﻿using MulTUNG.Utils;
-using PiTung.Console;
-using Server;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using UnityEngine;
 using StateKey = System.Collections.Generic.KeyValuePair<int, byte>;
 
-namespace MulTUNG.Packeting.Packets
+namespace MulTUNG.Packets
 {
     public class CircuitStatePacket : Packet
     {

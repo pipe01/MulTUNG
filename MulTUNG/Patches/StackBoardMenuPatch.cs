@@ -1,4 +1,4 @@
-﻿using MulTUNG.Packeting.Packets;
+﻿using MulTUNG.Packets;
 using PiTung;
 using System.Collections.Generic;
 using System.Linq;

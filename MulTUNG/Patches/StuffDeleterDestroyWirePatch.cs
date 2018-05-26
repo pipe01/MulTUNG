@@ -1,5 +1,5 @@
 ﻿using Harmony;
-using MulTUNG.Packeting.Packets;
+using MulTUNG.Packets;
 using UnityEngine;
 
 namespace MulTUNG.Patches

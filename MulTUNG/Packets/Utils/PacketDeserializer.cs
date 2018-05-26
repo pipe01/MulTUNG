@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace MulTUNG.Packeting.Packets
+namespace MulTUNG.Packets
 {
     public static class PacketDeserializer
     {

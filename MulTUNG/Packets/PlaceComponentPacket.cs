@@ -1,7 +1,7 @@
 ﻿using SavedObjects;
 using UnityEngine;
 
-namespace MulTUNG.Packeting.Packets
+namespace MulTUNG.Packets
 {
     public class PlaceComponentPacket : Packet
     {

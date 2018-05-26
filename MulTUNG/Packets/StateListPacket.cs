@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace MulTUNG.Packeting.Packets
+namespace MulTUNG.Packets
 {
     public struct PlayerState
     {

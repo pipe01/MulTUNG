@@ -1,4 +1,4 @@
-﻿using MulTUNG.Packeting.Packets;
+﻿using MulTUNG.Packets;
 using References;
 using SavedObjects;
 using System.IO;

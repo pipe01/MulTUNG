@@ -1,7 +1,6 @@
-﻿using MulTUNG.Packeting.Packets;
+﻿using MulTUNG.Packets;
 using MulTUNG.Utils;
 using PiTung;
-using PiTung.Console;
 
 namespace MulTUNG.Patches
 {

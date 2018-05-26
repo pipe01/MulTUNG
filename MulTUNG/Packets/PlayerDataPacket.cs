@@ -1,4 +1,4 @@
-﻿namespace MulTUNG.Packeting.Packets
+﻿namespace MulTUNG.Packets
 {
     public class PlayerDataPacket : Packet
     {

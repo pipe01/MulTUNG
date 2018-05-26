@@ -1,5 +1,5 @@
 ﻿using MulTUNG.Headless;
-using MulTUNG.Packeting.Packets;
+using MulTUNG.Packets;
 using MulTUNG.UI;
 using MulTUNG.Utils;
 using NAudio.Wave;
