@@ -21,5 +21,6 @@
         CircuitState,
         PlayerData,
         ChatMessage,
+        PauseGame,
     }
 }

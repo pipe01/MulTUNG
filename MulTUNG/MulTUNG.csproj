@@ -96,6 +96,7 @@
     <Compile Include="Packets\ChatMessagePacket.cs" />
     <Compile Include="Packets\CircuitStatePacket.cs" />
     <Compile Include="Packets\ComponentDataPacket.cs" />
+    <Compile Include="Packets\PauseGamePacket.cs" />
     <Compile Include="Packets\PlayerDataPacket.cs" />
     <Compile Include="Packets\SignalPacket.cs" />
     <Compile Include="Packets\DeleteBoardPacket.cs" />
