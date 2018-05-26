@@ -24,15 +24,19 @@ namespace MulTUNG
 
         public const int ServerPlayerID = 0;
         
-        public static void ProcessPacket(Packet packet, int playerId)
+        public static bool ProcessPacket(Packet packet, int playerId)
         {
-            try
-            {
-                if (packet == null)
-                    return;
+            if (packet == null || (packet.SenderID == playerId && !packet.ReceiveOwn))
+                return false;
 
-                if (packet is PlayerWelcomePacket wel)
-                {
+            if (IsClient && !NetworkClient.Instance.IsInGameplay)
+            {
+                NetworkClient.Instance.EnterEvent.WaitOne();
+            }
+
+            switch (packet)
+            {
+                case PlayerWelcomePacket wel:
                     ServerUsername = wel.ServerUsername;
                     NetworkClient.Instance.SetID(wel.YourID);
 
@@ -41,110 +45,95 @@ namespace MulTUNG
                         Username = NetworkClient.Instance.Username
                     });
 
-                    return;
-                }
+                    break;
+                case PlayerStatePacket state:
+                    if (IsServer)
+                    {
+                        NetworkServer.Instance.UpdatePlayerState(state);
+                    }
 
-                if (packet.SenderID == playerId && !(packet is StateListPacket))
-                    return;
+                    break;
+                case StateListPacket states:
+                    PlayerManager.UpdateStates(states);
 
-                if (IsClient && !NetworkClient.Instance.IsInGameplay)
-                {
-                    IGConsole.Log("Hold on " + packet.GetType().Name);
-                    NetworkClient.Instance.EnterEvent.WaitOne();
-                    IGConsole.Log("There you go");
-                }
+                    break;
+                case SignalPacket signal:
+                    HandleSignalPacket(signal);
 
-                switch (packet)
-                {
-                    case PlayerStatePacket state:
-                        if (IsServer)
-                        {
-                            NetworkServer.Instance.UpdatePlayerState(state);
-                        }
+                    break;
+                case PlayerDisconnectPacket disconnect:
+                    PlayerManager.WaveGoodbye(disconnect.PlayerID);
 
-                        break;
-                    case StateListPacket states:
-                        PlayerManager.UpdateStates(states);
+                    break;
+                case PlaceBoardPacket board:
+                    if (board.AuthorID != playerId)
+                    {
+                        NetUtilitiesComponent.Instance.Enqueue(new PlaceBoardJob(board));
+                    }
 
-                        break;
-                    case SignalPacket signal:
-                        HandleSignalPacket(signal);
+                    break;
+                case DeleteBoardPacket del:
+                    NetUtilitiesComponent.Instance.Enqueue(new DeleteBoardJob(del.BoardID));
 
-                        break;
-                    case PlayerDisconnectPacket disconnect:
-                        PlayerManager.WaveGoodbye(disconnect.PlayerID);
+                    break;
+                case PlaceComponentPacket placeComp:
+                    NetUtilitiesComponent.Instance.Enqueue(new PlaceComponentJob(placeComp));
 
-                        break;
-                    case PlaceBoardPacket board:
-                        if (board.AuthorID != playerId)
-                        {
-                            NetUtilitiesComponent.Instance.Enqueue(new PlaceBoardJob(board));
-                        }
+                    break;
+                case DeleteComponentPacket delComp:
+                    NetUtilitiesComponent.Instance.Enqueue(new DeleteComponentJob(delComp));
 
-                        break;
-                    case DeleteBoardPacket del:
-                        NetUtilitiesComponent.Instance.Enqueue(new DeleteBoardJob(del.BoardID));
+                    break;
+                case PlaceWirePacket placeWire:
+                    NetUtilitiesComponent.Instance.Enqueue(new PlaceWireJob(placeWire));
 
-                        break;
-                    case PlaceComponentPacket placeComp:
-                        NetUtilitiesComponent.Instance.Enqueue(new PlaceComponentJob(placeComp));
+                    break;
+                case DeleteWirePacket deleteWire:
+                    NetUtilitiesComponent.Instance.Enqueue(new DeleteWireJob(deleteWire));
 
-                        break;
-                    case DeleteComponentPacket delComp:
-                        NetUtilitiesComponent.Instance.Enqueue(new DeleteComponentJob(delComp));
+                    break;
+                case RotateComponentPacket rotateComp:
+                    NetUtilitiesComponent.Instance.Enqueue(new RotateComponentJob(rotateComp));
 
-                        break;
-                    case PlaceWirePacket placeWire:
-                        NetUtilitiesComponent.Instance.Enqueue(new PlaceWireJob(placeWire));
+                    break;
+                case WorldDataPacket world:
+                    MulTUNG.SynchronizationContext.Send(o => World.Deserialize(((WorldDataPacket)o).Data), world);
 
-                        break;
-                    case DeleteWirePacket deleteWire:
-                        NetUtilitiesComponent.Instance.Enqueue(new DeleteWireJob(deleteWire));
+                    if (MulTUNG.ShowStatusWindow)
+                    {
+                        MulTUNG.ShowStatusWindow = false;
+                        MulTUNG.Status = "";
+                    }
 
-                        break;
-                    case RotateComponentPacket rotateComp:
-                        NetUtilitiesComponent.Instance.Enqueue(new RotateComponentJob(rotateComp));
+                    break;
+                case UserInputPacket input:
+                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoAction((UserInputPacket)o), input);
 
-                        break;
-                    case WorldDataPacket world:
-                        MulTUNG.SynchronizationContext.Send(o => World.Deserialize(((WorldDataPacket)o).Data), world);
+                    break;
+                case ComponentDataPacket compdata:
+                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoData((ComponentDataPacket)o), compdata);
+                    break;
+                case CircuitStatePacket circuit:
+                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.UpdateStates((CircuitStatePacket)o), circuit);
 
-                        if (MulTUNG.ShowStatusWindow)
-                        {
-                            MulTUNG.ShowStatusWindow = false;
-                            MulTUNG.Status = "";
-                        }
+                    break;
+                case PlayerDataPacket player:
+                    if (IsServer)
+                        NetworkServer.Instance.ReceivedPlayerData(player);
+                    else if (IsClient)
+                        PlayerManager.NewPlayer(player.SenderID, player.Username);
 
-                        break;
-                    case UserInputPacket input:
-                        MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoAction((UserInputPacket)o), input);
+                    break;
+                case ChatMessagePacket chat:
+                    IGConsole.Log($"<b>{chat.Username}</b>: {chat.Text}");
 
-                        break;
-                    case ComponentDataPacket compdata:
-                        MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoData((ComponentDataPacket)o), compdata);
-                        break;
-                    case CircuitStatePacket circuit:
-                        MulTUNG.SynchronizationContext.Post(o => ComponentActions.UpdateStates((CircuitStatePacket)o), circuit);
-
-                        break;
-                    case PlayerDataPacket player:
-                        if (IsServer)
-                            NetworkServer.Instance.ReceivedPlayerData(player);
-                        else if (IsClient)
-                            PlayerManager.NewPlayer(player.SenderID, player.Username);
-
-                        break;
-                    case ChatMessagePacket chat:
-                        IGConsole.Log($"<b>{chat.Username}</b>: {chat.Text}");
+                    if (chat.SenderID != PlayerID)
                         MulTUNG.PlayChatPop();
 
-                        break;
-                }
+                    break;
             }
-            catch (System.Exception ex)
-            {
-                IGConsole.Log("Process " + ex);
-            }
+
+            return true;
         }
 
         public static void HandleSignalPacket(SignalPacket signal)

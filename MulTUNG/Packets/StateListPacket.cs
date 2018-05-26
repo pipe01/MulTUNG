@@ -14,6 +14,7 @@ namespace MulTUNG.Packeting.Packets
     public class StateListPacket : Packet
     {
         public override PacketType Type => PacketType.StateList;
+        public override bool ReceiveOwn => true;
 
         public Dictionary<int, PlayerState> States { get; set; } = new Dictionary<int, PlayerState>();
 

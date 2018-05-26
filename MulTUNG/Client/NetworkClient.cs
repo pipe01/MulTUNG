@@ -104,13 +104,10 @@ namespace MulTUNG
                     {
                         case NetIncomingMessageType.Data:
                             var packet = PacketDeserializer.DeserializePacket(new MessagePacketReader(msg));
+                            
+                            if (Network.ProcessPacket(packet, this.PlayerID))
+                                PacketLog.LogReceive(packet);
 
-                            if (packet.SenderID == this.PlayerID)
-                                break;
-
-                            PacketLog.LogReceive(packet);
-
-                            Network.ProcessPacket(packet, this.PlayerID);
                             break;
                         case NetIncomingMessageType.StatusChanged:
                             Log.WriteLine("Status: " + Client.ConnectionStatus);

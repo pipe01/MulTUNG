@@ -9,6 +9,7 @@ namespace MulTUNG.Packeting.Packets
     {
         public override PacketType Type => PacketType.ChatMessage;
         public override bool ShouldBroadcast => true;
+        public override bool ReceiveOwn => true;
 
         public string Username { get; set; }
         public string Text { get; set; }

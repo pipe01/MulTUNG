@@ -326,9 +326,7 @@ namespace MulTUNG
                 return false;
 
             string msg = string.Join(" ", arguments.ToArray());
-
-            IGConsole.Log($"<b>{Network.Username}</b>: {msg}");
-
+            
             Network.SendPacket(new ChatMessagePacket
             {
                 Username = Network.Username,

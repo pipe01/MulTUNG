@@ -8,6 +8,7 @@ namespace MulTUNG.Packeting.Packets
     {
         public virtual bool ShouldBroadcast => false;
         public virtual bool ReliableBroadcast => true;
+        public virtual bool ReceiveOwn => false;
 
         public byte[] Serialize()
         {
