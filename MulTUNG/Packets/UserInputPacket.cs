@@ -24,14 +24,11 @@
                 .Done();
         }
 
-        public static UserInputPacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<UserInputPacket>();
-            packet.NetID = reader.ReadInt32();
-            packet.Receiver = (UserInputReceiver)reader.ReadInt32();
-            packet.State = reader.ReadBool();
-
-            return packet;
+            this.NetID = reader.ReadInt32();
+            this.Receiver = (UserInputReceiver)reader.ReadInt32();
+            this.State = reader.ReadBool();
         }
     }
 }

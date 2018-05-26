@@ -23,12 +23,9 @@ namespace MulTUNG.Packets
             return BitConverter.GetBytes((int)Data);
         }
 
-        public static SignalPacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<SignalPacket>();
-            packet.Data = (SignalData)reader.ReadInt32();
-
-            return packet;
+            this.Data = (SignalData)reader.ReadInt32();
         }
 
         public override string ToString() => Data.ToString();

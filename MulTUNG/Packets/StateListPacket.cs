@@ -35,10 +35,8 @@ namespace MulTUNG.Packets
             return builder.Done();
         }
 
-        public static StateListPacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<StateListPacket>();
-
             int statesCount = reader.ReadInt32();
 
             for (int i = 0; i < statesCount; i++)
@@ -49,13 +47,11 @@ namespace MulTUNG.Packets
                     Position = reader.ReadVector3(),
                     EulerAngles = reader.ReadVector3(),
                     Username = reader.ReadString(),
-                    Time = packet.Time
+                    Time = this.Time
                 };
 
-                packet.States.Add(state.PlayerID, state);
+                this.States.Add(state.PlayerID, state);
             }
-
-            return packet;
         }
     }
 }

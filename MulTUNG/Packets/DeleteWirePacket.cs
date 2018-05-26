@@ -14,12 +14,9 @@ namespace MulTUNG.Packets
             return BitConverter.GetBytes(WireNetID);
         }
 
-        public static DeleteWirePacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<DeleteWirePacket>();
-            packet.WireNetID = reader.ReadInt32();
-
-            return packet;
+            this.WireNetID = reader.ReadInt32();
         }
     }
 }

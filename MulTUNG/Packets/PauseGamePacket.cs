@@ -18,12 +18,9 @@ namespace MulTUNG.Packets
                 .Done();
         }
 
-        public static PauseGamePacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<PauseGamePacket>();
-            packet.Reason = reader.ReadString();
-
-            return packet;
+            this.Reason = reader.ReadString();
         }
     }
 }

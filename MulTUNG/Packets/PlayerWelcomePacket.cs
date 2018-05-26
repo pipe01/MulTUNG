@@ -15,13 +15,10 @@
                 .Done();
         }
 
-        public static PlayerWelcomePacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<PlayerWelcomePacket>();
-            packet.YourID = reader.ReadInt32();
-            packet.ServerUsername = reader.ReadString();
-
-            return packet;
+            this.YourID = reader.ReadInt32();
+            this.ServerUsername = reader.ReadString();
         }
     }
 }

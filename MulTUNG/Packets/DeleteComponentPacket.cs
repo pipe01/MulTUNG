@@ -14,12 +14,9 @@ namespace MulTUNG.Packets
             return BitConverter.GetBytes(ComponentNetID);
         }
 
-        public static DeleteComponentPacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<DeleteComponentPacket>();
-            packet.ComponentNetID = reader.ReadInt32();
-
-            return packet;
+            this.ComponentNetID = reader.ReadInt32();
         }
     }
 }

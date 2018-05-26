@@ -61,16 +61,13 @@ namespace MulTUNG.Packets
                 .Done();
         }
 
-        public static PlaceWirePacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<PlaceWirePacket>();
-            packet.NetObj1Id = reader.ReadInt32();
-            packet.Point1Id = reader.ReadInt32();
-            packet.NetObj2Id = reader.ReadInt32();
-            packet.Point2Id = reader.ReadInt32();
-            packet.NetID = reader.ReadInt32();
-
-            return packet;
+            this.NetObj1Id = reader.ReadInt32();
+            this.Point1Id = reader.ReadInt32();
+            this.NetObj2Id = reader.ReadInt32();
+            this.Point2Id = reader.ReadInt32();
+            this.NetID = reader.ReadInt32();
         }
     }
 }

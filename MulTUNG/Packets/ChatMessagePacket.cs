@@ -17,13 +17,10 @@
                 .Done();
         }
 
-        public static ChatMessagePacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<ChatMessagePacket>();
-            packet.Username = reader.ReadString();
-            packet.Text = reader.ReadString();
-
-            return packet;
+            this.Username = reader.ReadString();
+            this.Text = reader.ReadString();
         }
     }
 }

@@ -20,14 +20,11 @@ namespace MulTUNG.Packets
                 .Done();
         }
 
-        public static PlayerStatePacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<PlayerStatePacket>();
-            packet.PlayerID = reader.ReadInt32();
-            packet.Position = reader.ReadVector3();
-            packet.EulerAngles = reader.ReadVector3();
-            
-            return packet;
+            this.PlayerID = reader.ReadInt32();
+            this.Position = reader.ReadVector3();
+            this.EulerAngles = reader.ReadVector3();
         }
 
         public override string ToString() => Position.ToString();

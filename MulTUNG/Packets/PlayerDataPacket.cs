@@ -14,12 +14,9 @@
                 .Done();
         }
 
-        public static PlayerDataPacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<PlayerDataPacket>();
-            packet.Username = reader.ReadString();
-
-            return packet;
+            this.Username = reader.ReadString();
         }
     }
 }

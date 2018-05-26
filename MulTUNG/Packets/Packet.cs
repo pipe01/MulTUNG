@@ -21,7 +21,9 @@ namespace MulTUNG.Packets
         }
 
         protected abstract byte[] SerializeInner();
-        
+
+        public abstract void Deserialize(IReader reader);
+
         public abstract PacketType Type { get; }
 
         public float Time { get; set; }

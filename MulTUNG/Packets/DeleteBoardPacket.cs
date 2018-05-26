@@ -14,12 +14,9 @@ namespace MulTUNG.Packets
             return BitConverter.GetBytes(BoardID);
         }
 
-        public static DeleteBoardPacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<DeleteBoardPacket>();
-            packet.BoardID = reader.ReadInt32();
-
-            return packet;
+            this.BoardID = reader.ReadInt32();
         }
     }
 }

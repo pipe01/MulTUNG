@@ -13,12 +13,9 @@
                 .Done();
         }
 
-        public static WorldDataPacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<WorldDataPacket>();
-            packet.Data = reader.ReadByteArray();
-
-            return packet;
+            this.Data = reader.ReadByteArray();
         }
     }
 }

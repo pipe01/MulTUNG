@@ -55,16 +55,13 @@ namespace MulTUNG.Packets
                 .Done();
         }
 
-        public static PlaceComponentPacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<PlaceComponentPacket>();
-            packet.NetID = reader.ReadInt32();
-            packet.ParentBoardID = reader.ReadInt32();
-            packet.LocalPosition = reader.ReadVector3();
-            packet.EulerAngles = reader.ReadVector3();
-            packet.SavedObject = reader.ReadBinaryObject<SavedObjectV2>();
-
-            return packet;
+            this.NetID = reader.ReadInt32();
+            this.ParentBoardID = reader.ReadInt32();
+            this.LocalPosition = reader.ReadVector3();
+            this.EulerAngles = reader.ReadVector3();
+            this.SavedObject = reader.ReadBinaryObject<SavedObjectV2>();
         }
     }
 }

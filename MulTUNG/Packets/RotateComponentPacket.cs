@@ -18,13 +18,10 @@ namespace MulTUNG.Packets
                 .Done();
         }
 
-        public static RotateComponentPacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<RotateComponentPacket>();
-            packet.ComponentID = reader.ReadInt32();
-            packet.EulerAngles = reader.ReadVector3();
-
-            return packet;
+            this.ComponentID = reader.ReadInt32();
+            this.EulerAngles = reader.ReadVector3();
         }
     }
 }

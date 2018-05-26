@@ -29,16 +29,13 @@ namespace MulTUNG.Packets
                 .Done();
         }
 
-        public static PlaceBoardPacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<PlaceBoardPacket>();
-            packet.ParentBoardID = reader.ReadInt32();
-            packet.AuthorID = reader.ReadInt32();
-            packet.Position = reader.ReadVector3();
-            packet.EulerAngles = reader.ReadVector3();
-            packet.SavedBoard = Compressor.Decompress(reader.ReadByteArray());
-            
-            return packet;
+            this.ParentBoardID = reader.ReadInt32();
+            this.AuthorID = reader.ReadInt32();
+            this.Position = reader.ReadVector3();
+            this.EulerAngles = reader.ReadVector3();
+            this.SavedBoard = Compressor.Decompress(reader.ReadByteArray());
         }
 
         public static PlaceBoardPacket BuildFromBoard(CircuitBoard board, Transform parent)

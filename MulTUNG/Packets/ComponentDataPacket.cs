@@ -20,14 +20,11 @@ namespace MulTUNG.Packets
                 .Done();
         }
 
-        public static ComponentDataPacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<ComponentDataPacket>();
-            packet.NetID = reader.ReadInt32();
-            packet.ComponentType = (ComponentType)reader.ReadInt32();
-            packet.Data = reader.ReadBinaryObject<List<object>>();
-
-            return packet;
+            this.NetID = reader.ReadInt32();
+            this.ComponentType = (ComponentType)reader.ReadInt32();
+            this.Data = reader.ReadBinaryObject<List<object>>();
         }
     }
 }

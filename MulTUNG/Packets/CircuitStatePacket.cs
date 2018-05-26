@@ -29,13 +29,11 @@ namespace MulTUNG.Packets
             return builder.Done();
         }
 
-        public static CircuitStatePacket Deserialize(IReader reader)
+        public override void Deserialize(IReader reader)
         {
-            var packet = reader.ReadBasePacket<CircuitStatePacket>();
-
             int count = reader.ReadInt32();
 
-            packet.States = new Dictionary<KeyValuePair<int, byte>, bool>();
+            this.States = new Dictionary<KeyValuePair<int, byte>, bool>();
 
             for (int i = 0; i < count; i++)
             {
@@ -43,10 +41,8 @@ namespace MulTUNG.Packets
                 byte keyValue = reader.ReadByte();
                 bool value = reader.ReadByte() == 1;
 
-                packet.States.Add(new KeyValuePair<int, byte>(keyKey, keyValue), value);
+                this.States.Add(new KeyValuePair<int, byte>(keyKey, keyValue), value);
             }
-
-            return packet;
         }
 
         public static CircuitStatePacket Build(bool forceFull = false)

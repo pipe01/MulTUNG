@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace MulTUNG.Packets
 {
     public static class PacketDeserializer
     {
-        private static IDictionary<PacketType, Func<byte[], Packet>> RawHandlers = new Dictionary<PacketType, Func<byte[], Packet>>();
+        private static IDictionary<PacketType, ObjectActivator> Builders = new Dictionary<PacketType, ObjectActivator>();
 
-        private static IDictionary<PacketType, Func<IReader, Packet>> Handlers = new Dictionary<PacketType, Func<IReader, Packet>>();
+        private delegate object ObjectActivator();
 
         static PacketDeserializer()
         {
@@ -18,28 +19,30 @@ namespace MulTUNG.Packets
             foreach (PacketType item in Enum.GetValues(typeof(PacketType)))
             {
                 var cls = ass.GetType(@namespace + item.ToString() + "Packet");
-                var method = cls?.GetMethod("Deserialize", BindingFlags.Public | BindingFlags.Static);
 
-                if (cls == null || method == null || method.GetParameters()[0].ParameterType != typeof(IReader))
+                if (cls == null)
                     continue;
-                
-                Handlers.Add(item, (Func<IReader, Packet>)Delegate.CreateDelegate(typeof(Func<IReader, Packet>), method));
+
+                var newExp = Expression.New(cls);
+                var lambda = Expression.Lambda(typeof(ObjectActivator), newExp);
+                var compiled = (ObjectActivator)lambda.Compile();
+
+                Builders.Add(item, compiled);
             }
         }
 
         public static Packet DeserializePacket(IReader reader)
         {
-            var packetType = reader.ReadPacketType();
+            var packetTypeEnum = reader.ReadPacketType();
 
-            if (Handlers.TryGetValue(packetType, out var handler))
+            if (Builders.TryGetValue(packetTypeEnum, out var builder))
             {
-                return handler(reader);
-            }
-            else if (RawHandlers.TryGetValue(packetType, out var rawHandler))
-            {
-                byte[] data = reader.ReadRaw(int.MaxValue);
+                var packet = (Packet)builder();
+                packet.Time = reader.ReadFloat();
+                packet.SenderID = reader.ReadInt32();
+                packet.Deserialize(reader);
 
-                return rawHandler(data);
+                return packet;
             }
 
             return null;
