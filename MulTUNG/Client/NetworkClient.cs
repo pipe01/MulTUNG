@@ -117,6 +117,7 @@ namespace MulTUNG
                             LastStatus = Client.ConnectionStatus;
                             break;
                     }
+
                     Client.Recycle(msg);
                 }
             });
@@ -140,7 +141,7 @@ namespace MulTUNG
             EnterEvent.Reset();
             IsInGameplay = false;
 
-            //EverythingHider.HideEverything();
+            EverythingHider.HideEverything();
             SceneManager.LoadScene("main menu");
         }
         

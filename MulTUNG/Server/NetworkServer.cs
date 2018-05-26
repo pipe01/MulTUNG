@@ -3,6 +3,7 @@ using MulTUNG;
 using MulTUNG.Packets;
 using MulTUNG.Server;
 using MulTUNG.Utils;
+using PiTung.Console;
 using PiTung.Mod_utilities;
 using System;
 using System.Collections.Generic;
@@ -205,7 +206,11 @@ namespace Server
         public void Stop()
         {
             Server.Shutdown("hasta la vista baby");
-            Server = null;
+
+            while (Server.Status != NetPeerStatus.NotRunning)
+            {
+                Thread.Sleep(100);
+            }
 
             PlayerManager.Reset();
         }
