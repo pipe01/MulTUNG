@@ -2,6 +2,8 @@
 using MulTUNG.Packeting.Packets;
 using MulTUNG.UI;
 using MulTUNG.Utils;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using PiTung;
 using PiTung.Console;
 using PiTung.Mod_utilities;
@@ -30,6 +32,7 @@ namespace MulTUNG
         public static SynchronizationContext SynchronizationContext;
         public static bool ShowStatusWindow;
         public static string Status = "";
+        public static AudioClip PopAudio { get; private set; }
 
         private IDialog ConnectDialog;
 
@@ -52,6 +55,8 @@ namespace MulTUNG
 
             World.DeleteSave();
             SynchronizationContext = SynchronizationContext.Current;
+
+            LoadChatAudio();
         }
 
         public override void AfterPatch()
@@ -120,6 +125,30 @@ namespace MulTUNG
                 GUILayout.FlexibleSpace();
             }
             GUILayout.EndVertical();
+        }
+
+        private void LoadChatAudio()
+        {
+            using (var fileStream = new MemoryStream(Properties.Resources.chatmessage))
+            {
+                WaveStream readerStream = new Mp3FileReader(fileStream);
+                SampleChannel sampleChannel = new SampleChannel(readerStream);
+
+                int destBytesPerSample = 4 * sampleChannel.WaveFormat.Channels;
+                int sourceBytesPerSample = (readerStream.WaveFormat.BitsPerSample / 8) * readerStream.WaveFormat.Channels;
+                int byteLength = (int)(destBytesPerSample * (readerStream.Length / sourceBytesPerSample));
+
+                float[] audioFile = new float[byteLength / sizeof(float)];
+                sampleChannel.Read(audioFile, 0, audioFile.Length);
+
+                PopAudio = AudioClip.Create("test.mp3", byteLength, sampleChannel.WaveFormat.Channels, sampleChannel.WaveFormat.SampleRate, false);
+                PopAudio.SetData(audioFile, 0);
+            }
+        }
+
+        public static void PlayChatPop()
+        {
+            SoundPlayer.PlaySoundGlobal(PopAudio);
         }
 
         public override void OnApplicationQuit()

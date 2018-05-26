@@ -136,6 +136,7 @@ namespace MulTUNG
                         break;
                     case ChatMessagePacket chat:
                         IGConsole.Log($"<b>{chat.Username}</b>: {chat.Text}");
+                        MulTUNG.PlayChatPop();
 
                         break;
                 }

@@ -63,6 +63,16 @@ namespace MulTUNG.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] chatmessage {
+            get {
+                object obj = ResourceManager.GetObject("chatmessage", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] Image_2D_0001_0008 {
             get {
                 object obj = ResourceManager.GetObject("Image_2D_0001_0008", resourceCulture);
@@ -96,6 +106,16 @@ namespace MulTUNG.Properties {
         internal static byte[] Lidgren_Network {
             get {
                 object obj = ResourceManager.GetObject("Lidgren_Network", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] NAudio_Unity {
+            get {
+                object obj = ResourceManager.GetObject("NAudio_Unity", resourceCulture);
                 return ((byte[])(obj));
             }
         }

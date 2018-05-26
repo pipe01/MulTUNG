@@ -14,7 +14,8 @@ public static class Preloader
     {
         var dic = new Dictionary<string, byte[]>
         {
-            ["Lidgren.Network"] = Resources.Lidgren_Network
+            ["Lidgren.Network"] = Resources.Lidgren_Network,
+            ["NAudio-Unity"] = Resources.NAudio_Unity,
         };
 
         var name = new AssemblyName(args.Name).Name;
