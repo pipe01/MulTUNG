@@ -126,6 +126,6 @@
   </Target>
   <Import Project="..\packages\Costura.Fody.2.0.1\build\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.2.0.1\build\Costura.Fody.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "C:\Users\Pipe\Downloads\The Ultimate Nerd Game\$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "C:\Users\Pipe\Downloads\The Ultimate Nerd Game\logs\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

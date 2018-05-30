@@ -14,10 +14,13 @@ namespace MulTUNG.Utils
         private static BinaryFormatter BinFormatter = new BinaryFormatter();
 
         private static string Random = "";
-        private static string LogPath => "./" + (Network.IsClient ? "client" : Network.IsServer ? "server" : "unknown") + Random + ".log";
+        private static string LogPath => "./logs/" + (Network.IsClient ? "client" : Network.IsServer ? "server" : "unknown") + Random + ".log";
         
         private static void OpenFile(bool @catch = true)
         {
+            if (!Directory.Exists("logs"))
+                Directory.CreateDirectory("logs");
+
             if (LogFile == null)
             {
                 if (File.Exists(LogPath))
@@ -65,10 +68,7 @@ namespace MulTUNG.Utils
                 {
                     BinFormatter.Serialize(LogFile, new PacketLogEntry(packet, sending));
                 }
-                catch (Exception ex)
-                {
-                    MyDebug.Log(ex);
-                }
+                catch { }
             }
         }
     }
