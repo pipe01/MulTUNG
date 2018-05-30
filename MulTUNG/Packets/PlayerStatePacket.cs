@@ -5,8 +5,7 @@ namespace MulTUNG.Packets
     public class PlayerStatePacket : Packet
     {
         public override PacketType Type => PacketType.PlayerState;
-        //public override bool ShouldBroadcast => true;
-
+        
         public int PlayerID { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 EulerAngles { get; set; }

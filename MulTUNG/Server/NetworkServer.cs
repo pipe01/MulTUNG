@@ -20,7 +20,8 @@ namespace Server
         public string Username => Network.ServerUsername;
 
         public bool Running => Server?.Status == NetPeerStatus.Running;
-        
+        public bool IsSendingWorld { get; set; }
+
         private readonly int MaxUsernameLength;
         private readonly IDictionary<int, Player> Players = new Dictionary<int, Player>();
 
@@ -93,7 +94,8 @@ namespace Server
                         msg.SenderConnection.SendMessage(new PlayerWelcomePacket
                         {
                             YourID = id,
-                            ServerUsername = Network.Username
+                            ServerUsername = Network.Username,
+                            Players = Players.Select(o => new Tuple<int, string>(o.Key, o.Value.Username)).ToList()
                         }.GetMessage(Server), NetDeliveryMethod.ReliableOrdered, 0);
 
                         var player = new Player(id, msg.SenderConnection);
@@ -163,28 +165,28 @@ namespace Server
 
         public void Broadcast(Packet packet, NetDeliveryMethod delivery)
         {
-            Network.ProcessPacket(packet, 0);
-
-            var msg = packet.GetMessage(Server);
-            
-            Server.SendToAll(msg, delivery);
-
             PacketLog.LogSend(packet);
+            
+            Network.ProcessPacket(packet, 0);
+            
+            var msg = packet.GetMessage(Server);
+
+            Server.SendToAll(msg, delivery);
         }
 
         public void SendWorld(int playerId)
         {
-            //foreach (var item in Players)
-            //{
-            //    if (item.Key == playerId)
-            //        continue;
-
-            //    item.Value.Connection.SendMessage(new SignalPacket(SignalData.Pause).GetMessage(Server), NetDeliveryMethod.ReliableOrdered, 0);
-            //}
-
             var player = Players[playerId];
 
+            //Send(new PauseGamePacket
+            //{
+            //    Reason = $"{player.Username} is downloading the world",
+            //    ExceptID = playerId
+            //});
+
             Log.WriteLine("Sending world to player " + playerId);
+
+            IsSendingWorld = true;
 
             byte[] world = World.Serialize();
 
@@ -199,8 +201,6 @@ namespace Server
             player.Connection.SendMessage(msg, NetDeliveryMethod.ReliableOrdered, 0);
             
             player.Connection.SendMessage(CircuitStatePacket.Build(true).GetMessage(Server), NetDeliveryMethod.ReliableOrdered, 0);
-
-            //Network.ResumeGame();
         }
 
         public void Stop()
@@ -213,6 +213,11 @@ namespace Server
             }
 
             PlayerManager.Reset();
+        }
+
+        public bool TryGetPlayerById(int id, out Player player)
+        {
+            return Players.TryGetValue(id, out player);
         }
     }
 }

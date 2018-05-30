@@ -2,9 +2,8 @@
 {
     public enum SignalData
     {
-        CircuitUpdate,
         RequestWorld,
-        Pause,
-        Resume
+        Resume,
+        WorldLoaded
     }
 }

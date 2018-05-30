@@ -13,9 +13,10 @@ namespace MulTUNG.Utils
         private static Stream LogFile;
         private static BinaryFormatter BinFormatter = new BinaryFormatter();
 
-        private static string LogPath => "./" + (Network.IsClient ? "client" : Network.IsServer ? "server" : "unknown") + ".log";
+        private static string Random = "";
+        private static string LogPath => "./" + (Network.IsClient ? "client" : Network.IsServer ? "server" : "unknown") + Random + ".log";
         
-        private static void OpenFile()
+        private static void OpenFile(bool @catch = true)
         {
             if (LogFile == null)
             {
@@ -24,7 +25,15 @@ namespace MulTUNG.Utils
                     if (File.Exists(LogPath + ".old"))
                         File.Delete(LogPath + ".old");
 
-                    File.Move(LogPath, LogPath + ".old");
+                    try
+                    {
+                        File.Move(LogPath, LogPath + ".old");
+                    }
+                    catch (IOException) when (@catch)
+                    {
+                        Random = UnityEngine.Random.Range(1, 99).ToString();
+                        OpenFile(false);
+                    }
                 }
 
                 LogFile = File.Open(LogPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
@@ -37,20 +46,21 @@ namespace MulTUNG.Utils
         [Conditional("DEBUG")]
         private static void Log(Packet packet, bool sending)
         {
-            try
+            lock (BinFormatter)
             {
-                OpenFile();
-            }
-            catch
-            {
-                return;
-            }
-            
-            if (packet == null || LogFile == null)
-                return;
+                try
+                {
+                    OpenFile();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Couldn't open packet log file. " + ex);
+                    return;
+                }
 
-            lock (LogFile)
-            {
+                if (packet == null || LogFile == null)
+                    return;
+
                 try
                 {
                     BinFormatter.Serialize(LogFile, new PacketLogEntry(packet, sending));

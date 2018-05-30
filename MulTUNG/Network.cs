@@ -45,6 +45,11 @@ namespace MulTUNG
                         Username = NetworkClient.Instance.Username
                     });
 
+                    foreach (var item in wel.Players)
+                    {
+                        PlayerManager.NewPlayer(item.Item1, item.Item2);
+                    }
+
                     break;
                 case PlayerStatePacket state:
                     if (IsServer)
@@ -99,6 +104,8 @@ namespace MulTUNG
                 case WorldDataPacket world:
                     MulTUNG.SynchronizationContext.Send(o => World.Deserialize(((WorldDataPacket)o).Data), world);
 
+                    SendPacket(new SignalPacket(SignalData.WorldLoaded));
+
                     if (MulTUNG.ShowStatusWindow)
                     {
                         MulTUNG.ShowStatusWindow = false;
@@ -131,6 +138,17 @@ namespace MulTUNG
                         MulTUNG.PlayChatPop();
 
                     break;
+                case PauseGamePacket pause:
+                    if (pause.ExceptID == playerId)
+                        break;
+
+                    MulTUNG.ShowStatusWindow = true;
+                    MulTUNG.Status = $"The game was paused:\n{pause.Reason}";
+
+                    IsPaused = true;
+                    Time.timeScale = 0;
+
+                    break;
             }
 
             return true;
@@ -140,16 +158,8 @@ namespace MulTUNG
         {
             switch (signal.Data)
             {
-                case SignalData.CircuitUpdate:
-                    break;
-                case SignalData.RequestWorld:
-                    if (IsServer)
-                        NetworkServer.Instance.SendWorld(signal.SenderID);
-
-                    break;
-                case SignalData.Pause:
-                    IsPaused = true;
-                    Time.timeScale = 0;
+                case SignalData.RequestWorld when IsServer:
+                    NetworkServer.Instance.SendWorld(signal.SenderID);
 
                     break;
                 case SignalData.Resume:
@@ -166,7 +176,7 @@ namespace MulTUNG
             Timer timer = null;
             timer = new Timer(_ =>
             {
-                if (!Connected || ModUtilities.IsOnMainMenu)
+                if (!Connected || (ModUtilities.IsOnMainMenu && !Headlesser.IsHeadless))
                 {
                     timer.Dispose();
                     return;
@@ -199,7 +209,7 @@ namespace MulTUNG
         public static void PauseGame()
         {
             if (IsServer)
-                Network.SendPacket(new SignalPacket(SignalData.Pause));
+                Network.SendPacket(new PauseGamePacket());
         }
 
         public static void ResumeGame()

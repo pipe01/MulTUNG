@@ -1,9 +1,6 @@
-﻿#define NET_462
-
-using Harmony;
+﻿using Harmony;
 using MulTUNG;
-using MulTUNG.Packeting.Packets;
-using Server;
+using MulTUNG.Packets;
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -31,12 +28,7 @@ namespace DummyClient
 
         private Vector3 Position, Rotation;
         private HarmonyInstance Harmony = HarmonyInstance.Create("dummyclient");
-
-        public static void TestMethod()
-        {
-            Console.WriteLine("Not patched!");
-        }
-
+        
         public void Run()
         {
             System.Windows.Forms.Application.EnableVisualStyles();

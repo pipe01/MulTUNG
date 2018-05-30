@@ -1,6 +1,6 @@
 ﻿using Microsoft.CSharp;
 using MulTUNG;
-using MulTUNG.Packeting.Packets;
+using MulTUNG.Packets;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;

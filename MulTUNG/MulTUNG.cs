@@ -40,9 +40,9 @@ namespace MulTUNG
 
         public override void BeforePatch()
         {
-            if (Headlesser.IsHeadless)
+            if (!Headlesser.IsHeadless)
             {
-                HeadlessServer.Instance.Start();
+                LoadChatAudio();
             }
             
             IGConsole.RegisterCommand<Command_connect>();
@@ -55,8 +55,6 @@ namespace MulTUNG
 
             World.DeleteSave();
             SynchronizationContext = SynchronizationContext.Current;
-
-            LoadChatAudio();
         }
 
         public override void AfterPatch()
@@ -80,15 +78,6 @@ namespace MulTUNG
                 }
 
                 ConnectDialog.Draw();
-            }
-
-            if (Network.IsPaused)
-            {
-                Rect size = new Rect(0, 0, 200, 70);
-                size.x = Screen.width / 2 - size.width / 2;
-                size.y = Screen.height / 2 - size.height / 2;
-
-                GUI.Box(size, "A player is downloading the world...");
             }
 
             if (ShowStatusWindow)
