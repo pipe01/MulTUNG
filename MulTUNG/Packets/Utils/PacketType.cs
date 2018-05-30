@@ -22,5 +22,6 @@
         PlayerData,
         ChatMessage,
         PauseGame,
+        PaintBoard
     }
 }

@@ -150,6 +150,10 @@ namespace MulTUNG
                     Time.timeScale = 0;
 
                     break;
+                case PaintBoardPacket paint:
+                    MulTUNG.SynchronizationContext.Post(o => ComponentActions.DoPaint((PaintBoardPacket)o), paint);
+
+                    break;
             }
 
             return true;

@@ -51,6 +51,12 @@ namespace MulTUNG.Packets
                 .Write(d.y)
                 .Write(d.z);
 
+        public PacketBuilder Write(Color d) =>
+                Write(d.r)
+               .Write(d.g)
+               .Write(d.b)
+               .Write(d.a);
+
         public PacketBuilder Write(string d) => Write(Encoding.UTF8.GetBytes(d ?? ""));
 
         public PacketBuilder Write(byte[] d)

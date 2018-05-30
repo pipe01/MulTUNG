@@ -1,4 +1,5 @@
 ﻿using Lidgren.Network;
+using PiTung.Console;
 using System;
 
 namespace MulTUNG.Packets
@@ -32,7 +33,14 @@ namespace MulTUNG.Packets
         public NetOutgoingMessage GetMessage(NetPeer peer)
         {
             var msg = peer.CreateMessage();
-            msg.Write(this.Serialize());
+            try
+            {
+                msg.Write(this.Serialize());
+            }
+            catch (Exception ex)
+            {
+                IGConsole.Log(ex);
+            }
             return msg;
         }
     }

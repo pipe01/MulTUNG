@@ -57,6 +57,8 @@ namespace MulTUNG.Packets
         
         public Vector3 ReadVector3() => Message.ReadVector3();
 
+        public Color ReadColor() => new Color(ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat());
+
         public byte[] ReadRaw(int length)
         {
             int maxLength = Message.LengthBytes - Message.PositionInBytes;
@@ -123,6 +125,8 @@ namespace MulTUNG.Packets
 
         public Vector3 ReadVector3() => new Vector3(ReadFloat(), ReadFloat(), ReadFloat());
 
+        public Color ReadColor() => new Color(ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat());
+
         public string ReadString()
         {
             int length = ReadInt32();
@@ -151,6 +155,7 @@ namespace MulTUNG.Packets
         float ReadFloat();
         bool ReadBool();
         Vector3 ReadVector3();
+        Color ReadColor();
         string ReadString();
         byte[] ReadByteArray();
         T ReadBinaryObject<T>();

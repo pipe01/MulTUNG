@@ -96,6 +96,7 @@
     <Compile Include="Packets\ChatMessagePacket.cs" />
     <Compile Include="Packets\CircuitStatePacket.cs" />
     <Compile Include="Packets\ComponentDataPacket.cs" />
+    <Compile Include="Packets\PaintBoardPacket.cs" />
     <Compile Include="Packets\PauseGamePacket.cs" />
     <Compile Include="Packets\PlayerDataPacket.cs" />
     <Compile Include="Packets\SignalPacket.cs" />
@@ -129,6 +130,7 @@
     <Compile Include="Patches\LabelPatch.cs" />
     <Compile Include="Patches\NoisemakerMenuPatch.cs" />
     <Compile Include="Client\PlayerManager.cs" />
+    <Compile Include="Patches\PaintBoardMenuPatch.cs" />
     <Compile Include="Patches\PatchesCommon.cs" />
     <Compile Include="Patches\PauseMenuPatch.cs" />
     <Compile Include="Patches\SavedObjectUtilitiesCreateSavedObjectFromPatch.cs" />

@@ -147,5 +147,13 @@ namespace MulTUNG.Utils
 
             return true;
         }
+
+        public static void DoPaint(PaintBoardPacket packet)
+        {
+            var obj = NetObject.GetByNetId(packet.BoardID).gameObject;
+            var board = obj.GetComponent<CircuitBoard>();
+
+            board.SetBoardColor(packet.Color);
+        }
     }
 }
