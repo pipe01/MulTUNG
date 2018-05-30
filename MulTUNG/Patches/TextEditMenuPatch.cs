@@ -10,6 +10,22 @@ namespace MulTUNG.Patches
     internal static class TextEditMenuPatch
     {
         [PatchMethod]
+        public static bool RunTextMenu()
+        {
+            try
+            {
+                var b = PatchesCommon.LabelBeingEdited.transform.parent;
+            }
+            catch (NullReferenceException)
+            {
+                TextEditMenu.Instance.Done();
+                return false;
+            }
+
+            return true;
+        }
+
+        [PatchMethod]
         public static void Done()
         {
             NetObject netObj;

@@ -1,4 +1,5 @@
 ﻿using MulTUNG.Packets;
+using PiTung.Console;
 using References;
 using SavedObjects;
 using System.IO;
@@ -117,6 +118,12 @@ namespace MulTUNG
         {
             var obj = NetObject.GetByNetId(Packet.ComponentNetID).gameObject;
 
+            var interactable = obj.GetComponentInChildren<Interactable>();
+            if (interactable is DisplayInteractable)
+            {
+                EditDisplayColorMenu.Instance.DoneMenu();
+            }
+
             CircuitInput[] componentsInChildren = obj.GetComponentsInChildren<CircuitInput>();
             CircuitOutput[] componentsInChildren2 = obj.GetComponentsInChildren<CircuitOutput>();
             foreach (CircuitInput input in componentsInChildren)
@@ -126,12 +133,6 @@ namespace MulTUNG
             foreach (CircuitOutput output in componentsInChildren2)
             {
                 StuffDeleter.DestroyOutput(output);
-            }
-
-            var label = obj.GetComponent<Label>();
-            if (label != null && PatchesCommon.LabelBeingEdited == label)
-            {
-                TextEditMenu.Instance.Done();
             }
 
             GameObject.Destroy(obj);
