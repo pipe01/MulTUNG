@@ -39,7 +39,7 @@ namespace MulTUNG
             Client = new NetClient(config);
             Client.Start();
             var conn = Client.Connect(endPoint);
-
+            
             ThreadPool.QueueUserWorkItem(o =>
             {
                 var c = o as NetConnection;
@@ -52,6 +52,8 @@ namespace MulTUNG
                     
                     if (c.Status != NetConnectionStatus.Connected && elapsed >= Constants.WaitForConnection)
                     {
+                        Network.IsClient = false;
+
                         MulTUNG.Status = "Couldn't connect to remote server.";
 
                         Thread.Sleep(2000);
@@ -64,6 +66,8 @@ namespace MulTUNG
                     }
                     else if (c.Status == NetConnectionStatus.Connected)
                     {
+                        Network.IsClient = true;
+
                         MulTUNG.SynchronizationContext.Send(_ =>
                         {
                             SaveManager.SaveName = MulTUNG.ForbiddenSaveName;
@@ -127,6 +131,8 @@ namespace MulTUNG
 
         public void Disconnect(bool force = false)
         {
+            Network.IsClient = false;
+
             if (ModUtilities.IsOnMainMenu || (LastStatus != NetConnectionStatus.Connected && !force))
                 return;
 

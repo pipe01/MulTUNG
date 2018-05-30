@@ -42,6 +42,8 @@ namespace Server
             Server = new NetServer(config);
             Server.Start();
 
+            Network.IsServer = true;
+
             ThreadPool.QueueUserWorkItem(_ =>
             {
                 NetIncomingMessage msg;
@@ -206,6 +208,7 @@ namespace Server
         public void Stop()
         {
             Server.Shutdown("hasta la vista baby");
+            Network.IsServer = false;
 
             while (Server.Status != NetPeerStatus.NotRunning)
             {

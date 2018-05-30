@@ -12,9 +12,33 @@ namespace MulTUNG
 {
     public static class Network
     {
-        public static bool Connected => IsClient || IsServer;
-        public static bool IsClient => NetworkClient.Instance?.Connected ?? false;
-        public static bool IsServer => NetworkServer.Instance?.Running ?? false;
+        public static bool Running => IsClient || IsServer;
+
+        private static bool _isClient;
+        public static bool IsClient
+        {
+            get => _isClient;
+            set
+            {
+                _isClient = value;
+
+                if (value)
+                    IsServer = false;
+            }
+        }
+
+        private static bool _isServer;
+        public static bool IsServer
+        {
+            get => _isServer;
+            set
+            {
+                _isServer = value;
+
+                if (value)
+                    IsClient = false;
+            }
+        }
 
         public static bool IsPaused { get; private set; }
 
@@ -24,7 +48,7 @@ namespace MulTUNG
         public static string ServerUsername { get; set; } = "Server";
 
         public const int ServerPlayerID = 0;
-        
+
         public static bool ProcessPacket(Packet packet, int playerId)
         {
             if (packet == null || (packet.SenderID == playerId && !packet.ReceiveOwn))
@@ -181,7 +205,7 @@ namespace MulTUNG
             Timer timer = null;
             timer = new Timer(_ =>
             {
-                if (!Connected || (ModUtilities.IsOnMainMenu && !Headlesser.IsHeadless))
+                if (!Running || (ModUtilities.IsOnMainMenu && !Headlesser.IsHeadless))
                 {
                     timer.Dispose();
                     return;

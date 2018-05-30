@@ -64,6 +64,8 @@ namespace MulTUNG
 
         public override void Update()
         {
+            //IGConsole.Log($"Client: {Network.IsClient}; Server: {Network.IsServer}");
+
             if (ModUtilities.DummyComponent.gameObject.GetComponent<NetUtilitiesComponent>() == null)
                 ModUtilities.DummyComponent.gameObject.AddComponent<NetUtilitiesComponent>();
         }
@@ -89,7 +91,7 @@ namespace MulTUNG
                 GUI.Window(53451, rect, DrawWindow, "");
             }
 
-            if (!ModUtilities.IsOnMainMenu && PauseMenu.Instance.PauseCanvas.enabled && Network.Connected)
+            if (!ModUtilities.IsOnMainMenu && PauseMenu.Instance.PauseCanvas.enabled && Network.Running)
             {
                 PlayersList.Instance.Draw();
             }
