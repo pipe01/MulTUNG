@@ -1,4 +1,5 @@
 ﻿using MulTUNG.Packets;
+using PiTung.Mod_utilities;
 using System;
 using UnityEngine;
 
@@ -20,13 +21,22 @@ namespace MulTUNG.Client
 
         private float TimeBetweenStates = 0;
         private float LastStateTime = 0;
+        private bool Interpolate;
 
         private GUIStyle UsernameStyle;
         private Rect UsernameRect = new Rect();
 
+        void Awake()
+        {
+            Interpolate = Configuration.Get("InterpolatePlayers", true);
+        }
+
         void FixedUpdate()
         {
-            float t = (Time.time - LastStateTime) / TimeBetweenStates;
+            float t = 1;
+
+            if (Interpolate)
+                t = (Time.time - LastStateTime) / TimeBetweenStates;
 
             transform.position = Vector3.Lerp(LastPosition, NextPosition, t);
             transform.rotation = Quaternion.Lerp(LastRotation, NextRotation, t);
