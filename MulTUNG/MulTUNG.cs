@@ -234,6 +234,7 @@ namespace MulTUNG
     {
         public override string Name => "disconnect";
         public override string Usage => Name;
+        public override string Description => "Disconnects from the current server.";
 
         public override bool Execute(IEnumerable<string> arguments)
         {
@@ -246,10 +247,14 @@ namespace MulTUNG
     public class Command_connect : Command
     {
         public override string Name => "connect";
-        public override string Usage => Name;
+        public override string Usage => $"{Name} <ip>";
+        public override string Description => "Connects to a host.";
 
         public override bool Execute(IEnumerable<string> arguments)
         {
+            if (arguments.Count() != 1)
+                return false;
+
             MulTUNG.Connect(new IPEndPoint(IPAddress.Parse(arguments.FirstOrDefault() ?? "127.0.0.1"), Constants.Port));
 
             return true;
@@ -260,6 +265,7 @@ namespace MulTUNG
     {
         public override string Name => "host";
         public override string Usage => $"{Name} [username]";
+        public override string Description => "Hosts a server on the current world with an optional username.";
 
         public override bool Execute(IEnumerable<string> arguments)
         {
@@ -297,6 +303,7 @@ namespace MulTUNG
     {
         public override string Name => "netobjs";
         public override string Usage => Name;
+        public override string Description => "Outputs a tree of net objects to the log.";
 
         public override bool Execute(IEnumerable<string> arguments)
         {
@@ -310,6 +317,8 @@ namespace MulTUNG
     {
         public override string Name => "chat";
         public override string Usage => $"{Name} <message>";
+        public override string[] Aliases => new[] { "c" };
+        public override string Description => "Sends a chat message to everyone on the server.";
 
         public override bool Execute(IEnumerable<string> arguments)
         {
@@ -332,6 +341,7 @@ namespace MulTUNG
     {
         public override string Name => "players";
         public override string Usage => Name;
+        public override string Description => "Prints a list of connected players";
 
         public override bool Execute(IEnumerable<string> arguments)
         {
@@ -348,6 +358,7 @@ namespace MulTUNG
     {
         public override string Name => "stop";
         public override string Usage => Name;
+        public override string Description => "Stops hosting a server.";
 
         public override bool Execute(IEnumerable<string> arguments)
         {
