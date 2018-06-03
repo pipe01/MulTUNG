@@ -40,7 +40,10 @@ namespace MulTUNG.Client
 
             transform.position = Vector3.Lerp(LastPosition, NextPosition, t);
             transform.rotation = Quaternion.Lerp(LastRotation, NextRotation, t);
+        }
 
+        void LateUpdate()
+        {
             if (UsernameStyle == null)
                 return;
 
