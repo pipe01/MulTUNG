@@ -13,15 +13,9 @@ namespace MulTUNG.Utils
         public static bool HasCalledCircuitUpdate { get; set; }
 
         public static CircuitOutput CurrentlyUpdating = null;
-
-        private static FieldInfo IOConnectionsField;
+        
         private static Dictionary<CircuitOutput, StateKey> KeysCache = new Dictionary<CircuitOutput, StateKey>();
-
-        static ComponentActions()
-        {
-            IOConnectionsField = typeof(CircuitOutput).GetField("IOConnections", BindingFlags.NonPublic | BindingFlags.Instance);
-        }
-
+        
         public static void DoAction(UserInputPacket packet)
         {
             var obj = NetObject.GetByNetId(packet.NetID);
@@ -114,9 +108,9 @@ namespace MulTUNG.Utils
             HasCalledCircuitUpdate = true;
         }
 
-        public static bool TryGetKeyFromOutput(CircuitOutput output, out StateKey key)
+        public static bool TryGetKeyFromOutput(CircuitOutput output, out StateKey key, bool clearCache = false)
         {
-            if (!KeysCache.TryGetValue(output, out StateKey k))
+            if (clearCache || !KeysCache.TryGetValue(output, out key))
             {
                 var component = ComponentPlacer.FullComponent(output.transform);
 
@@ -139,10 +133,6 @@ namespace MulTUNG.Utils
                 }
 
                 key = KeysCache[output] = new KeyValuePair<int, byte>(netObj.NetID, ioIndex);
-            }
-            else
-            {
-                key = k;
             }
 
             return true;

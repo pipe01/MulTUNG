@@ -46,10 +46,10 @@ namespace MulTUNG
             var boardObj = SavedObjectUtilities.LoadSavedObject(savedBoard, parentBoard?.transform);
             boardObj.transform.position = Packet.Position;
             boardObj.transform.eulerAngles = Packet.EulerAngles;
-
+            
             foreach (var item in boardObj.GetComponentsInChildren<CircuitOutput>())
             {
-                item.On = item.On;
+                item.On = item.On; //It works 100% of the times most of the time
             }
 
             BoardFunctions.RecalculateClustersOfBoard(boardObj);

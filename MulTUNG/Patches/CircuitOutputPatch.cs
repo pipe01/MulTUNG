@@ -17,6 +17,12 @@ namespace MulTUNG.Patches
 
             if (Network.IsServer)
             {
+                var component = ComponentPlacer.FullComponent(__instance.transform);
+                var netObj = component.GetComponent<NetObject>();
+
+                if (netObj == null)
+                    component.AddComponent<NetObject>();
+
                 CircuitStatePacket.SetOutputState(__instance, value);
             }
 

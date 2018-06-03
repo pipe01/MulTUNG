@@ -1,4 +1,5 @@
 ﻿using MulTUNG.Utils;
+using PiTung.Console;
 using System.Collections.Generic;
 using StateKey = System.Collections.Generic.KeyValuePair<int, byte>;
 
@@ -65,11 +66,16 @@ namespace MulTUNG.Packets
             };
         }
 
-        public static void SetOutputState(CircuitOutput output, bool value)
+        public static void SetOutputState(CircuitOutput output, bool value, bool clearCache = false)
         {
-            if (ComponentActions.TryGetKeyFromOutput(output, out var key))
+            if (ComponentActions.TryGetKeyFromOutput(output, out var key, clearCache))
             {
+                IGConsole.Log(key);
                 CurrentState[key] = Updated[key] = value;
+            }
+            else
+            {
+                IGConsole.Log("No key for " + output.transform.parent);
             }
         }
     }
