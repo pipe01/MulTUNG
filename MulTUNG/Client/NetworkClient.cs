@@ -44,8 +44,7 @@ namespace MulTUNG
             Client.Start();
 
             var approval = Client.CreateMessage();
-            //approval.Write(MulTUNG.Version.ToString());
-            approval.Write("0.0.1");
+            approval.Write(MulTUNG.Version.ToString());
 
             var conn = Client.Connect(endPoint, approval);
             
