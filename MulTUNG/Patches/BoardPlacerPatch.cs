@@ -29,8 +29,7 @@ namespace MulTUNG.Patches
                 var packet = PlaceBoardPacket.BuildFromBoard(boardComp, parent);
 
                 Network.SendPacket(packet);
-
-                MulTUNG.DumpNetobjs();
+                
                 foreach (var item in boardComp.GetComponentsInChildren<CircuitOutput>())
                 {
                     CircuitStatePacket.SetOutputState(item, item.On, true);

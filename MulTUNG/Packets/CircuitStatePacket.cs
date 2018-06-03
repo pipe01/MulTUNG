@@ -70,12 +70,7 @@ namespace MulTUNG.Packets
         {
             if (ComponentActions.TryGetKeyFromOutput(output, out var key, clearCache))
             {
-                IGConsole.Log(key);
                 CurrentState[key] = Updated[key] = value;
-            }
-            else
-            {
-                IGConsole.Log("No key for " + output.transform.parent);
             }
         }
     }
