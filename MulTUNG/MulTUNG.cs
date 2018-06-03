@@ -45,13 +45,13 @@ namespace MulTUNG
                 LoadChatAudio();
             }
             
-            IGConsole.RegisterCommand<Command_connect>();
-            IGConsole.RegisterCommand<Command_disconnect>();
-            IGConsole.RegisterCommand<Command_host>();
-            IGConsole.RegisterCommand<Command_netobjs>();
-            IGConsole.RegisterCommand<Command_chat>();
-            IGConsole.RegisterCommand<Command_players>();
-            IGConsole.RegisterCommand<Command_stop>();
+            Shell.RegisterCommand<Command_connect>();
+            Shell.RegisterCommand<Command_disconnect>();
+            Shell.RegisterCommand<Command_host>();
+            Shell.RegisterCommand<Command_netobjs>();
+            Shell.RegisterCommand<Command_chat>();
+            Shell.RegisterCommand<Command_players>();
+            Shell.RegisterCommand<Command_stop>();
 
             World.DeleteSave();
             SynchronizationContext = SynchronizationContext.Current;
