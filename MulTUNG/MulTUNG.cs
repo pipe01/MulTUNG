@@ -21,10 +21,12 @@ namespace MulTUNG
 {
     public class MulTUNG : Mod
     {
+        public static readonly Version Version = new Version("1.0.3");
+
         public override string Name => "MulTUNG";
         public override string PackageName => "me.pipe01.MulTUNG";
         public override string Author => "pipe01";
-        public override Version ModVersion => new Version("1.0.2");
+        public override Version ModVersion => Version;
         public override string UpdateUrl => "http://pipe0481.heliohost.org/pitung/mods/manifest.ptm";
 
         public const string ForbiddenSaveName = "_multiplayer";

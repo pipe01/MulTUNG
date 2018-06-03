@@ -8,6 +8,7 @@ using MulTUNG.Utils;
 using MulTUNG.Packets.Utils;
 using Server;
 using PiTung;
+using PiTung.Console;
 
 namespace MulTUNG
 {
@@ -24,6 +25,7 @@ namespace MulTUNG
 
         private NetClient Client;
         private NetConnectionStatus LastStatus;
+        private string DisconnectReason = null;
 
         public NetworkClient()
         {
@@ -35,10 +37,17 @@ namespace MulTUNG
 
         public void Connect(IPEndPoint endPoint)
         {
+            DisconnectReason = null;
+
             NetPeerConfiguration config = new NetPeerConfiguration("MulTUNG");
             Client = new NetClient(config);
             Client.Start();
-            var conn = Client.Connect(endPoint);
+
+            var approval = Client.CreateMessage();
+            //approval.Write(MulTUNG.Version.ToString());
+            approval.Write("0.0.1");
+
+            var conn = Client.Connect(endPoint, approval);
             
             ThreadPool.QueueUserWorkItem(o =>
             {
@@ -50,11 +59,13 @@ namespace MulTUNG
                     Thread.Sleep(50);
                     elapsed += 50;
                     
-                    if (c.Status != NetConnectionStatus.Connected && elapsed >= Constants.WaitForConnection)
+                    if ((c.Status != NetConnectionStatus.Connected && elapsed >= Constants.WaitForConnection) || DisconnectReason != null)
                     {
                         Network.IsClient = false;
 
-                        MulTUNG.Status = "Couldn't connect to remote server.";
+                        string status = MulTUNG.Status = "Couldn't connect to remote server." + (DisconnectReason != null ? " Reason: " + DisconnectReason : "");
+
+                        IGConsole.Error(status);
 
                         Thread.Sleep(2000);
 
@@ -113,10 +124,18 @@ namespace MulTUNG
 
                             break;
                         case NetIncomingMessageType.StatusChanged:
-                            Log.WriteLine("Status: " + Client.ConnectionStatus);
+                            var status = (NetConnectionStatus)msg.ReadByte();
+                            Log.WriteLine("Status: " + status);
 
-                            if (Client.ConnectionStatus == NetConnectionStatus.Disconnected)
+                            if (status == NetConnectionStatus.Disconnected)
+                            {
+                                string reason = msg.ReadString();
+
+                                if (!string.IsNullOrEmpty(reason))
+                                    DisconnectReason = reason;
+
                                 Disconnect();
+                            }
 
                             LastStatus = Client.ConnectionStatus;
                             break;

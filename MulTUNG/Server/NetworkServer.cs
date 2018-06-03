@@ -38,6 +38,7 @@ namespace Server
         {
             NetPeerConfiguration config = new NetPeerConfiguration("MulTUNG");
             config.Port = Constants.Port;
+            config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
 
             Server = new NetServer(config);
             Server.Start();
@@ -72,6 +73,20 @@ namespace Server
         {
             switch (msg.MessageType)
             {
+                case NetIncomingMessageType.ConnectionApproval:
+                    string verStr = msg.ReadString();
+                    Version ver = new Version(verStr);
+
+                    if (ver == MulTUNG.MulTUNG.Version)
+                    {
+                        msg.SenderConnection.Approve();
+                    }
+                    else
+                    {
+                        msg.SenderConnection.Deny($"wrong MulTUNG version, server has v{MulTUNG.MulTUNG.Version}.");
+                    }
+
+                    break;
                 case NetIncomingMessageType.Data:
                     var packet = PacketDeserializer.DeserializePacket(new MessagePacketReader(msg));
 
