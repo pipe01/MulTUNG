@@ -153,7 +153,7 @@ namespace MulTUNG
                     if (IsServer)
                         NetworkServer.Instance.ReceivedPlayerData(player);
                     else if (IsClient)
-                        PlayerManager.NewPlayer(player.SenderID, player.Username);
+                        PlayerManager.NewPlayer(player.SenderID, player.Username.Trim());
 
                     break;
                 case ChatMessagePacket chat:

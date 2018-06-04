@@ -45,6 +45,7 @@ namespace MulTUNG
 
             var approval = Client.CreateMessage();
             approval.Write(MulTUNG.Version.ToString());
+            approval.Write(Username);
 
             var conn = Client.Connect(endPoint, approval);
             
@@ -62,11 +63,11 @@ namespace MulTUNG
                     {
                         Network.IsClient = false;
 
-                        string status = MulTUNG.Status = "Couldn't connect to remote server." + (DisconnectReason != null ? " Reason: " + DisconnectReason : "");
+                        string status = MulTUNG.Status = "Couldn't connect to remote server." + (DisconnectReason != null ? " Check the console for more details." : "");
 
-                        IGConsole.Error(status);
+                        IGConsole.Error("Couldn't connect to remote server: " + DisconnectReason);
 
-                        Thread.Sleep(2000);
+                        Thread.Sleep(3000);
 
                         MulTUNG.ShowMainMenuCanvases();
                         MulTUNG.ShowStatusWindow = false;

@@ -8,6 +8,7 @@ using PiTung.Mod_utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using Network = MulTUNG.Network;
 
@@ -37,7 +38,8 @@ namespace Server
         public void Start()
         {
             NetPeerConfiguration config = new NetPeerConfiguration("MulTUNG");
-            config.Port = Constants.Port;
+            config.Port = (int)Configuration.Get<long>("ServerPort", 5678);
+            config.LocalAddress = IPAddress.Parse(Configuration.Get("LocalServerIP", "127.0.0.1"));
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
 
             Server = new NetServer(config);
@@ -66,7 +68,7 @@ namespace Server
             
             Network.StartPositionUpdateThread(Constants.PositionUpdateInterval);
 
-            Log.WriteLine("Listening on port " + Constants.Port);
+            Log.WriteLine("Listening on port " + config.Port);
         }
 
         private void HandleMessage(NetIncomingMessage msg)
@@ -80,6 +82,25 @@ namespace Server
                     if (ver == MulTUNG.MulTUNG.Version)
                     {
                         msg.SenderConnection.Approve();
+
+                        string username = msg.ReadString().Trim();
+
+                        if (!Players.Any(o => o.Value.Username.Equals(username)))
+                        {
+                            IGConsole.Log($"{username.Length} {MaxUsernameLength}");
+                            if (username.Length < MaxUsernameLength)
+                            {
+                                msg.SenderConnection.Approve();
+                            }
+                            else
+                            {
+                                msg.SenderConnection.Deny($"your username must be shorter than {MaxUsernameLength} characters.");
+                            }
+                        }
+                        else
+                        {
+                            msg.SenderConnection.Deny("someone is already using that username.");
+                        }
                     }
                     else
                     {
