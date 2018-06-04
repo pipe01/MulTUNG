@@ -105,6 +105,14 @@ namespace MulTUNG
 
             var component = SavedObjectUtilities.LoadSavedObject(Packet.SavedObject, parentBoard?.transform);
             component.AddComponent<NetObject>().NetID = Packet.NetID;
+
+            if (Network.IsServer)
+            {
+                foreach (var item in component.GetComponentsInChildren<CircuitOutput>())
+                {
+                    CircuitStatePacket.SetOutputState(item, item.On, true);
+                }
+            }
         }
     }
 
