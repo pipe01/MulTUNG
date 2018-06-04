@@ -134,7 +134,7 @@
     <value>..\Resources\Lidgren.Network.dll;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="patrick" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\patrick.obj;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\patrick.obj2;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="patrick_mtl" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\patrick.mtl;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

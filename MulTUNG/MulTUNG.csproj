@@ -192,7 +192,7 @@
     <None Include="Resources\Image_2D_0002_0009.png2" />
     <None Include="Resources\Image_2D_0003_0010.png2" />
     <None Include="Resources\patrick.mtl" />
-    <None Include="Resources\patrick.obj" />
+    <None Include="Resources\patrick.obj2" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Lidgren.Network.dll" />
