@@ -205,6 +205,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "C:\Users\Pipe\Downloads\The Ultimate Nerd Game\mods\$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>if "%COMPUTERNAME%" == "DESKTOP-PAE8VI4" copy "$(TargetPath)" "C:\Users\Pipe\Downloads\The Ultimate Nerd Game\mods\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
