@@ -43,7 +43,7 @@
       <HintPath>..\lib\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\lib\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Lidgren.Network">
       <HintPath>..\lib\Lidgren.Network.dll</HintPath>
