@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummyClient", "DummyClient\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Packet Log Viewer", "Packet Log Viewer\Packet Log Viewer.csproj", "{84F676A6-E93A-4F41-91C7-E6237F1473FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeadlessServer", "HeadlessServer\HeadlessServer.csproj", "{73103F41-7C8F-4B6D-9775-340CD1468BB8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
