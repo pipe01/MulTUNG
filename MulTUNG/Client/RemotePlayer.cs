@@ -51,7 +51,10 @@ namespace MulTUNG.Client
             Vector3 screenPos = FirstPersonInteraction.FirstPersonCamera.WorldToScreenPoint(worldPos);
 
             if (screenPos.z < 0)
+            {
+                UsernameRect = Rect.zero;
                 return;
+            }
 
             float distance = Vector3.Distance(worldPos, FirstPersonInteraction.FirstPersonCamera.transform.position);
             float scale = Mathf.LerpUnclamped(0, UsernameSize, MaxDistance / distance);

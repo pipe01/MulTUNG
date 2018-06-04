@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace MulTUNG.Patches
 {
-
     [Target(typeof(StuffPlacer))]
     internal static class StuffPlacerPatch
     {

@@ -48,7 +48,7 @@ namespace MulTUNG
             approval.Write(Username);
 
             var conn = Client.Connect(endPoint, approval);
-            
+
             ThreadPool.QueueUserWorkItem(o =>
             {
                 var c = o as NetConnection;
